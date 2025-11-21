@@ -45,7 +45,7 @@ operation:
         config: {}
         dataType: INT64
         description: ""
-        name: C_CUSTKEY
+        name: C_CUSTKEY1
         nullable: true
         sourceColumnReferences:
           - columnReferences:
