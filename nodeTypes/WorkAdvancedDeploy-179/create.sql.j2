@@ -662,7 +662,7 @@ does not permit copying or modification for any other purpose.
                         {{ stage('Rename Column ' + renameCurCol.name) }}
                         ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
                         RENAME COLUMN `{{ renameCurCol.name }}`
-                        TO "{{ desiredColumnName }}"
+                        TO `{{ desiredColumnName }}`
 
                         {# Metadata changes detected #}
                         {% set nsMetaVariables.metaDataChanged = true %} 
