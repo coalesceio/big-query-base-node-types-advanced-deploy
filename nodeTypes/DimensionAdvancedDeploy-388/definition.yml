@@ -33,7 +33,7 @@ metadata:
         type: dropdownSelector
         default: UNION ALL
         options:
-        - "UNION"
+        - "UNION DISTINCT"
         - "UNION ALL"
         isRequired: false
         enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"

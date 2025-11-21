@@ -3,10 +3,10 @@ id: 39fa03a3-9408-41ec-ad26-e6267703518c
 name: DIM_nation
 operation:
   config:
-    clusterKey: false
+    clusterKey: true
     clusterKeyConfig:
       items:
-        - {}
+        - clustColumn: null
     dataRetention: ex. 30
     groupByAll: false
     insertStrategy: UNION ALL
@@ -15,8 +15,7 @@ operation:
     partitionBy: false
     partitionConfig:
       items:
-        - partByColExpression: ex. RANGE_BUCKET(<col_name>, [1, 100, 200]) DATE(TIMESTAMP_TRUNC(<col_name>, DAY))
-          partByColumn: null
+        - {}
     postSQL: ""
     preSQL: ""
     primary: false
@@ -64,6 +63,7 @@ operation:
         config: {}
         dataType: INT64
         description: ""
+        isBusinessKey: true
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
