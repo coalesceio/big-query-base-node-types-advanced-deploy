@@ -1,0 +1,262 @@
+fileVersion: 1
+id: "388"
+isDisabled: false
+metadata:
+  defaultStorageLocation: null
+  error: null
+  nodeMetadataSpec: |-
+    capitalized: Dimension Advanced Deploy
+    short: DIM
+    tagColor: '#1E339A'
+    plural: Dimensions
+
+    deployStrategy: advanced
+
+    config:
+    - groupName: General Options
+      items:
+      - type: materializationSelector
+        isRequired: true
+        default: table
+        options:
+        - table
+        - view
+
+      - type: overrideSQLToggle
+        enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
+
+      - type: multisourceToggle
+        enableIf: "{% if node.materializationType == 'view' and node.override.create.enabled %} false {% else %} true {% endif %}"
+
+      - displayName: Multi Source Strategy
+        attributeName: insertStrategy
+        type: dropdownSelector
+        default: UNION ALL
+        options:
+        - "UNION"
+        - "UNION ALL"
+        isRequired: false
+        enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        displayName: Primary Key
+        default: false
+        attributeName: primary
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: Primary Key Name
+        attributeName: primaryKeyName
+        enableIf: "{% if node.materializationType != 'view' and config.primary %} true {% else %} false {% endif %}"
+
+      - type: tabular   
+        displayName: Primary Key Columns
+        attributeName: primaryKeyCol
+        columns:
+
+        -  type: columnDropdownSelector
+           displayName: Primary Key Columns
+           attributeName: primaryKey
+
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.primary %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: partitionBy
+        displayName: 'Enable Partition'
+        default: false
+        isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - displayName: 'Partion By Based On'
+        attributeName: partByBase
+        type: dropdownSelector
+        default: INGESTION TIME
+        options:
+        - "INGESTION TIME"
+        - "TIME UNIT"
+        - "INTEGER RANGE"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+
+      - type: tabular
+        displayName: 'Partion By (Choose Only One Column)'
+        attributeName: partitionConfig
+
+        columns:
+
+        -  type: columnDropdownSelector
+           displayName: Partition By Column
+           attributeName: partByColumn
+           isRequired: false
+
+        -  type: textBox
+           displayName: Expression (For DATE and RANGE partitions)
+           attributeName: partByColExpression
+           default: "ex. RANGE_BUCKET(<col_name>, [1, 100, 200])
+                      DATE(TIMESTAMP_TRUNC(<col_name>, DAY))"
+           isRequired: false
+
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partByBase != 'INGESTION TIME' and config.partitionBy %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: Partition Expiration Days (Blank/Integers Only)
+        attributeName: partExpireDays
+        default: "ex. 30"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: partitionFilter
+        displayName: 'Require Partition Filter'
+        default: false
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: clusterKey
+        displayName: 'Enable Cluster'
+        default: false
+        isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - type: tabular
+        displayName: 'Cluster By (Max Limit: 4 Columns)'
+        attributeName: clusterKeyConfig
+        columns:
+
+        -  type: columnDropdownSelector
+           displayName: Cluster By Columns
+           attributeName: clustColumn
+           isRequired: false
+      
+        isRequired: false
+        enableIf: "{% if node.materializationType != view and config.clusterKey %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: Data Retention Period (Blank/Integers Only)
+        attributeName: dataRetention
+        default: "ex. 30"
+        isRequired: false
+
+      - type: tabular
+        displayName: Table Expiration (Processes First row only)
+        attributeName: tabExpirationConfig
+
+        columns:
+
+        -  displayName: 'Expiration Type'
+           attributeName: exprnType
+           type: dropdownSelector
+           default: ''
+           options:
+           - ""
+           - "EXACT TIMESTAMP"
+           - "EXACT DATE ONLY"
+           - "DAYS FROM NOW"
+           isRequired: false
+
+        -  type: textBox
+           displayName: Expression
+           attributeName: exprnTypeExpression
+           default: "ex. EXACT TIMESTAMP - 2024-12-31 23:59:59
+                          EXACT DATE ONLY - 2024-12-31
+                          DAYS FROM NOW - 30"
+           isRequired: false
+
+        isRequired: false
+
+    - groupName: Dimension Options
+
+      items:
+      - type: businessKeyColumns
+        isRequired: true
+
+      - type: changeTrackingColumns
+        isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - displayName: Truncate Before
+        attributeName: truncateBefore
+        type: toggleButton
+        default: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - displayName: Distinct
+        attributeName: selectDistinct
+        type: toggleButton
+        enableIf: "{% if config.groupByAll or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
+        default: false
+        
+      - displayName: Group By All
+        attributeName: groupByAll
+        type: toggleButton
+        default: false
+        enableIf: "{% if config.selectDistinct or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
+
+      - displayName: Enable Tests
+        attributeName: testsEnabled
+        type: toggleButton
+        default: false
+
+    - groupName: Pre / Post SQL
+      items:
+      - displayName: Pre-SQL
+        attributeName: preSQL
+        type: textBox
+        syntax: sql
+        isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - displayName: Post-SQL
+        attributeName: postSQL
+        type: textBox
+        syntax: sql
+        isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+    systemColumns:
+    - displayName: '{{NODE_NAME}}_KEY'
+      transform: ''
+      dataType: NUMBER
+      placement: beginning
+      attributeName: isSurrogateKey
+
+    - displayName: SYSTEM_VERSION
+      transform: ''
+      dataType: NUMBER
+      placement: end
+      attributeName: isSystemVersion
+
+    - displayName: SYSTEM_CURRENT_FLAG
+      transform: ''
+      dataType: VARCHAR
+      placement: end
+      attributeName: isSystemCurrentFlag
+
+    - displayName: SYSTEM_START_DATE
+      transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+      dataType: TIMESTAMP
+      placement: end
+      attributeName: isSystemStartDate
+
+    - displayName: SYSTEM_END_DATE
+      transform: CAST('2999-12-31 00:00:00' AS TIMESTAMP)
+      dataType: TIMESTAMP
+      placement: end
+      attributeName: isSystemEndDate
+
+    - displayName: SYSTEM_CREATE_DATE
+      transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+      dataType: TIMESTAMP
+      placement: end
+      attributeName: isSystemCreateDate
+
+    - displayName: SYSTEM_UPDATE_DATE
+      transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+      dataType: TIMESTAMP
+      placement: end
+      attributeName: isSystemUpdateDate
+name: Dimension Advanced Deploy
+type: NodeType
