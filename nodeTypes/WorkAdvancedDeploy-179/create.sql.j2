@@ -1,5 +1,5 @@
 {#
-    Copyright (c) 2023 Coalesce. All rights reserved.
+    Copyright (c) 2025 Coalesce. All rights reserved.
 This script and its associated documentation are confidential and proprietary to Coalesce.
 Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
 Coalesce permits you to copy and modify this script for the purposes of using with Coalsce but
@@ -61,7 +61,7 @@ does not permit copying or modification for any other purpose.
         CREATE OR REPLACE VIEW {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
         (
             {% for col in desiredState.columns %}
-                "{{ col.name }}"
+                `{{ col.name }}`
                 {%- if col.description | length > 0 %} COMMENT '{{ col.description | escape }}'{% endif %}
                 {%- if not loop.last -%}, {% endif %}
             {% endfor %}
@@ -74,7 +74,7 @@ does not permit copying or modification for any other purpose.
               DISTINCT
             {% endif %}
             {% for col in source.columns %}
-                {{ get_source_transform(col) }} AS "{{ col.name }}"
+                {{ get_source_transform(col) }} AS `{{ col.name }}`
                 {%- if not loop.last -%}, {% endif %}
             {% endfor %}
 
@@ -144,7 +144,7 @@ does not permit copying or modification for any other purpose.
                CREATE OR REPLACE {{desiredState.node.materializationType}} {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
                 (
                 {% for col in desiredState.columns %}
-                    "{{ col.name }}" {{ col.dataType }}
+                    `{{ col.name }}` {{ col.dataType }}
                     {%- if not col.nullable %} NOT NULL
                         {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
                     {% endif %}
@@ -170,7 +170,7 @@ does not permit copying or modification for any other purpose.
             CREATE OR REPLACE {{desiredState.node.materializationType}} {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
             (
                 {% for col in desiredState.columns %}
-                    "{{ col.name }}" {{ col.dataType }}
+                    `{{ col.name }}` {{ col.dataType }}
                     {%- if not col.nullable %} NOT NULL
                         {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }}{% endif %}
                     {% endif %}
@@ -593,7 +593,7 @@ does not permit copying or modification for any other purpose.
                 {% set cdb = currentState.storageLocations | selectattr('name', 'equalto', srcSchName) | map(attribute='database') | first %}
                 {% set csch = currentState.storageLocations | selectattr('name', 'equalto', srcSchName) | map(attribute='schema') | first %}
 
-                ALTER TABLE  "{{cdb}}"."{{csch}}"."{{currentState.node.name}}"
+                ALTER TABLE  `{{cdb}}`.`{{csch}}`.`{{currentState.node.name}}`
                 RENAME TO   {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
 
                 {# Metadata changes detected #}
@@ -610,8 +610,6 @@ does not permit copying or modification for any other purpose.
                 {% set nsMetaVariables.metaDataChanged = true %} 
             {% endif %}
 
-
-
             {# Drop Columns #}
             {% set nsVariables = namespace(colchanges=0) %}
             {% for dropCurCol in currentState.columns %}
@@ -625,7 +623,7 @@ does not permit copying or modification for any other purpose.
                     {% else %}
                         , 
                     {% endif %}
-                    "{{ dropCurCol.name }}"
+                    `{{ dropCurCol.name }}`
 
                     {# Metadata changes detected #}
                     {% set nsMetaVariables.metaDataChanged = true %} 
@@ -663,7 +661,7 @@ does not permit copying or modification for any other purpose.
                     {% if renameCurCol.name != desiredColumnName %}
                         {{ stage('Rename Column ' + renameCurCol.name) }}
                         ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
-                        RENAME COLUMN "{{ renameCurCol.name }}"
+                        RENAME COLUMN `{{ renameCurCol.name }}`
                         TO "{{ desiredColumnName }}"
 
                         {# Metadata changes detected #}
@@ -705,13 +703,13 @@ does not permit copying or modification for any other purpose.
                         {% endif %}
                         {% if datatypeTest == false %}
                             {% if nsVariables.colchanges > 1 %},{% endif %}
-                            COLUMN "{{ desiredColumnName }}"
+                            COLUMN `{{ desiredColumnName }}`
                             SET DATA TYPE {{ desiredDatatype }}
                             {% set nsVariables.colchanges = nsVariables.colchanges + 1 %}
                         {% endif %}
                         {% if nullableTest == false %}
                             {% if nsVariables.colchanges > 1 %},{% endif %}
-                            COLUMN "{{ desiredColumnName }}"
+                            COLUMN `{{ desiredColumnName }}`
                             {% if currentNullable == true %}
                                 SET
                             {% else %}
