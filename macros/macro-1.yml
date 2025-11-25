@@ -5,7 +5,7 @@ macroString: |-
     Macro: columDictionary
     Purpose: Builds a dictionary (ns.column_dict) of columns for all sources
   ---------------------------------------------------------------------- #}
-  {% macro columDictionary(ns) %}
+  {% macro columnDictionary(ns) %}
     {% if sources is defined %}
       {% for source_idx in range(sources | length) %}
         {% set source = sources[source_idx] %}
@@ -27,7 +27,6 @@ macroString: |-
     Initialize variables for node types that use the 
     advanced deployment strategy
   ----------------------------------------------------------#}
-
   {% if desiredState %}
       {% set columns = desiredState.columns %}
       {% set storageLocations = desiredState.storageLocations %}
@@ -38,32 +37,164 @@ macroString: |-
 
       {% set ns = namespace(column_dict = {}) %}
       {# Populate column dictionary #}
-      {{ columDictionary(ns) }}
+      {{ columnDictionary(ns) }}
 
   {% endif %}
+
+  {#--------------------------------------------------------
+    Initialize variables for node types that use the 
+    advanced deployment strategy
+  ----------------------------------------------------------#}
+  {% macro initializeAllVariables(nsAllVariables) %}
+
+    {% if currentState is defined %}
+      {% set currentDatabase = currentState.storageLocations 
+                                | selectattr('name', 'equalto', currentState.node.location.name)
+                                | map(attribute='database')
+                                | first %}
+      {% set currentSchema = currentState.storageLocations
+                              | selectattr('name', 'equalto', currentState.node.location.name)
+                              | map(attribute='schema')
+                              | first %}
+      {% set nsAllVariables.currentDatabaseSchema = currentDatabase + '.' + currentSchema %}
+    {% endif %}
+
+    {% if currentState is defined %}
+      {% set desiredDatabase = desiredState.storageLocations
+                                | selectattr('name', 'equalto', desiredState.node.location.name)
+                                | map(attribute='database')
+                                | first %}
+      {% set desiredSchema = desiredState.storageLocations
+                                | selectattr('name', 'equalto', desiredState.node.location.name)
+                                | map(attribute='schema')
+                                | first %}
+      {% set nsAllVariables.desiredDatabaseSchema = desiredDatabase + '.' + desiredSchema %}
+    {% endif %}
+  {% endmacro %}
+
+  {# =========================================================
+    Purpose: Generates the PARTITION BY clause
+    Input Parameters : None
+    Returns          : String representing the PARTITION BY clause
+  ========================================================= #}
+  {% macro getPartitionBy(nsPartitionBy) %}
+
+  {# Macro to build partitionBy from config and store in namespace #}
+   {%- set nsPartitionBy = namespace(elements = "") -%}
+
+      {% if config.partitionBy %}
+          {% if config.partByIngnTime %}
+              {%- set nsPartitionBy.elements = config.partByIngnTimeExpression
+                  if config.partByIngnTimeExpression != "" else "_PARTITIONTIME" -%}
+          
+          {% elif config.partByColumnConfig is defined and config.partByColumnConfig.items() | length > 0 %}
+              
+              {# Loop through all items, using loop.index0 if needed #}
+              {% for item in config.partByColumnConfig.get('items', []) %}
+                  
+                  {% if loop.index0 == 0 %}
+                      {% if item.partBySqlExpression != "" %}
+                          {%- set nsPartitionBy.elements = '"' ~ item.partBySqlExpression ~ '"' -%}
+                      {% else %}
+                          {%- set nsPartitionBy.elements = '"' ~ item.partByColumn.name ~ '"' -%}
+                      {% endif %}
+                  {% endif %}
+                  
+              {% endfor %}
+
+          {% endif %}
+      {% endif %}
+
+      {{ nsPartitionBy.elements }}
+
+  {% endmacro %}
 
   {# -----------------------------------------------------------------------------
     Purpose: Generates the CLUSTER BY clause
     Input Parameters : None
     Returns          : String representing the CLUSTER BY clause
   ----------------------------------------------------------------------------- #}
-  {% macro cluster_by(nodetype) %}
+  {% macro getClusterBy() %}
 
     {# Create namespaces #}
-    {% set nsVars = namespace(cluster = "") %}
+    {% set nsClusterBy = namespace(elements = "") %}
 
-    {# Build cluster expression #}
-    {% if config is defined and config.clusterKeyConfig is defined %}
-      {% for item in config.clusterKeyConfig.get('items', [])[:4] %}
-        
-        {% set clustCol = ns.column_dict[0][item.clustColumn.id] %}
-        
-        {%- set nsVars.cluster = (nsVars.cluster ~ ',' if nsVars.cluster else '') ~ get_source_transform(clustCol) ~ '."' ~ get_source_transform(clustCol) ~ '"' -%}
+    {# Build cluster By #}
+    {% if config.clusterKey %}
+      {% if config is defined and config.clusterKeyConfig is defined %}
+        {% for item in config.clusterKeyConfig.get('items', [])[:4] %}
+          
+          {% set clustCol = ns.column_dict[0][item.clustColumn.id] %}
+          
+          {%- set nsClusterBy.elements = (nsClusterBy.elements ~ ',' if nsClusterBy.elements else '') ~ get_source_transform(clustCol) ~ '."' -%}
 
-      {% endfor %}
+        {% endfor %}
+      {% endif %}
     {% endif %}
 
-    {{ nsVars.cluster }}
+    {{ nsClusterBy.elements }}
+  {% endmacro %}
+
+  {# =========================================================
+    Purpose: Generates the PRIMARY KEY clause
+    Input Parameters : None
+    Returns          : String representing the PRIMARY KEY clause
+  ========================================================= #}
+  {% macro getPrimaryKey(ns) %}
+
+      {% if ns.primaryKey is not defined %}
+          {% set ns.primaryKey = {} %}
+      {% endif %}
+
+      {% if config.primary %}
+          {# Extract column names safely #}
+          {% set colList = config.primaryKeyCol.get('items', [])
+                        | map(attribute='primaryKey')
+                        | map(attribute='name')
+                        | list %}
+
+          {% if colList | length > 0 %}
+              {% set pkName = config.primaryKeyName | default('') | trim %}
+              {% if pkName == '' %}
+                  {% set pkName = 'pk_' ~ node.name %}
+              {% endif %}
+
+              {% set ns.primaryKey = {'pkName': pkName, 'pkColumns': colList} %}
+          {% endif %}
+
+      {% endif %}
+
+  {% endmacro %}
+
+  {# -----------------------------------------------------------------------------
+    Purpose: Generates the Table Expiration clause
+    Input Parameters : None
+    Returns          : String representing the Table Expiration clause
+  ----------------------------------------------------------------------------- #}
+  {% macro getTabExpirationClause() %}
+
+    {# Create namespaces #}
+    {% set nsTabExprn = namespace(elements = "") %}
+
+    {# Loop through all items, using loop.index0 if needed #}
+    {% for item in config.tabExpirationConfig.get('items', []) %}
+        
+      {% if loop.index0 == 0 %}
+        {# Build Options By #}
+        {% if item.exprnType != '' %}
+          {% if item.exprnType == "EXACT TIMESTAMP" %}
+            {% set nsTabExprn.elements = 'TIMESTAMP ' + item.timeExprnExpression %}
+          {% elif item.exprnType == "EXACT DATE ONLY" %}
+            {% set nsTabExprn.elements = 'TIMESTAMP ' + item.timeExprnExpression + '23:59:59' %}
+          {% elif item.exprnType == "DAYS FROM NOW" %}
+            {% set nsTabExprn.elements = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  item.timeExprnExpression + ' DAY)' %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+      {{ nsTabExprn.elements }}
+
   {% endmacro %}
 name: macro
 type: Macro

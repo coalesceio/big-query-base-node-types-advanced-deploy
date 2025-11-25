@@ -6,7 +6,7 @@ metadata:
   error: null
   nodeMetadataSpec: |-
     capitalized: Dimension Advanced Deploy
-    short: DIM
+    short: dim
     tagColor: '#1E339A'
     plural: Dimensions
 
@@ -63,54 +63,58 @@ metadata:
 
       - type: toggleButton
         attributeName: partitionBy
-        displayName: 'Enable Partition'
+        displayName: Enable Partition
         default: false
         isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
-      - displayName: 'Partion By Based On'
-        attributeName: partByBase
-        type: dropdownSelector
-        default: INGESTION TIME
-        options:
-        - "INGESTION TIME"
-        - "TIME UNIT"
-        - "INTEGER RANGE"
+      - type: toggleButton
+        attributeName: partByIngnTime
+        displayName: 'Partition By Ingestion-Time'
+        default: false
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
+      - type: textBox
+        displayName: Partition By ingestion-time Expression (Ex. DATE_TRUNC(_PARTITIONTIME, MONTH))
+        attributeName: partByIngnTimeExpression
+        default: ''
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByIngnTime %} true {% else %} false {% endif %}"
+
       - type: tabular
-        displayName: 'Partion By (Choose Only One Column)'
-        attributeName: partitionConfig
+        displayName: Partition By (Processes First row only)
+        attributeName: partByColumnConfig
 
         columns:
 
         -  type: columnDropdownSelector
            displayName: Partition By Column
            attributeName: partByColumn
-           isRequired: false
-
+           isRequired: true
+      
         -  type: textBox
-           displayName: Expression (For DATE and RANGE partitions)
-           attributeName: partByColExpression
-           default: "ex. RANGE_BUCKET(<col_name>, [1, 100, 200])
-                      DATE(TIMESTAMP_TRUNC(<col_name>, DAY))"
+           displayName: Partition By Expression (Optional)
+           attributeName: partBySqlExpression
+           default: "Ex: 
+                        DATE(TIMESTAMP_TRUNC(`columnName`, DAY))
+                        RANGE_BUCKET(`columnName`, [1, 100, 200])"
            isRequired: false
-
+      
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partByBase != 'INGESTION TIME' and config.partitionBy %} true {% else %} false {% endif %}"
-
-      - type: textBox
-        displayName: Partition Expiration Days (Blank/Integers Only)
-        attributeName: partExpireDays
-        default: "ex. 30"
-        isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy == true and config.partByIngnTime == false %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: partitionFilter
         displayName: 'Require Partition Filter'
         default: false
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: Partition Expiration Days (Ex. 30)
+        attributeName: partExpireDays
+        default: ''
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
@@ -129,19 +133,27 @@ metadata:
         -  type: columnDropdownSelector
            displayName: Cluster By Columns
            attributeName: clustColumn
-           isRequired: false
+           isRequired: true
       
         isRequired: false
         enableIf: "{% if node.materializationType != view and config.clusterKey %} true {% else %} false {% endif %}"
 
       - type: textBox
-        displayName: Data Retention Period (Blank/Integers Only)
+        displayName: Data Retention Period (Ex. 30)
         attributeName: dataRetention
-        default: "ex. 30"
+        default: ''
         isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - type: label
+        attributeName: exprnNote
+        displayName: "Relevent Expression Format\n
+        For EXACT TIMESTAMP -  Ex: 2024-12-31 23:59:59\n
+        For EXACT DATE ONLY - Ex: 2024-12-31\n
+        For DAYS FROM NOW - Ex:30"
 
       - type: tabular
-        displayName: Table Expiration (Processes First row only)
+        displayName: Table Expiration (If chosen, Processes First row only)
         attributeName: tabExpirationConfig
 
         columns:
@@ -158,14 +170,13 @@ metadata:
            isRequired: false
 
         -  type: textBox
-           displayName: Expression
-           attributeName: exprnTypeExpression
-           default: "ex. EXACT TIMESTAMP - 2024-12-31 23:59:59
-                          EXACT DATE ONLY - 2024-12-31
-                          DAYS FROM NOW - 30"
+           displayName: Expression       
+           attributeName: timeExprnExpression
+           default: ""
            isRequired: false
 
         isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
     - groupName: Dimension Options
 
@@ -207,31 +218,32 @@ metadata:
         type: textBox
         syntax: sql
         isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       - displayName: Post-SQL
         attributeName: postSQL
         type: textBox
         syntax: sql
         isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      isRequired: false
+      enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
     systemColumns:
     - displayName: '{{NODE_NAME}}_KEY'
       transform: ''
-      dataType: NUMBER
+      dataType: STRING
       placement: beginning
       attributeName: isSurrogateKey
 
     - displayName: SYSTEM_VERSION
       transform: ''
-      dataType: NUMBER
+      dataType: INT64
       placement: end
       attributeName: isSystemVersion
 
     - displayName: SYSTEM_CURRENT_FLAG
       transform: ''
-      dataType: VARCHAR
+      dataType: STRING
       placement: end
       attributeName: isSystemCurrentFlag
 

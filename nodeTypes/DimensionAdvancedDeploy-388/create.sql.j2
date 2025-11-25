@@ -1,2 +1,63 @@
-{{ stage('Create Dimension View',true,"sql","create") }}
-{{ cluster_by() }}
+{% set nsCreateVariables = namespace(options = "", partionBy = "", clusterBy = "", primaryKey = {}) %}
+
+{%- set nsCreateVariables.partionBy = getPartitionBy() | trim -%}
+{%- set nsCreateVariables.clusterBy = getClusterBy() | trim -%}
+
+{{getPrimaryKey(nsCreateVariables)}}
+
+{# Build table options #}
+{% if node.description | length > 0 %}
+    {% set nsCreateVariables.options = nsCreateVariables.options + "DESCRIPTION=\"" + node.description | escape + "\"" %}
+{% endif %}
+
+{% if getTabExpirationClause() | length > 0 %}
+    {% if nsCreateVariables.options | length > 0 %}
+        {% set nsCreateVariables.options = nsCreateVariables.options + ", " %}
+    {% endif %}
+    {% set nsCreateVariables.options = nsCreateVariables.options + getTabExpirationClause() %}
+{% endif %}
+
+{% if config.partitionFilter %}
+    {% if nsCreateVariables.options | length > 0 %}
+        {% set nsCreateVariables.options = nsCreateVariables.options + ", " %}
+    {% endif %}
+    {% set nsCreateVariables.options = nsCreateVariables.options + "partition_filter_enabled=true" %}
+{% endif %}
+
+{% if config.partExpireDays | length > 0 %}
+    {% if nsCreateVariables.options | length > 0 %}
+        {% set nsCreateVariables.options = nsCreateVariables.options + ", " %}
+    {% endif %}
+    {% set nsCreateVariables.options = nsCreateVariables.options + "partition_expiration_days=" + config.partExpireDays %}
+{% endif %}
+
+{{ stage('Create Dimension ' + desiredState.node.materializationType ) }}
+    CREATE OR REPLACE TABLE {{ ref_no_link(node.location.name, node.name) }}
+
+    {% if nsCreateVariables.partionBy | length > 0 %}
+        PARTITION BY {{ nsCreateVariables.partionBy }}
+    {% endif %}
+
+    {% if nsCreateVariables.clusterBy | length > 0 %}
+        CLUSTER BY {{ nsCreateVariables.clusterBy }}
+    {% endif %}
+    
+    {% if nsCreateVariables.options | trim != "" %}
+        " OPTIONS " + {{ nsCreateVariables.options }} + ""
+    {% endif %}
+    (
+        {% for col in columns %}
+            `{{ col.name }}` {{ col.dataType }}
+            {% if col.isSurrogateKey %}
+                DEFAULT GENERATE_UUID()
+            {% endif %}
+            {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }} {%endif%}
+            {% if not col.nullable %} NOT NULL {% endif%}
+            {%- if col.description | length > 0 %} OPTIONS(DESCRIPTION="{{ col.description | escape }}") {% endif %}
+            {%- if not loop.last -%}, {% endif %}
+        {% endfor %}
+
+        {% if nsCreateVariables.primaryKey | length > 0 %} 
+            , PRIMARY KEY ( {{ nsCreateVariables.primaryKey['pkColumns'] | join(', ') }} ) NOT ENFORCED
+        {% endif %}
+    )
