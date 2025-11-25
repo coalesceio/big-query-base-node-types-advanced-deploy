@@ -85,7 +85,7 @@ macroString: |-
       {% if config.partitionBy %}
           {% if config.partByIngnTime %}
               {%- set nsPartitionBy.elements = config.partByIngnTimeExpression
-                  if config.partByIngnTimeExpression != "" else "_PARTITIONTIME" -%}
+                  if config.partByIngnTimeExpression != "" else "_PARTITIONDATE" -%}
           
           {% elif config.partByColumnConfig is defined and config.partByColumnConfig.items() | length > 0 %}
               
@@ -94,9 +94,9 @@ macroString: |-
                   
                   {% if loop.index0 == 0 %}
                       {% if item.partBySqlExpression != "" %}
-                          {%- set nsPartitionBy.elements = '"' ~ item.partBySqlExpression ~ '"' -%}
+                          {%- set nsPartitionBy.elements = item.partBySqlExpression -%}
                       {% else %}
-                          {%- set nsPartitionBy.elements = '"' ~ item.partByColumn.name ~ '"' -%}
+                          {%- set nsPartitionBy.elements = '(' + item.partByColumn.name + ')'-%}
                       {% endif %}
                   {% endif %}
                   
@@ -119,18 +119,12 @@ macroString: |-
     {# Create namespaces #}
     {% set nsClusterBy = namespace(elements = "") %}
 
-    {# Build cluster By #}
-    {% if config.clusterKey %}
-      {% if config is defined and config.clusterKeyConfig is defined %}
-        {% for item in config.clusterKeyConfig.get('items', [])[:4] %}
-          
-          {% set clustCol = ns.column_dict[0][item.clustColumn.id] %}
-          
-          {%- set nsClusterBy.elements = (nsClusterBy.elements ~ ',' if nsClusterBy.elements else '') ~ get_source_transform(clustCol) ~ '."' -%}
-
-        {% endfor %}
+    {% if config.clusterKey and config.clusterKeyConfig is defined %}
+          {%- set nsClusterBy.elements = config.clusterKeyConfig.get('items', [])[:4]
+                                          | map(attribute='clustColumn')
+                                          | map(attribute='name')
+                                          | list | join(', ') -%}
       {% endif %}
-    {% endif %}
 
     {{ nsClusterBy.elements }}
   {% endmacro %}
@@ -140,30 +134,20 @@ macroString: |-
     Input Parameters : None
     Returns          : String representing the PRIMARY KEY clause
   ========================================================= #}
-  {% macro getPrimaryKey(ns) %}
+  {% macro getPrimaryKey() %}
 
-      {% if ns.primaryKey is not defined %}
-          {% set ns.primaryKey = {} %}
-      {% endif %}
+    {# Create namespaces #}
+    {% set nsPrimaryKey = namespace(elements = "") %}
 
       {% if config.primary %}
           {# Extract column names safely #}
-          {% set colList = config.primaryKeyCol.get('items', [])
-                        | map(attribute='primaryKey')
-                        | map(attribute='name')
-                        | list %}
-
-          {% if colList | length > 0 %}
-              {% set pkName = config.primaryKeyName | default('') | trim %}
-              {% if pkName == '' %}
-                  {% set pkName = 'pk_' ~ node.name %}
-              {% endif %}
-
-              {% set ns.primaryKey = {'pkName': pkName, 'pkColumns': colList} %}
-          {% endif %}
-
+          {% set nsPrimaryKey.elements = config.primaryKeyCol.get('items', [])
+                                          | map(attribute='primaryKey')
+                                          | map(attribute='name')
+                                          | list | join(', ') %}
       {% endif %}
 
+    {{ nsPrimaryKey.elements }}
   {% endmacro %}
 
   {# -----------------------------------------------------------------------------
@@ -183,9 +167,9 @@ macroString: |-
         {# Build Options By #}
         {% if item.exprnType != '' %}
           {% if item.exprnType == "EXACT TIMESTAMP" %}
-            {% set nsTabExprn.elements = 'TIMESTAMP ' + item.timeExprnExpression %}
+            {% set nsTabExprn.elements = 'TIMESTAMP "' + item.timeExprnExpression + '"' %}
           {% elif item.exprnType == "EXACT DATE ONLY" %}
-            {% set nsTabExprn.elements = 'TIMESTAMP ' + item.timeExprnExpression + '23:59:59' %}
+            {% set nsTabExprn.elements = 'TIMESTAMP "' + item.timeExprnExpression + ' 23:59:59"' %}
           {% elif item.exprnType == "DAYS FROM NOW" %}
             {% set nsTabExprn.elements = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  item.timeExprnExpression + ' DAY)' %}
           {% endif %}

@@ -44,11 +44,6 @@ metadata:
         attributeName: primary
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
-      - type: textBox
-        displayName: Primary Key Name
-        attributeName: primaryKeyName
-        enableIf: "{% if node.materializationType != 'view' and config.primary %} true {% else %} false {% endif %}"
-
       - type: tabular   
         displayName: Primary Key Columns
         attributeName: primaryKeyCol
@@ -94,11 +89,11 @@ metadata:
            isRequired: true
       
         -  type: textBox
-           displayName: Partition By Expression (Optional)
+           displayName: "Partition By Expression (Optional) | Ex: 
+                        DATE_TRUNC(columnName, MONTH) |
+                        RANGE_BUCKET(columnName, [1, 100, 200])"
            attributeName: partBySqlExpression
-           default: "Ex: 
-                        DATE(TIMESTAMP_TRUNC(`columnName`, DAY))
-                        RANGE_BUCKET(`columnName`, [1, 100, 200])"
+           default: ""
            isRequired: false
       
         isRequired: false
@@ -138,20 +133,6 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != view and config.clusterKey %} true {% else %} false {% endif %}"
 
-      - type: textBox
-        displayName: Data Retention Period (Ex. 30)
-        attributeName: dataRetention
-        default: ''
-        isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
-
-      - type: label
-        attributeName: exprnNote
-        displayName: "Relevent Expression Format\n
-        For EXACT TIMESTAMP -  Ex: 2024-12-31 23:59:59\n
-        For EXACT DATE ONLY - Ex: 2024-12-31\n
-        For DAYS FROM NOW - Ex:30"
-
       - type: tabular
         displayName: Table Expiration (If chosen, Processes First row only)
         attributeName: tabExpirationConfig
@@ -170,7 +151,10 @@ metadata:
            isRequired: false
 
         -  type: textBox
-           displayName: Expression       
+           displayName: "Relevent Expression Format |
+                          For EXACT TIMESTAMP - Ex: 2024-12-31 23:59:59 | 
+                          For EXACT DATE ONLY - Ex: 2024-12-31 | 
+                          For DAYS FROM NOW - Ex:30"       
            attributeName: timeExprnExpression
            default: ""
            isRequired: false
@@ -229,43 +213,43 @@ metadata:
       enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
     systemColumns:
-    - displayName: '{{NODE_NAME}}_KEY'
+    - displayName: '{{NODE_NAME}}_key'
       transform: ''
       dataType: STRING
       placement: beginning
       attributeName: isSurrogateKey
 
-    - displayName: SYSTEM_VERSION
+    - displayName: system_version
       transform: ''
       dataType: INT64
       placement: end
       attributeName: isSystemVersion
 
-    - displayName: SYSTEM_CURRENT_FLAG
+    - displayName: system_current_flag
       transform: ''
       dataType: STRING
       placement: end
       attributeName: isSystemCurrentFlag
 
-    - displayName: SYSTEM_START_DATE
+    - displayName: system_start_date
       transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
       dataType: TIMESTAMP
       placement: end
       attributeName: isSystemStartDate
 
-    - displayName: SYSTEM_END_DATE
+    - displayName: system_end_date
       transform: CAST('2999-12-31 00:00:00' AS TIMESTAMP)
       dataType: TIMESTAMP
       placement: end
       attributeName: isSystemEndDate
 
-    - displayName: SYSTEM_CREATE_DATE
+    - displayName: system_create_date
       transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
       dataType: TIMESTAMP
       placement: end
       attributeName: isSystemCreateDate
 
-    - displayName: SYSTEM_UPDATE_DATE
+    - displayName: system_update_date
       transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
       dataType: TIMESTAMP
       placement: end
