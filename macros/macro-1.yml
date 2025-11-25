@@ -79,33 +79,23 @@ macroString: |-
   ========================================================= #}
   {% macro getPartitionBy(nsPartitionBy) %}
 
-  {# Macro to build partitionBy from config and store in namespace #}
-   {%- set nsPartitionBy = namespace(elements = "") -%}
+    {# Macro to build partitionBy from config and store in namespace #}
+    {%- set nsPartitionBy = namespace(elements = "") -%}
 
-      {% if config.partitionBy %}
-          {% if config.partByIngnTime %}
-              {%- set nsPartitionBy.elements = config.partByIngnTimeExpression
-                  if config.partByIngnTimeExpression != "" else "_PARTITIONDATE" -%}
-          
-          {% elif config.partByColumnConfig is defined and config.partByColumnConfig.items() | length > 0 %}
-              
-              {# Loop through all items, using loop.index0 if needed #}
-              {% for item in config.partByColumnConfig.get('items', []) %}
-                  
-                  {% if loop.index0 == 0 %}
-                      {% if item.partBySqlExpression != "" %}
-                          {%- set nsPartitionBy.elements = item.partBySqlExpression -%}
-                      {% else %}
-                          {%- set nsPartitionBy.elements = '(' + item.partByColumn.name + ')'-%}
-                      {% endif %}
-                  {% endif %}
-                  
-              {% endfor %}
+    {% if config.partitionBy %}
+        {% if config.partByColumnConfig == 'INGESTION TIME'%}
+    
+          {%- set nsPartitionBy.elements = config.partByIngnTimeExpression
+                if config.partByIngnTimeExpression != "" else "_PARTITIONDATE" -%}
 
-          {% endif %}
-      {% endif %}
+        {% elif config.partByColumnConfig == 'COLUMN' %}
+          {%- set nsPartitionBy.elements = config.partByColumn.name -%}
 
-      {{ nsPartitionBy.elements }}
+        {% elif config.partByColumnConfig == 'COLUMN EXPRESSION' %}
+          {%- set nsPartitionBy.elements = config.partBySqlExpression -%}
+        {% endif %}
+    {% endif %}
+    {{ nsPartitionBy.elements }}
 
   {% endmacro %}
 

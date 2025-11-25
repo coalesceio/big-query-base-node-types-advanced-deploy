@@ -13,7 +13,7 @@ metadata:
     deployStrategy: advanced
 
     config:
-    - groupName: General Options
+    - groupName: Create Options
       items:
       - type: materializationSelector
         isRequired: true
@@ -25,19 +25,6 @@ metadata:
       - type: overrideSQLToggle
         enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
 
-      - type: multisourceToggle
-        enableIf: "{% if node.materializationType == 'view' and node.override.create.enabled %} false {% else %} true {% endif %}"
-
-      - displayName: Multi Source Strategy
-        attributeName: insertStrategy
-        type: dropdownSelector
-        default: UNION ALL
-        options:
-        - "UNION DISTINCT"
-        - "UNION ALL"
-        isRequired: false
-        enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"
-
       - type: toggleButton
         displayName: Primary Key
         default: false
@@ -45,7 +32,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
       - type: tabular   
-        displayName: Primary Key Columns
+        displayName: Primary Key Columns*
         attributeName: primaryKeyCol
         columns:
 
@@ -63,41 +50,38 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
-      - type: toggleButton
-        attributeName: partByIngnTime
-        displayName: 'Partition By Ingestion-Time'
-        default: false
+      - displayName: Partition By
+        attributeName: partByColumnConfig*
+        type: dropdownSelector
+        default: COLUMN
+        options:
+        - "COLUMN"
+        - "COLUMN EXPRESSION"
+        - "INGESTION TIME"
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
+      - type: columnDropdownSelector
+        displayName: Partition By Column*
+        attributeName: partByColumn
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'COLUMN' %} true {% else %} false {% endif %}"
+
       - type: textBox
-        displayName: Partition By ingestion-time Expression (Ex. DATE_TRUNC(_PARTITIONTIME, MONTH))
+        displayName: "Partition By Expression* | Ex: 
+                      DATE_TRUNC(columnName, MONTH) |
+                      RANGE_BUCKET(columnName, [1, 100, 200])"
+        attributeName: partBySqlExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'COLUMN EXPRESSION' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: Ingestion-time Expression(Optional) (Ex. DATE_TRUNC(_PARTITIONTIME, MONTH))
         attributeName: partByIngnTimeExpression
         default: ''
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByIngnTime %} true {% else %} false {% endif %}"
-
-      - type: tabular
-        displayName: Partition By (Processes First row only)
-        attributeName: partByColumnConfig
-
-        columns:
-
-        -  type: columnDropdownSelector
-           displayName: Partition By Column
-           attributeName: partByColumn
-           isRequired: true
-      
-        -  type: textBox
-           displayName: "Partition By Expression (Optional) | Ex: 
-                        DATE_TRUNC(columnName, MONTH) |
-                        RANGE_BUCKET(columnName, [1, 100, 200])"
-           attributeName: partBySqlExpression
-           default: ""
-           isRequired: false
-      
-        isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy == true and config.partByIngnTime == false %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'INGESTION TIME' %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: partitionFilter
@@ -107,7 +91,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
       - type: textBox
-        displayName: Partition Expiration Days (Ex. 30)
+        displayName: Partition Expiration Days(Optional) (Ex. 30)
         attributeName: partExpireDays
         default: ''
         isRequired: false
@@ -121,20 +105,20 @@ metadata:
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       - type: tabular
-        displayName: 'Cluster By (Max Limit: 4 Columns)'
+        displayName: 'Cluster By* (Only first 4 rows are processed)'
         attributeName: clusterKeyConfig
         columns:
 
         -  type: columnDropdownSelector
            displayName: Cluster By Columns
            attributeName: clustColumn
-           isRequired: true
+           isRequired: false
       
         isRequired: false
         enableIf: "{% if node.materializationType != view and config.clusterKey %} true {% else %} false {% endif %}"
 
       - type: tabular
-        displayName: Table Expiration (If chosen, Processes First row only)
+        displayName: Table Expiration (Optional) (Only first row is processed)
         attributeName: tabExpirationConfig
 
         columns:
@@ -162,13 +146,27 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
-    - groupName: Dimension Options
+    - groupName: Load Dimension Options
 
       items:
+
+      - type: multisourceToggle
+        enableIf: "{% if node.materializationType == 'view' and node.override.create.enabled %} false {% else %} true {% endif %}"
+
+      - displayName: Multi Source Strategy*
+        attributeName: insertStrategy
+        type: dropdownSelector
+        default: UNION ALL
+        options:
+        - "UNION DISTINCT"
+        - "UNION ALL"
+        isRequired: false
+        enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"
+
       - type: businessKeyColumns
         isRequired: true
 
-      - type: changeTrackingColumns
+      - type: changeTrackingColumns (If chosen, treats as SCD2)
         isRequired: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
@@ -190,20 +188,21 @@ metadata:
         default: false
         enableIf: "{% if config.selectDistinct or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
 
+    - groupName: Other Options
+      items:
+
       - displayName: Enable Tests
         attributeName: testsEnabled
         type: toggleButton
         default: false
 
-    - groupName: Pre / Post SQL
-      items:
-      - displayName: Pre-SQL
+      - displayName: Pre-SQL (Optional)
         attributeName: preSQL
         type: textBox
         syntax: sql
         isRequired: false
 
-      - displayName: Post-SQL
+      - displayName: Post-SQL (Optional)
         attributeName: postSQL
         type: textBox
         syntax: sql
