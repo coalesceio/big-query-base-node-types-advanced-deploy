@@ -1,5 +1,5 @@
 fileVersion: 1
-id: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+id: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
 name: dim_nation
 operation:
   config:
@@ -7,12 +7,14 @@ operation:
     clusterKeyConfig:
       items:
         - {}
+    dateExprnExpression: ""
+    dayExprnExpression: ""
+    exprnType: ""
     groupByAll: false
     insertStrategy: UNION ALL
-    partByColumn:
-      columnCounter: cb54a8d6-a0df-4ae4-b82d-b5fba1f1d7cf
-      stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+    partByColumn: ""
     partByColumnConfig: COLUMN
+    partByColumnConfig*: COLUMN
     partByIngnTimeExpression: ""
     partBySqlExpression: ""
     partExpireDays: ""
@@ -21,15 +23,13 @@ operation:
     postSQL: ""
     preSQL: ""
     primary: false
-    primaryKeyCol:
+    primaryKeyConfig:
       items:
         - {}
     selectDistinct: false
-    tabExpirationConfig:
-      items:
-        - exprnType: ""
-          timeExprnExpression: ""
+    tabExpiration: false
     testsEnabled: false
+    timeExprnExpression: ""
     truncateBefore: false
   database: ""
   deployEnabled: true
@@ -45,8 +45,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 9aa71669-1ddb-467c-ad8f-bf5f02995b9a
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: 90217582-2d51-426e-ae6c-a207801f2bcc
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: STRING
         defaultValue: ""
@@ -59,8 +59,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: b50dccd6-42a0-44ff-8cac-94e1819e5313
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: 9e8a0c64-c87a-4a3c-9490-0b1fb4a51b32
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: INT64
         description: ""
@@ -74,8 +74,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 05bea4bb-b826-493e-852b-5faaecc4cfb6
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: 9971b560-91ba-488a-8712-3beeba9f0a8d
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: STRING
         description: ""
@@ -88,8 +88,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 5ae3fb05-007d-4cbc-ba5e-0583940f3038
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: 516ee3e6-bb56-4e22-9ad5-670eb488e33c
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: INT64
         description: ""
@@ -102,8 +102,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 832a96fe-3ca5-40f5-a640-50be358b7487
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: f00e7ed0-d09b-4d17-a449-10c77d44495b
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: STRING
         description: ""
@@ -119,8 +119,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: fd82340b-fd7d-4943-8be5-0a6e9a5f12f2
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: ff2fb759-6d85-4fbe-8a20-fe54b0f1c757
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: INT64
         defaultValue: ""
@@ -136,8 +136,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 503b0da5-e9ec-46e6-926f-87a96ce02fb1
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: 9b784716-46e8-41b2-b1dd-ec81bdff2fba
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: STRING
         defaultValue: ""
@@ -153,8 +153,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: cb54a8d6-a0df-4ae4-b82d-b5fba1f1d7cf
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: 71d1d5ce-b5af-444b-bcad-41ca8099ce1d
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -170,8 +170,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: b7d5ee4c-5953-4025-9e22-5cf8da0f44e6
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: 75999f4c-a05e-4b29-bdfd-9e1e13d93873
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -187,8 +187,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: b5c7187c-d89b-446b-8f3a-d2630cc1bac0
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: 7d817a88-187a-4d0f-86c0-e303a9547720
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -204,8 +204,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 3f5afc81-8026-4c4a-98b8-3c26ccaf11e5
-          stepCounter: 9675daef-9ab5-4698-b6d1-1fc617a13a9f
+          columnCounter: baea03da-e6b7-40c7-8bae-d0f474a87ec2
+          stepCounter: 3ad9c9ac-b2fb-4e9f-acb8-29b8eda93729
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -222,7 +222,9 @@ operation:
       - aliases:
           nation: 1065c77d-0a85-47d2-8099-48c4da891257
         customSQL:
-          customSQL: ""
+          customSQL: |-
+            {{ stage('Override Create SQL') }}
+            DROP TABLE `cls-dev-bigquery`.`DE_TGT`.`dim_nation`
         dependencies:
           - locationName: SRC
             nodeName: nation

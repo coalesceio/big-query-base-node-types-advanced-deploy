@@ -33,7 +33,7 @@ metadata:
 
       - type: tabular   
         displayName: Primary Key Columns*
-        attributeName: primaryKeyCol
+        attributeName: primaryKeyConfig
         columns:
 
         -  type: columnDropdownSelector
@@ -50,8 +50,8 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
-      - displayName: Partition By
-        attributeName: partByColumnConfig*
+      - displayName: Partition By*
+        attributeName: partByColumnConfig
         type: dropdownSelector
         default: COLUMN
         options:
@@ -62,15 +62,13 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
       - type: columnDropdownSelector
-        displayName: Partition By Column*
+        displayName: Partition By Column* (dataType:DATE)
         attributeName: partByColumn
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'COLUMN' %} true {% else %} false {% endif %}"
 
       - type: textBox
-        displayName: "Partition By Expression* | Ex: 
-                      DATE_TRUNC(columnName, MONTH) |
-                      RANGE_BUCKET(columnName, [1, 100, 200])"
+        displayName: "Partition By Expression* | Ex: DATE_TRUNC(columnName, MONTH) | RANGE_BUCKET(columnName, [1, 100, 200])"
         attributeName: partBySqlExpression
         default: ""
         isRequired: false
@@ -85,7 +83,7 @@ metadata:
 
       - type: toggleButton
         attributeName: partitionFilter
-        displayName: 'Require Partition Filter'
+        displayName: Require Partition Filter
         default: false
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
@@ -99,13 +97,13 @@ metadata:
 
       - type: toggleButton
         attributeName: clusterKey
-        displayName: 'Enable Cluster'
+        displayName: Enable Cluster
         default: false
         isRequired: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       - type: tabular
-        displayName: 'Cluster By* (Only first 4 rows are processed)'
+        displayName: Cluster By* (Only first 4 rows are processed)
         attributeName: clusterKeyConfig
         columns:
 
@@ -117,35 +115,44 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != view and config.clusterKey %} true {% else %} false {% endif %}"
 
-      - type: tabular
-        displayName: Table Expiration (Optional) (Only first row is processed)
-        attributeName: tabExpirationConfig
-
-        columns:
-
-        -  displayName: 'Expiration Type'
-           attributeName: exprnType
-           type: dropdownSelector
-           default: ''
-           options:
-           - ""
-           - "EXACT TIMESTAMP"
-           - "EXACT DATE ONLY"
-           - "DAYS FROM NOW"
-           isRequired: false
-
-        -  type: textBox
-           displayName: "Relevent Expression Format |
-                          For EXACT TIMESTAMP - Ex: 2024-12-31 23:59:59 | 
-                          For EXACT DATE ONLY - Ex: 2024-12-31 | 
-                          For DAYS FROM NOW - Ex:30"       
-           attributeName: timeExprnExpression
-           default: ""
-           isRequired: false
-
+      - type: toggleButton
+        attributeName: tabExpiration
+        displayName: Table Expiration
+        default: false
         isRequired: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
+      - displayName: Expiration Type*
+        attributeName: exprnType
+        type: dropdownSelector
+        options:
+        - "EXACT TIMESTAMP"
+        - "EXACT DATE ONLY"
+        - "DAYS FROM NOW"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration %} true {% else %} flase {% endif %}"
+
+      - type: textBox
+        displayName: 'Expiration Value* (Ex: 2024-12-31 23:59:59)'
+        attributeName: timeExprnExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'EXACT TIMESTAMP' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: 'Expiration Value* (Ex: 2024-12-31)'
+        attributeName: dateExprnExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'EXACT DATE ONLY' %} true {% else %} flase {% endif %}"
+
+      - type: textBox
+        displayName: 'Expiration Value* (Ex: 30)'
+        attributeName: dayExprnExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'DAYS FROM NOW' %} true {% else %} false {% endif %}"
+        
     - groupName: Load Dimension Options
 
       items:
