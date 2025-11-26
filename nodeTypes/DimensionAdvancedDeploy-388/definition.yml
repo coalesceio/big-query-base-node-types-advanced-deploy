@@ -53,33 +53,40 @@ metadata:
       - displayName: Partition By*
         attributeName: partByColumnConfig
         type: dropdownSelector
-        default: COLUMN
+        default: "Time-Unit Column"
         options:
-        - "COLUMN"
-        - "COLUMN EXPRESSION"
-        - "INGESTION TIME"
+        - "Time-Unit Column"
+        - "Integer Range"
+        - "Ingestion Time"
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
       - type: columnDropdownSelector
-        displayName: Partition By Column* (dataType:DATE)
+        displayName: Partition By Column*
         attributeName: partByColumn
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'COLUMN' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: textBox
-        displayName: "Partition By Expression* | Ex: DATE_TRUNC(columnName, MONTH) | RANGE_BUCKET(columnName, [1, 100, 200])"
-        attributeName: partBySqlExpression
+        displayName: "Partition By Expression(Optional) (Ex: DATE_TRUNC(columnName, MONTH))"
+        attributeName: partByTimeSqlExpression
         default: ""
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'COLUMN EXPRESSION' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: "Partition By Expression* (Ex: RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))"
+        attributeName: partByIntSqlExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Integer Range' %} true {% else %} false {% endif %}"
 
       - type: textBox
         displayName: Ingestion-time Expression(Optional) (Ex. DATE_TRUNC(_PARTITIONTIME, MONTH))
         attributeName: partByIngnTimeExpression
         default: ''
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'INGESTION TIME' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Ingestion Time' %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: partitionFilter
@@ -93,7 +100,7 @@ metadata:
         attributeName: partExpireDays
         default: ''
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: clusterKey
@@ -124,27 +131,20 @@ metadata:
 
       - displayName: Expiration Type*
         attributeName: exprnType
+        default: "DAYS FROM NOW"
         type: dropdownSelector
         options:
-        - "EXACT TIMESTAMP"
-        - "EXACT DATE ONLY"
+        - "EXACT DATE/DATETIME"
         - "DAYS FROM NOW"
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.tabExpiration %} true {% else %} flase {% endif %}"
 
       - type: textBox
-        displayName: 'Expiration Value* (Ex: 2024-12-31 23:59:59)'
+        displayName: 'Expiration Value* (Ex: 2024-12-31 | 2024-12-31 23:59:59)'
         attributeName: timeExprnExpression
         default: ""
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'EXACT TIMESTAMP' %} true {% else %} false {% endif %}"
-
-      - type: textBox
-        displayName: 'Expiration Value* (Ex: 2024-12-31)'
-        attributeName: dateExprnExpression
-        default: ""
-        isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'EXACT DATE ONLY' %} true {% else %} flase {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'EXACT DATE/DATETIME' %} true {% else %} false {% endif %}"
 
       - type: textBox
         displayName: 'Expiration Value* (Ex: 30)'

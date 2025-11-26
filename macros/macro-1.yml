@@ -83,18 +83,25 @@ macroString: |-
     {%- set nsPartitionBy = namespace(elements = "") -%}
 
     {% if config.partitionBy %}
-        {% if config.partByColumnConfig == 'INGESTION TIME'%}
-    
-          {%- set nsPartitionBy.elements = config.partByIngnTimeExpression
-                if config.partByIngnTimeExpression != "" else "_PARTITIONDATE" -%}
+        {% if config.partByColumnConfig == 'Ingestion Time' %}
+          {% if config.partByIngnTimeExpression != "" %}
+            {%- set nsPartitionBy.elements = config.partByIngnTimeExpression -%}
+          {% else %}
+              {%- set nsPartitionBy.elements = "_PARTITIONDATE" -%}
+          {% endif %}
 
-        {% elif config.partByColumnConfig == 'COLUMN' %}
-          {%- set nsPartitionBy.elements = config.partByColumn.name -%}
+        {% elif config.partByColumnConfig == 'Integer Range' %}
+          {%- set nsPartitionBy.elements = config.partByIntSqlExpression|trim -%}
 
-        {% elif config.partByColumnConfig == 'COLUMN EXPRESSION' %}
-          {%- set nsPartitionBy.elements = config.partBySqlExpression -%}
+        {% elif config.partByColumnConfig == 'Time-Unit Column' %}
+          {% if config.partByTimeSqlExpression|trim|length > 0 %}
+            {%- set nsPartitionBy.elements = config.partByTimeSqlExpression|trim -%}
+          {% else %}
+            {%- set nsPartitionBy.elements = config.partByColumn.name -%}
+          {% endif %}
         {% endif %}
     {% endif %}
+
     {{ nsPartitionBy.elements }}
 
   {% endmacro %}
@@ -151,11 +158,13 @@ macroString: |-
     {% set nsTabExprn = namespace(elements = "") %}
 
     {% if config.exprnType != '' %}
-      {% if config.exprnType == "EXACT TIMESTAMP" %}
-        {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression + '"' %}
-      {% elif config.exprnType == "EXACT DATE ONLY" %}
-        {% set nsTabExprn.elements = 'TIMESTAMP "' + config.dateExprnExpression + ' 23:59:59"' %}
-      {% elif config.exprnType == "DAYS FROM NOW" %}
+      {% if config.exprnType == 'EXACT DATE/DATETIME' %}
+        {% if config.timeExprnExpression|trim|length > 11 %}
+          {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression + '"' %}
+        {% else %}
+          {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression + ' 23:59:59"' %}
+        {% endif %}
+      {% elif config.exprnType == 'DAYS FROM NOW' %}
         {% set nsTabExprn.elements = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  config.dayExprnExpression + ' DAY)' %}
       {% endif %}
     {% endif %}

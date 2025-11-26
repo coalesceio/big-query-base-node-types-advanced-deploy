@@ -12,9 +12,12 @@ operation:
     exprnType: ""
     groupByAll: false
     insertStrategy: UNION ALL
-    partByColumnConfig: COLUMN
+    partByColumn: ""
+    partByColumnConfig: Ingestion Time
     partByIngnTimeExpression: ""
+    partByIntSqlExpression: ""
     partBySqlExpression: ""
+    partByTimeSqlExpression: ""
     partExpireDays: ""
     partitionBy: false
     partitionFilter: false
