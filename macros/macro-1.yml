@@ -57,9 +57,12 @@ macroString: |-
                               | map(attribute='schema')
                               | first %}
       {% set nsAllVariables.currentDatabaseSchema = currentDatabase + '.' + currentSchema %}
+
+      {% set nsAllVariables.curObjectNameFullPath = ref_no_link(currentState.node.location.name, currentState.node.name) %}
+
     {% endif %}
 
-    {% if currentState is defined %}
+    {% if desiredState is defined %}
       {% set desiredDatabase = desiredState.storageLocations
                                 | selectattr('name', 'equalto', desiredState.node.location.name)
                                 | map(attribute='database')
@@ -69,7 +72,11 @@ macroString: |-
                                 | map(attribute='schema')
                                 | first %}
       {% set nsAllVariables.desiredDatabaseSchema = desiredDatabase + '.' + desiredSchema %}
+
+      {% set nsAllVariables.desObjectNameFullPath = ref_no_link(desiredState.node.location.name, desiredState.node.name) %}
+
     {% endif %}
+
   {% endmacro %}
 
   {# =========================================================
@@ -123,7 +130,7 @@ macroString: |-
                                           | list | join(', ') -%}
       {% endif %}
 
-    {{ nsClusterBy.elements }}
+    {{- nsClusterBy.elements -}}
   {% endmacro %}
 
   {# =========================================================
@@ -158,14 +165,14 @@ macroString: |-
     {% set nsTabExprn = namespace(elements = "") %}
 
     {% if config.exprnType != '' %}
-      {% if config.exprnType == 'EXACT DATE/DATETIME' %}
+      {% if config.exprnType == 'EXACT DATE/DATETIME' and config.timeExprnExpression|trim|length > 0 %}
         {% if config.timeExprnExpression|trim|length > 11 %}
-          {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression + '"' %}
+          {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression|trim + '"' %}
         {% else %}
-          {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression + ' 23:59:59"' %}
+          {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression|trim + ' 23:59:59"' %}
         {% endif %}
-      {% elif config.exprnType == 'DAYS FROM NOW' %}
-        {% set nsTabExprn.elements = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  config.dayExprnExpression + ' DAY)' %}
+      {% elif config.exprnType == 'DAYS FROM NOW'and config.dayExprnExpression|trim|length > 0 %}
+        {% set nsTabExprn.elements = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  config.dayExprnExpression|trim + ' DAY)' %}
       {% endif %}
     {% endif %}
 

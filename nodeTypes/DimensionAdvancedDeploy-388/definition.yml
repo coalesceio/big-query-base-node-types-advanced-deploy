@@ -61,16 +61,21 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
-      - type: columnDropdownSelector
-        displayName: Partition By Column*
-        attributeName: partByColumn
+      - type: textBox
+        displayName: "Partition By Expression (Ex: DATE_TRUNC(columnName, MONTH))"
+        attributeName: partByTimeSqlExpression
+        default: ""
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
-      - type: textBox
-        displayName: "Partition By Expression(Optional) (Ex: DATE_TRUNC(columnName, MONTH))"
-        attributeName: partByTimeSqlExpression
-        default: ""
+      - type: label
+        displayName: -- OR --
+        attributeName: labelOR
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+
+      - type: columnDropdownSelector
+        displayName: Partition By Column (dataType-DATE)
+        attributeName: partByColumn
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
@@ -100,7 +105,7 @@ metadata:
         attributeName: partExpireDays
         default: ''
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and ( config.partByColumnConfig == 'Time-Unit Column' or config.partByColumnConfig == 'Ingestion Time' ) %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: clusterKey
@@ -219,7 +224,7 @@ metadata:
       enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
     systemColumns:
-    - displayName: '{{NODE_NAME}}_key'
+    - displayName: '{{NODE_NAME}}_KEY'
       transform: ''
       dataType: STRING
       placement: beginning

@@ -9,7 +9,9 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Description    : This node creates dimension table, view and also override create sql for view with advanced deployment strategy == #}
 
 {% set nsAllVariables = namespace(currentDatabaseSchema = "",
-                        desiredDatabaseSchema = "") %}
+                        desiredDatabaseSchema = "",
+                        desObjectNameFullPath = "",
+                        curObjectFullPath = "") %}
 {{ initializeAllVariables(nsAllVariables) }}
 
 {% if desiredState %}
@@ -18,14 +20,16 @@ does not permit copying or modification for any other purpose.
     {% if desiredState.node.materializationType == 'view' %}
         
         {% if desiredState.node.override.create.enabled and desiredState.node.override.create.script | trim != "" %}
-	
+
+            {# Drop current table before overriding #}
             {% if currentState != undefined %}
                 {% if currentState.node.materializationType != 'view' %}
                     {{ stage('Drop Current Table - ' + currentState.node.name) }}
-                    DROP TABLE IF EXISTS {{ ref_no_link(currentState.node.location.name, currentState.node.name) }}
+                    DROP TABLE IF EXISTS {{ nsAllVariables.curObjectNameFullPath }}
                 {% endif %}
             {% endif %}
 
+            {# Run the overriding script #}
             {{ desiredState.node.override.create.script }}
 
 
@@ -34,22 +38,24 @@ does not permit copying or modification for any other purpose.
             {% if currentState != undefined %}		
                 {% if currentState.node.materializationType != 'view' %}
 
+                    {# Drop current table before creating #}
                     {{ stage('Drop Current Table - ' + currentState.node.name, true, "sql", "drop") }}
-                    DROP TABLE IF EXISTS {{ ref_no_link(currentState.node.location.name, currentState.node.name) }}
+                    DROP TABLE IF EXISTS {{ nsAllVariables.curObjectNameFullPath }}
 
                 {% elif  desiredState.node.name != currentState.node.name
                             or nsAllVariables.desiredDatabaseSchema != nsAllVariables.currentDatabaseSchema  %}
 
+                    {# Drop current view if renamed or moved #}
                     {{ stage('Drop Current View - ' + currentState.node.name, true, "sql", "drop") }}
-                    DROP VIEW IF EXISTS {{ ref_no_link(currentState.node.location.name, currentState.node.name) }}                    
+                    DROP VIEW IF EXISTS {{ nsAllVariables.curObjectNameFullPath }}                    
                 {% endif %}
             {% endif %}
 
-            {# CreateSQL for View #}
+            {# Create new view #}
             {% if currentState == undefined or currentState != desiredState %}
                 {{ stage('Create Dimension View - ' + desiredState.node.name, true, "sql", "create") }}
 
-                CREATE OR REPLACE VIEW {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                CREATE OR REPLACE VIEW {{ nsAllVariables.desObjectNameFullPath }}
                 (
                     {% for col in desiredState.columns %}
                         `{{ col.name }}`
@@ -89,11 +95,13 @@ does not permit copying or modification for any other purpose.
 
         {% set nsCreateVariables = namespace(options = "", partionBy = "", clusterBy = "", primaryKey = "", tabEprnClause = "", createTable = false) %}
 
+        {# Initialise the variables necessary for create/alter of table #}
         {%- set nsCreateVariables.partionBy = getPartitionBy() | trim -%}
         {%- set nsCreateVariables.clusterBy = getClusterBy() | trim -%}
         {%- set nsCreateVariables.primaryKey = getPrimaryKey() | trim -%}
         {%- set nsCreateVariables.tabEprnClause = getTabExpirationClause() | trim -%}
 
+        {# Check the conditions for creating new tables #}
         {% if currentState != undefined
                 and (currentState.node.materializationType != desiredState.node.materializationType
                 or desiredState.config.partitionBy != currentState.config.partitionBy
@@ -107,10 +115,8 @@ does not permit copying or modification for any other purpose.
             {% set nsCreateVariables.createTable = true %}
         {% endif %}
 
-        {# Alter table incase of any chnages in states #}
-        {% if currentState != undefined
-            and currentState.node.materializationType == desiredState.node.materializationType
-            and createTable == false %}
+        {# Alter table incase of any chnages in states and alter is allowed #}
+        {% if currentState != undefined and nsCreateVariables.createTable == false %}
 
             {# Rename / Move Object #}
             {% if currentState.node.name != desiredState.node.name %}
@@ -121,23 +127,25 @@ does not permit copying or modification for any other purpose.
         
             {% endif %}
 
+            {# Alter Primary Key #}
             {% if (desiredState.config.primary
                     and currentState.config.primary == desiredState.config.primary
                     and currentState.config.get('primaryKeyConfig', []) != desiredState.config.get('primaryKeyConfig', []))
                     or (desiredState.config.primary and currentState.config.primary != desiredState.config.primary) %}
                 {% if nsCreateVariables.primaryKey | length > 0 %}
                     {{ stage('Alter Table - Add Primary Key Constraint') }}
-                    ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                    ALTER TABLE {{ nsAllVariables.desObjectNameFullPath }}
                     ADD PRIMARY KEY ( {{ nsCreateVariables.primaryKey}} ) NOT ENFORCED
                 {% endif %}
             {% else %}
                 {% if currentState.config.primary and desiredState.config.primary == false %}
                     {{ stage('Alter Table - Drop Primary Key Constraint') }}
-                    ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                    ALTER TABLE {{ nsAllVariables.desObjectNameFullPath }}
                     DROP PRIMARY KEY
                 {% endif %}
             {% endif %}
 
+            {# Alter Partition Expiration and Filter #}
             {% set alterPartition = "" %}
             {% if desiredState.config.partitionFilter %}
                 {% if desiredState.config.partitionFilter != currentState.config.partitionFilter %}
@@ -149,32 +157,34 @@ does not permit copying or modification for any other purpose.
                 {% endif %}
             {% endif %}
 
-            {% if desiredState.config.partExpireDays | trim | length > 0 %}
-                {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
-                    {% if alterPartition | length > 0 %}
-                        {% set alterPartition = alterPartition + ", " %}
+            {% if desiredState.config.partByColumnConfig != 'Integer Range' %}
+                {% if desiredState.config.partExpireDays | trim | length > 0 %}
+                    {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
+                        {% if alterPartition | length > 0 %}
+                            {% set alterPartition = alterPartition + ", " %}
+                        {% endif %}
+                        {% set alterPartition = alterPartition + 'partition_expiration_days = ' +  desiredState.config.partExpireDays %}
                     {% endif %}
-                    {% set alterPartition = alterPartition + 'partition_expiration_days = ' +  desiredState.config.partExpireDays %}
-                {% endif %}
-            {% else %}
-                {% if currentState.config.partExpireDays | trim | length > 0 %}
-                    {% if alterPartition | length > 0 %}
-                        {% set alterPartition = alterPartition + ", " %}
+                {% else %}
+                    {% if currentState.config.partExpireDays | trim | length > 0 %}
+                        {% if alterPartition | length > 0 %}
+                            {% set alterPartition = alterPartition + ", " %}
+                        {% endif %}
+                        {% set alterPartition = alterPartition + 'partition_expiration_days = NULL' %}
                     {% endif %}
-                    {% set alterPartition = alterPartition + 'partition_expiration_days = NULL' %}
                 {% endif %}
             {% endif %}
 
             {% if alterPartition | trim | length > 0 %}
                 {{ stage('Alter Table - Partition Options') }}
-                ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                ALTER TABLE {{ nsAllVariables.desObjectNameFullPath }}
                 SET OPTIONS ( {{ alterPartition }} )
             {% endif %}
 
-            {# Change table description #}
+            {# Change Table Description #}
             {% if currentState.node.description != desiredState.node.description %}
                 {{ stage('Alter Table - Change Table Description') }}
-                ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                ALTER TABLE {{ nsAllVariables.desObjectNameFullPath }}
                 SET OPTIONS (description = '{{ desiredState.node.description | escape }}')
             {% endif %}
 
@@ -195,7 +205,7 @@ does not permit copying or modification for any other purpose.
                         {% set ns.renameColCount = ns.renameColCount + 1 %}
                         {% if ns.renameColCount == 1 %}
                             {{ stage('Alter Table - Rename Column/s') }}
-                            ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                            ALTER TABLE {{ nsAllVariables.desObjectNameFullPath }}
                         {% else %}
                             , 
                         {% endif %}
@@ -217,7 +227,7 @@ does not permit copying or modification for any other purpose.
 
                         {% if ns.attributeColCount == 1 %}
                             {{ stage('Alter Table - Change Column Attributes') }}
-                            ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                            ALTER TABLE {{ nsAllVariables.desObjectNameFullPath }}
                         {% endif %}
 
                         {% if datatypeTest == false %}
@@ -260,7 +270,7 @@ does not permit copying or modification for any other purpose.
                     {% set ns.dropColCount = ns.dropColCount + 1 %}
                     {% if ns.dropColCount == 1 %}
                         {{ stage('Alter Table - Drop Column/s') }}
-                        ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                        ALTER TABLE {{ nsAllVariables.desObjectNameFullPath }}
                     {% else %}
                         , 
                     {% endif %}
@@ -276,7 +286,7 @@ does not permit copying or modification for any other purpose.
                     {% set ns.addCount = ns.addCount + 1 %}
                     {% if ns.addCount == 1 %}
                         {{ stage('Alter Table - Add Columns') }}
-                        ALTER TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+                        ALTER TABLE {{ nsAllVariables.desObjectNameFullPath }}
                     {% else %}
                         ,
                     {% endif %}
@@ -324,12 +334,13 @@ does not permit copying or modification for any other purpose.
                 {% endif %}
             {% endif %}
 
-        {# Create table incase of current state undefined or unsupported alter changes in existing table #}
+        {# Create table incase of new deployment or unsupported alter changes in existing table #}
         {% elif currentState == undefined or nsCreateVariables.createTable %}
 
             {% if currentState != undefined and currentState.node.materializationType != desiredState.node.materializationType %}
+                {# Drop current view before creation #}
                 {{ stage('Drop Current View - ' + currentState.node.name) }}
-                DROP {{currentState.node.materializationType}} IF EXISTS {{ ref_no_link(currentState.node.location.name, currentState.node.name) }}
+                DROP {{currentState.node.materializationType}} IF EXISTS {{ nsAllVariables.curObjectNameFullPath }}
 
             {% endif %}
 
@@ -345,22 +356,22 @@ does not permit copying or modification for any other purpose.
                 {% set nsCreateVariables.options = nsCreateVariables.options + "expiration_timestamp=" + nsCreateVariables.tabEprnClause %}
             {% endif %}
 
-            {% if config.partitionFilter %}
+            {% if desiredState.config.partitionFilter %}
                 {% if nsCreateVariables.options | length > 0 %}
                     {% set nsCreateVariables.options = nsCreateVariables.options + ", " %}
                 {% endif %}
                 {% set nsCreateVariables.options = nsCreateVariables.options + "require_partition_filter=true" %}
             {% endif %}
 
-            {% if config.partExpireDays | length > 0 %}
+            {% if desiredState.config.partByColumnConfig != 'Integer Range' and desiredState.config.partExpireDays | length > 0 %}
                 {% if nsCreateVariables.options | length > 0 %}
                     {% set nsCreateVariables.options = nsCreateVariables.options + ", " %}
                 {% endif %}
-                {% set nsCreateVariables.options = nsCreateVariables.options + "partition_expiration_days=" + config.partExpireDays %}
+                {% set nsCreateVariables.options = nsCreateVariables.options + "partition_expiration_days=" + desiredState.config.partExpireDays %}
             {% endif %}
 
             {{ stage('Create Dimension Table - ' + desiredState.node.name ) }}
-            CREATE OR REPLACE TABLE {{ ref_no_link(desiredState.node.location.name, desiredState.node.name) }}
+            CREATE OR REPLACE TABLE {{ nsAllVariables.desObjectNameFullPath }}
             (
                 {% for col in columns %}
                     `{{ col.name }}` {{ col.dataType }}
