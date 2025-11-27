@@ -123,7 +123,7 @@ macroString: |-
     {# Create namespaces #}
     {% set nsClusterBy = namespace(elements = "") %}
 
-    {% if config.clusterKey and config.clusterKeyConfig is defined %}
+    {% if config.partitionBy and config.clusterKey and config.clusterKeyConfig is defined %}
           {%- set nsClusterBy.elements = config.clusterKeyConfig.get('items', [])[:4]
                                           | map(attribute='clustColumn')
                                           | map(attribute='name')
@@ -164,7 +164,7 @@ macroString: |-
     {# Create namespaces #}
     {% set nsTabExprn = namespace(elements = "") %}
 
-    {% if config.exprnType != '' %}
+    {% if config.tabExpiration and config.exprnType != '' %}
       {% if config.exprnType == 'EXACT DATE/DATETIME' and config.timeExprnExpression|trim|length > 0 %}
         {% if config.timeExprnExpression|trim|length > 11 %}
           {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression|trim + '"' %}
@@ -177,6 +177,26 @@ macroString: |-
     {% endif %}
 
     {{ nsTabExprn.elements }}
+
+  {% endmacro %}
+
+  {# -----------------------------------------------------------------------------
+    Purpose: Generates the Default Rounding Mode for numeric type
+    Input Parameters : None
+    Returns          : String representing the Default Rounding Mode
+  ----------------------------------------------------------------------------- #}
+  {% macro getDefaultRoundingMode() %}
+
+    {# Create namespaces #}
+    {% set nsdefRndMd = namespace(elements = "") %}
+
+    {% if config.defRndMode == '' %}
+      {% set nsdefRndMd.elements = 'ROUND_HALF_AWAY_FROM_ZERO' %}
+    {% else %}
+      {% set nsdefRndMd.elements = config.defRndMode %}
+    {% endif %}
+
+    {{ nsdefRndMd.elements }}
 
   {% endmacro %}
 name: macro

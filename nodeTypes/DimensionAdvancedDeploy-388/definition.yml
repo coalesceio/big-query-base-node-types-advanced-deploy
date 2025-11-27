@@ -45,7 +45,7 @@ metadata:
 
       - type: toggleButton
         attributeName: partitionBy
-        displayName: Enable Partition
+        displayName: Enable Partitioning
         default: false
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
@@ -62,7 +62,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
       - type: textBox
-        displayName: "Partition By Expression (Ex: DATE_TRUNC(columnName, MONTH))"
+        displayName: "Time-Unit Expression (Ex: DATE_TRUNC(columnName, MONTH))"
         attributeName: partByTimeSqlExpression
         default: ""
         isRequired: false
@@ -80,7 +80,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: textBox
-        displayName: "Partition By Expression* (Ex: RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))"
+        displayName: "Integer Range Expression* (Ex: RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200)))"
         attributeName: partByIntSqlExpression
         default: ""
         isRequired: false
@@ -109,10 +109,10 @@ metadata:
 
       - type: toggleButton
         attributeName: clusterKey
-        displayName: Enable Cluster
+        displayName: Enable Clustering
         default: false
         isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
       - type: tabular
         displayName: Cluster By* (Only first 4 rows are processed)
@@ -157,6 +157,17 @@ metadata:
         default: ""
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'DAYS FROM NOW' %} true {% else %} false {% endif %}"
+
+      - displayName: Default Rounding Mode(Optional)
+        attributeName: defRndMode
+        default: ""
+        type: dropdownSelector
+        options:
+        - ""
+        - "ROUND_HALF_AWAY_FROM_ZERO"
+        - "ROUND_HALF_EVEN"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} flase {% endif %}"
         
     - groupName: Load Dimension Options
 
