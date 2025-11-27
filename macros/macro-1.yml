@@ -1,32 +1,10 @@
 fileVersion: 1
 id: "1"
 macroString: |-
-  {# ----------------------------------------------------------------------
-    Macro: columDictionary
-    Purpose: Builds a dictionary (ns.column_dict) of columns for all sources
-  ---------------------------------------------------------------------- #}
-  {% macro columnDictionary(ns) %}
-    {% if sources is defined %}
-      {% for source_idx in range(sources | length) %}
-        {% set source = sources[source_idx] %}
-
-        {# Initialize the source entry if missing #}
-        {% if source_idx not in ns.column_dict %}
-          {% set _ = ns.column_dict.update({source_idx: {}}) %}
-        {% endif %}
-
-        {# Add all columns in this source to the dictionary #}
-        {% for column in source.columns %}
-          {% set _ = ns.column_dict[source_idx].update({column.id: column}) %}
-        {% endfor %}
-      {% endfor %}
-    {% endif %}
-  {% endmacro %}
-
-  {#--------------------------------------------------------
+  {#=========================================================
     Initialize variables for node types that use the 
     advanced deployment strategy
-  ----------------------------------------------------------#}
+  =========================================================== #}
   {% if desiredState %}
       {% set columns = desiredState.columns %}
       {% set storageLocations = desiredState.storageLocations %}
@@ -34,18 +12,13 @@ macroString: |-
       {% set sources = desiredState.sources %}
       {% set node = desiredState.node %}
       {% set parameters = desiredState.parameters %}
-
-      {% set ns = namespace(column_dict = {}) %}
-      {# Populate column dictionary #}
-      {{ columnDictionary(ns) }}
-
   {% endif %}
 
-  {#--------------------------------------------------------
+  {#=========================================================
     Initialize variables for node types that use the 
     advanced deployment strategy
-  ----------------------------------------------------------#}
-  {% macro initializeAllVariables(nsAllVariables) %}
+  ===========================================================#}
+  {% macro initializeNodeVariables(nsNodeVariables) %}
 
     {% if currentState is defined %}
       {% set currentDatabase = currentState.storageLocations 
@@ -56,9 +29,9 @@ macroString: |-
                               | selectattr('name', 'equalto', currentState.node.location.name)
                               | map(attribute='schema')
                               | first %}
-      {% set nsAllVariables.currentDatabaseSchema = currentDatabase + '.' + currentSchema %}
+      {% set nsNodeVariables.currentDatabaseSchema = currentDatabase + '.' + currentSchema %}
 
-      {% set nsAllVariables.curObjectNameFullPath = ref_no_link(currentState.node.location.name, currentState.node.name) %}
+      {% set nsNodeVariables.curObjectNameFullPath = ref_no_link(currentState.node.location.name, currentState.node.name) %}
 
     {% endif %}
 
@@ -71,19 +44,19 @@ macroString: |-
                                 | selectattr('name', 'equalto', desiredState.node.location.name)
                                 | map(attribute='schema')
                                 | first %}
-      {% set nsAllVariables.desiredDatabaseSchema = desiredDatabase + '.' + desiredSchema %}
+      {% set nsNodeVariables.desiredDatabaseSchema = desiredDatabase + '.' + desiredSchema %}
 
-      {% set nsAllVariables.desObjectNameFullPath = ref_no_link(desiredState.node.location.name, desiredState.node.name) %}
+      {% set nsNodeVariables.desObjectNameFullPath = ref_no_link(desiredState.node.location.name, desiredState.node.name) %}
 
     {% endif %}
 
   {% endmacro %}
 
-  {# =========================================================
+  {# ============================================================
     Purpose: Generates the PARTITION BY clause
     Input Parameters : None
     Returns          : String representing the PARTITION BY clause
-  ========================================================= #}
+  ============================================================= #}
   {% macro getPartitionBy(nsPartitionBy) %}
 
     {# Macro to build partitionBy from config and store in namespace #}
@@ -113,11 +86,11 @@ macroString: |-
 
   {% endmacro %}
 
-  {# -----------------------------------------------------------------------------
+  {# ===========================================================
     Purpose: Generates the CLUSTER BY clause
     Input Parameters : None
     Returns          : String representing the CLUSTER BY clause
-  ----------------------------------------------------------------------------- #}
+  ============================================================= #}
   {% macro getClusterBy() %}
 
     {# Create namespaces #}
@@ -133,11 +106,11 @@ macroString: |-
     {{- nsClusterBy.elements -}}
   {% endmacro %}
 
-  {# =========================================================
+  {# ============================================================
     Purpose: Generates the PRIMARY KEY clause
     Input Parameters : None
     Returns          : String representing the PRIMARY KEY clause
-  ========================================================= #}
+  ============================================================= #}
   {% macro getPrimaryKey() %}
 
     {# Create namespaces #}
@@ -154,11 +127,11 @@ macroString: |-
     {{ nsPrimaryKey.elements }}
   {% endmacro %}
 
-  {# -----------------------------------------------------------------------------
+  {# ===============================================================
     Purpose: Generates the Table Expiration clause
     Input Parameters : None
     Returns          : String representing the Table Expiration clause
-  ----------------------------------------------------------------------------- #}
+  ================================================================ #}
   {% macro getTabExpirationClause() %}
 
     {# Create namespaces #}
@@ -180,11 +153,11 @@ macroString: |-
 
   {% endmacro %}
 
-  {# -----------------------------------------------------------------------------
+  {# ============================================================
     Purpose: Generates the Default Rounding Mode for numeric type
     Input Parameters : None
     Returns          : String representing the Default Rounding Mode
-  ----------------------------------------------------------------------------- #}
+  =============================================================== #}
   {% macro getDefaultRoundingMode() %}
 
     {# Create namespaces #}
