@@ -57,32 +57,31 @@ macroString: |-
     Input Parameters : None
     Returns          : String representing the PARTITION BY clause
   ============================================================= #}
-  {% macro getPartitionBy(nsPartitionBy) %}
+  {% macro getPartitionBy() %}
 
-    {# Macro to build partitionBy from config and store in namespace #}
-    {%- set nsPartitionBy = namespace(elements = "") -%}
+    {%- set varPartitionBy = "" -%}
 
     {% if config.partitionBy %}
         {% if config.partByColumnConfig == 'Ingestion Time' %}
           {% if config.partByIngnTimeExpression != "" %}
-            {%- set nsPartitionBy.elements = config.partByIngnTimeExpression -%}
+            {%- set varPartitionBy = config.partByIngnTimeExpression -%}
           {% else %}
-              {%- set nsPartitionBy.elements = "_PARTITIONDATE" -%}
+              {%- set varPartitionBy = "_PARTITIONDATE" -%}
           {% endif %}
 
         {% elif config.partByColumnConfig == 'Integer Range' %}
-          {%- set nsPartitionBy.elements = config.partByIntSqlExpression|trim -%}
+          {%- set varPartitionBy = config.partByIntSqlExpression|trim -%}
 
         {% elif config.partByColumnConfig == 'Time-Unit Column' %}
           {% if config.partByTimeSqlExpression|trim|length > 0 %}
-            {%- set nsPartitionBy.elements = config.partByTimeSqlExpression|trim -%}
+            {%- set varPartitionBy = config.partByTimeSqlExpression|trim -%}
           {% else %}
-            {%- set nsPartitionBy.elements = config.partByColumn.name -%}
+            {%- set varPartitionBy = config.partByColumn.name -%}
           {% endif %}
         {% endif %}
     {% endif %}
 
-    {{ nsPartitionBy.elements }}
+    {{ varPartitionBy }}
 
   {% endmacro %}
 
@@ -94,16 +93,16 @@ macroString: |-
   {% macro getClusterBy() %}
 
     {# Create namespaces #}
-    {% set nsClusterBy = namespace(elements = "") %}
+    {% set varClusterBy = "" %}
 
     {% if config.partitionBy and config.clusterKey and config.clusterKeyConfig is defined %}
-          {%- set nsClusterBy.elements = config.clusterKeyConfig.get('items', [])[:4]
+          {%- set varClusterBy = config.clusterKeyConfig.get('items', [])[:4]
                                           | map(attribute='clustColumn')
                                           | map(attribute='name')
                                           | list | join(', ') -%}
-      {% endif %}
+    {% endif %}
 
-    {{- nsClusterBy.elements -}}
+    {{- varClusterBy -}}
   {% endmacro %}
 
   {# ============================================================
@@ -114,17 +113,17 @@ macroString: |-
   {% macro getPrimaryKey() %}
 
     {# Create namespaces #}
-    {% set nsPrimaryKey = namespace(elements = "") %}
+    {% set varPrimaryKey = "" %}
 
-      {% if config.primary %}
-          {# Extract column names safely #}
-          {% set nsPrimaryKey.elements = config.primaryKeyConfig.get('items', [])
-                                          | map(attribute='primaryKey')
-                                          | map(attribute='name')
-                                          | list | join(', ') %}
-      {% endif %}
+    {% if config.primary %}
+        {# Extract column names safely #}
+        {% set varPrimaryKey = config.primaryKeyConfig.get('items', [])
+                                        | map(attribute='primaryKey')
+                                        | map(attribute='name')
+                                        | list | join(', ') %}
+    {% endif %}
 
-    {{ nsPrimaryKey.elements }}
+    {{ varPrimaryKey }}
   {% endmacro %}
 
   {# ===============================================================
@@ -135,21 +134,21 @@ macroString: |-
   {% macro getTabExpirationClause() %}
 
     {# Create namespaces #}
-    {% set nsTabExprn = namespace(elements = "") %}
+    {% set varTabExprn = "" %}
 
     {% if config.tabExpiration and config.exprnType != '' %}
       {% if config.exprnType == 'EXACT DATE/DATETIME' and config.timeExprnExpression|trim|length > 0 %}
         {% if config.timeExprnExpression|trim|length > 11 %}
-          {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression|trim + '"' %}
+          {% set varTabExprn = 'TIMESTAMP "' + config.timeExprnExpression|trim + '"' %}
         {% else %}
-          {% set nsTabExprn.elements = 'TIMESTAMP "' + config.timeExprnExpression|trim + ' 23:59:59"' %}
+          {% set varTabExprn = 'TIMESTAMP "' + config.timeExprnExpression|trim + ' 23:59:59"' %}
         {% endif %}
       {% elif config.exprnType == 'DAYS FROM NOW'and config.dayExprnExpression|trim|length > 0 %}
-        {% set nsTabExprn.elements = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  config.dayExprnExpression|trim + ' DAY)' %}
+        {% set varTabExprn = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  config.dayExprnExpression|trim + ' DAY)' %}
       {% endif %}
     {% endif %}
 
-    {{ nsTabExprn.elements }}
+    {{ varTabExprn }}
 
   {% endmacro %}
 
@@ -161,15 +160,15 @@ macroString: |-
   {% macro getDefaultRoundingMode() %}
 
     {# Create namespaces #}
-    {% set nsdefRndMd = namespace(elements = "") %}
+    {% set varDefRndMd = namespace(elements = "") %}
 
     {% if config.defRndMode == '' %}
-      {% set nsdefRndMd.elements = 'ROUND_HALF_AWAY_FROM_ZERO' %}
+      {% set varDefRnd = 'ROUND_HALF_AWAY_FROM_ZERO' %}
     {% else %}
-      {% set nsdefRndMd.elements = config.defRndMode %}
+      {% set varDefRndMd = config.defRndMode %}
     {% endif %}
 
-    {{ nsdefRndMd.elements }}
+    {{ varDefRndMd }}
 
   {% endmacro %}
 name: macro

@@ -209,7 +209,7 @@ does not permit copying or modification for any other purpose.
                     {% if alterOptions | length > 0 %}
                         {% set alterOptions = alterOptions + ", " %}
                     {% endif %}
-                    {% set alterOptions = alterOptions + 'expiration_timestamp = ""' %}
+                    {% set alterOptions = alterOptions + 'expiration_timestamp = NULL' %}
                 {% endif %}
             {% endif %}
 
@@ -410,6 +410,12 @@ does not permit copying or modification for any other purpose.
                     {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
                 {% endif %}
                 {% set nsConfigVariables.options = nsConfigVariables.options + 'default_rounding_mode = ' + nsConfigVariables.defRndMode %}
+            {% endif %}
+
+            {% if nsConfigVariables.createTable %}		
+                {# Drop current table/view before creating #}
+                {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
+                DROP {{ currentState.node.materializationType }} IF EXISTS {{ nsNodeVariables.curObjectNameFullPath }}
             {% endif %}
 
             {# Create table with all the config/mapping options #}
