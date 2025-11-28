@@ -32,7 +32,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
       - type: tabular   
-        displayName: Primary Key Columns*
+        displayName: Primary Key Columns* (Not Enforced)
         attributeName: primaryKeyConfig
         columns:
 
@@ -125,7 +125,7 @@ metadata:
            isRequired: false
       
         isRequired: false
-        enableIf: "{% if node.materializationType != view and config.clusterKey %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.clusterKey and config.partitionBy %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: tabExpiration
@@ -189,8 +189,13 @@ metadata:
       - type: businessKeyColumns
         isRequired: true
 
-      - type: changeTrackingColumns (If chosen, treats as SCD2)
+      - type: changeTrackingColumns
         isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - type: label
+        displayName: Note - SCD2 if selected, else SCD1
+        attributeName: labelCT
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       - displayName: Truncate Before
@@ -224,15 +229,16 @@ metadata:
         type: textBox
         syntax: sql
         isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       - displayName: Post-SQL (Optional)
         attributeName: postSQL
         type: textBox
         syntax: sql
         isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       isRequired: false
-      enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
     systemColumns:
     - displayName: '{{NODE_NAME}}_KEY'

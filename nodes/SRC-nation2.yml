@@ -1,6 +1,6 @@
 fileVersion: 1
-id: 1065c77d-0a85-47d2-8099-48c4da891257
-name: nation
+id: 1598a943-d1c4-4767-886c-6f101b123c79
+name: nation2
 operation:
   database: ""
   deployEnabled: true
@@ -13,8 +13,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 1708ebff-03a7-4598-abad-1340b1bb8702
-          stepCounter: 1065c77d-0a85-47d2-8099-48c4da891257
+          columnCounter: cfbea450-4af5-4e70-8538-4c35c58789df
+          stepCounter: 1598a943-d1c4-4767-886c-6f101b123c79
         config: {}
         dataType: INT64
         defaultValue: "NULL"
@@ -30,8 +30,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 8f2ffc47-b2eb-4cca-bc47-d7fef3b8a047
-          stepCounter: 1065c77d-0a85-47d2-8099-48c4da891257
+          columnCounter: 938608d6-2faf-4698-bb61-1b787accdd8d
+          stepCounter: 1598a943-d1c4-4767-886c-6f101b123c79
         config: {}
         dataType: STRING
         defaultValue: "NULL"
@@ -47,8 +47,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: a16ea460-1e52-46ec-a159-fea00818838d
-          stepCounter: 1065c77d-0a85-47d2-8099-48c4da891257
+          columnCounter: 919e8345-09d6-416c-9fa1-1d80833e72b0
+          stepCounter: 1598a943-d1c4-4767-886c-6f101b123c79
         config: {}
         dataType: INT64
         defaultValue: "NULL"
@@ -64,8 +64,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 57c4a6ff-f1fb-4f03-bd11-c397a857efcc
-          stepCounter: 1065c77d-0a85-47d2-8099-48c4da891257
+          columnCounter: 14ab7dd7-e85c-41b2-97cd-ac4bc19af6f7
+          stepCounter: 1598a943-d1c4-4767-886c-6f101b123c79
         config: {}
         dataType: STRING
         defaultValue: "NULL"
@@ -76,7 +76,7 @@ operation:
           - columnReferences: []
             transform: ""
         transform: ""
-  name: nation
+  name: nation2
   schema: ""
   sqlType: Source
   type: sourceInput

@@ -52,11 +52,13 @@ macroString: |-
 
   {% endmacro %}
 
-  {# ============================================================
-    Purpose: Generates the PARTITION BY clause
+  {# =======================================================================================
+    Purpose: Generates the correct PARTITION BY expression based on the user’s configuration.
+    Supports ingestion time, integer range, and time-unit column partitioning, 
+    and falls back to defaults when no custom expression is provided.
     Input Parameters : None
     Returns          : String representing the PARTITION BY clause
-  ============================================================= #}
+  ========================================================================================= #}
   {% macro getPartitionBy() %}
 
     {%- set varPartitionBy = "" -%}
@@ -85,11 +87,12 @@ macroString: |-
 
   {% endmacro %}
 
-  {# ===========================================================
-    Purpose: Generates the CLUSTER BY clause
+  {# ===================================================================================
+    Purpose: Builds the CLUSTER BY clause from the selected clustering columns.
+    Uses up to four columns from the config and returns them as a comma-separated list.
     Input Parameters : None
     Returns          : String representing the CLUSTER BY clause
-  ============================================================= #}
+  ====================================================================================== #}
   {% macro getClusterBy() %}
 
     {# Create namespaces #}
@@ -105,11 +108,12 @@ macroString: |-
     {{- varClusterBy -}}
   {% endmacro %}
 
-  {# ============================================================
-    Purpose: Generates the PRIMARY KEY clause
+  {# ==================================================================================
+    Purpose: Returns the list of selected primary key columns as a comma-separated 
+    string, using values from the primary key configuration safely
     Input Parameters : None
     Returns          : String representing the PRIMARY KEY clause
-  ============================================================= #}
+  ===================================================================================== #}
   {% macro getPrimaryKey() %}
 
     {# Create namespaces #}
@@ -126,11 +130,13 @@ macroString: |-
     {{ varPrimaryKey }}
   {% endmacro %}
 
-  {# ===============================================================
-    Purpose: Generates the Table Expiration clause
+  {# ========================================================================
+    Purpose: Builds the table expiration expression based on the selected type. 
+    Supports exact date or datetime values and day-based offsets, 
+    converting inputs into a valid TIMESTAMP
     Input Parameters : None
     Returns          : String representing the Table Expiration clause
-  ================================================================ #}
+  ========================================================================= #}
   {% macro getTabExpirationClause() %}
 
     {# Create namespaces #}
@@ -152,11 +158,12 @@ macroString: |-
 
   {% endmacro %}
 
-  {# ============================================================
-    Purpose: Generates the Default Rounding Mode for numeric type
+  {# =======================================================================================
+    Purpose: Returns the default rounding mode. Uses the user-selected value if provided;
+    otherwise falls back to ROUND_HALF_AWAY_FROM_ZERO
     Input Parameters : None
     Returns          : String representing the Default Rounding Mode
-  =============================================================== #}
+  ========================================================================================== #}
   {% macro getDefaultRoundingMode() %}
 
     {# Create namespaces #}

@@ -1,6 +1,6 @@
 fileVersion: 1
-id: 9cfb7870-3b1b-4556-86e7-dce18b8b0012
-name: nation_SMALL
+id: cdba39ad-e6cc-423d-9ba9-d69f96771719
+name: nation1
 operation:
   database: ""
   deployEnabled: true
@@ -13,13 +13,13 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 2d8a239d-8e84-4c1b-8d89-60a24865403f
-          stepCounter: 9cfb7870-3b1b-4556-86e7-dce18b8b0012
+          columnCounter: 041263e8-3693-4054-9276-585a49d35092
+          stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
         config: {}
         dataType: INT64
         defaultValue: "NULL"
         description: ""
-        name: n_nationkey
+        name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
           - columnReferences: []
@@ -30,13 +30,13 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 63c15f9b-ea4c-4bd8-9e3a-9bfd152402e8
-          stepCounter: 9cfb7870-3b1b-4556-86e7-dce18b8b0012
+          columnCounter: 932f5024-7aa3-40c9-b84c-f08595a698de
+          stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
         config: {}
         dataType: STRING
         defaultValue: "NULL"
         description: ""
-        name: n_name
+        name: N_NAME
         nullable: true
         sourceColumnReferences:
           - columnReferences: []
@@ -47,13 +47,13 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: b5a9873b-dd17-4894-bd89-fdb89a74e912
-          stepCounter: 9cfb7870-3b1b-4556-86e7-dce18b8b0012
+          columnCounter: 4cc9417b-f40a-4ea7-be54-643cd8b2a85d
+          stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
         config: {}
         dataType: INT64
         defaultValue: "NULL"
         description: ""
-        name: n_regionkey
+        name: N_REGIONKEY
         nullable: true
         sourceColumnReferences:
           - columnReferences: []
@@ -64,19 +64,19 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 25259551-93aa-4764-9c91-38e7b883c8de
-          stepCounter: 9cfb7870-3b1b-4556-86e7-dce18b8b0012
+          columnCounter: 3a84694b-6580-4671-a134-a7dbbddcaf04
+          stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
         config: {}
         dataType: STRING
         defaultValue: "NULL"
         description: ""
-        name: n_comment
+        name: N_COMMENT
         nullable: true
         sourceColumnReferences:
           - columnReferences: []
             transform: ""
         transform: ""
-  name: nation_SMALL
+  name: nation1
   schema: ""
   sqlType: Source
   type: sourceInput
