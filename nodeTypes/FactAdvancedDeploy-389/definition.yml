@@ -13,7 +13,7 @@ metadata:
     deployStrategy: advanced
 
     config:
-    - groupName: Options
+    - groupName: Create Options
       items:
       - type: materializationSelector
         isRequired: true
@@ -21,38 +21,19 @@ metadata:
         options:
         - table
         - view
-        - transient table
 
       - type: overrideSQLToggle
         enableIf: "{% if node.materializationType == 'view' %} true {% else %} false {% endif %}"
 
-      - type: multisourceToggle
-        enableIf: "{% if node.materializationType == 'view' and node.override.create.enabled %} false {% else %} true {% endif %}"
-
-      - displayName: Multi Source Strategy
-        attributeName: insertStrategy
-        type: dropdownSelector
-        default: UNION ALL
-        options:
-        - "UNION"
-        - "UNION ALL"
-        isRequired: false
-        enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"
-
       - type: toggleButton
         displayName: Primary Key
-        attributeName: primary
         default: false
+        attributeName: primary
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
-      - type: textBox
-        displayName: Primary Key Name
-        attributeName: primaryKeyName
-        enableIf: "{% if node.materializationType != 'view' and config.primary %} true {% else %} false {% endif %}"
-
       - type: tabular   
-        displayName: Primary Key Columns
-        attributeName: primaryKeyCol
+        displayName: Primary Key Columns* (Not Enforced)
+        attributeName: primaryKeyConfig
         columns:
 
         -  type: columnDropdownSelector
@@ -62,97 +43,160 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.primary %} true {% else %} false {% endif %}"
 
-      - type: businessKeyColumns
-        isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
-
-      - displayName: Unmatched Record Strategy
-        attributeName: deleteStrategy
-        type: dropdownSelector
-        default: "NO DELETE"
-        options:
-        - "NO DELETE"
-        - "HARD DELETE"
-        isRequired: false
-        enableIf: "{% if node.materializationType != 'view' 
-                      and node.isMultisource == false
-                      and (columns 
-                          | selectattr('isBusinessKey')
-                          | list
-                          | length > 0) %} true {% else %} false {% endif %}"
-
-      - displayName: Exclude Columns from Merge (For SCD Type I)
-        attributeName: excludeMergeToggle
-        type: toggleButton
+      - type: toggleButton
+        attributeName: partitionBy
+        displayName: Enable Partitioning
         default: false
-        enableIf: "{% if node.materializationType != 'view' and (columns 
-                      | selectattr('isBusinessKey')
-                      | list
-                      | length > 0) %} true {% else %} false {% endif %}"
-
-      - type: tabular
-        displayName: 'Exclude Merge List'
-        attributeName: excludeMergeList
-        columns:
-
-          -  type: columnDropdownSelector
-             displayName: Exclude Column Name
-             attributeName: excludeColName
-           
         isRequired: false
-        enableIf: "{% if config.excludeMergeToggle
-                      and node.materializationType != 'view' 
-                      and node.isMultisource == false
-                      and (columns 
-                          | selectattr('isBusinessKey')
-                          | list
-                          | length > 0) %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
+
+      - displayName: Partition By*
+        attributeName: partByColumnConfig
+        type: dropdownSelector
+        default: "Time-Unit Column"
+        options:
+        - "Time-Unit Column"
+        - "Integer Range"
+        - "Ingestion Time"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: "Time-Unit Expression (Ex: DATE_TRUNC(columnName, MONTH))"
+        attributeName: partByTimeSqlExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: -- OR --
+        attributeName: labelOR
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+
+      - type: columnDropdownSelector
+        displayName: Partition By Column (dataType-DATE)
+        attributeName: partByColumn
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: "Integer Range Expression* (Ex: RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200)))"
+        attributeName: partByIntSqlExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Integer Range' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: Ingestion-time Expression(Optional) (Ex. DATE_TRUNC(_PARTITIONTIME, MONTH))
+        attributeName: partByIngnTimeExpression
+        default: ''
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Ingestion Time' %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: partitionFilter
+        displayName: Require Partition Filter
+        default: false
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: Partition Expiration Days(Optional) (Ex. 30)
+        attributeName: partExpireDays
+        default: ''
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and ( config.partByColumnConfig == 'Time-Unit Column' or config.partByColumnConfig == 'Ingestion Time' ) %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: clusterKey
-        displayName: Cluster Key
+        displayName: Enable Clustering
         default: false
         isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
-
-      - type: toggleButton
-        attributeName: clusterKeyExpressions
-        displayName: Allow Expressions in Cluster Key
-        default: false
-        isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.clusterKey %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
 
       - type: tabular
-        displayName: 'Cluster Key'
+        displayName: Cluster By* (Only first 4 rows are processed)
         attributeName: clusterKeyConfig
         columns:
 
         -  type: columnDropdownSelector
-           displayName: Column Name
-           attributeName: columnName
+           displayName: Cluster By Columns
+           attributeName: clustColumn
            isRequired: false
       
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.clusterKey and not config.clusterKeyExpressions %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.clusterKey and config.partitionBy %} true {% else %} false {% endif %}"
 
-      - type: tabular
-        displayName: 'Cluster Key'
-        attributeName: clusterKeyConfigExpressions
-        columns:
-
-        -  type: columnDropdownSelector
-           displayName: Column Name
-           attributeName: columnNameExpressions
-           isRequired: false
-      
-        -  type: textBox
-           displayName: Expression(Column name to be enclosed within double quotes)
-           attributeName: sqlExpression
-           default: "ex. trunc(\"<column_name>\", -5)"
-           isRequired: false
-      
+      - type: toggleButton
+        attributeName: tabExpiration
+        displayName: Table Expiration
+        default: false
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.clusterKey and config.clusterKeyExpressions %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - displayName: Expiration Type*
+        attributeName: exprnType
+        default: "DAYS FROM NOW"
+        type: dropdownSelector
+        options:
+        - "EXACT DATE/DATETIME"
+        - "DAYS FROM NOW"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration %} true {% else %} flase {% endif %}"
+
+      - type: textBox
+        displayName: 'Expiration Value* (Ex: 2024-12-31 | 2024-12-31 23:59:59)'
+        attributeName: timeExprnExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'EXACT DATE/DATETIME' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: 'Expiration Value* (Ex: 30)'
+        attributeName: dayExprnExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'DAYS FROM NOW' %} true {% else %} false {% endif %}"
+
+      - displayName: Default Rounding Mode(Optional)
+        attributeName: defRndMode
+        default: ""
+        type: dropdownSelector
+        options:
+        - ""
+        - "ROUND_HALF_AWAY_FROM_ZERO"
+        - "ROUND_HALF_EVEN"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} flase {% endif %}"
+
+    - groupName: Load Fact Options
+
+      items:
+
+      - type: textBox
+        displayName: Partition Filter Query* (Ex. <partByCluase> > current_time())
+        attributeName: partFiltetrQuery
+        syntax: sql
+        default: ""
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partitionFilter %} true {% else %} false {% endif %}"
+
+      - type: multisourceToggle
+        enableIf: "{% if node.materializationType == 'view' and node.override.create.enabled %} false {% else %} true {% endif %}"
+
+      - displayName: Multi Source Strategy*
+        attributeName: insertStrategy
+        type: dropdownSelector
+        default: UNION ALL
+        options:
+        - "UNION DISTINCT"
+        - "UNION ALL"
+        isRequired: false
+        enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"
+
+      - type: businessKeyColumns
+        isRequired: false
+        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       - displayName: Truncate Before
         attributeName: truncateBefore
@@ -160,62 +204,43 @@ metadata:
         default: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
-      - displayName: Enable Tests
-        attributeName: testsEnabled
-        type: toggleButton
-        default: false
-        
       - displayName: Distinct
         attributeName: selectDistinct
         type: toggleButton
+        enableIf: "{% if config.groupByAll %} false {% else %} true {% endif %}"
         default: false
-        enableIf: "{% if config.groupByAll or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
-
+        
       - displayName: Group By All
         attributeName: groupByAll
         type: toggleButton
         default: false
-        enableIf: "{% if config.selectDistinct or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
+        enableIf: "{% if config.selectDistinct %} false {% else %} true {% endif %}"
 
-      - displayName: Order By
-        attributeName: orderby
+      enableIf: "{% if node.materializationType == 'view' and node.override.create.enabled %} false {% else %} true {% endif %}"
+
+    - groupName: Other Options
+      items:
+
+      - displayName: Enable Tests
+        attributeName: testsEnabled
         type: toggleButton
         default: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
-      - type: tabular
-        displayName: 'Sort column'
-        attributeName: orderbycolumn
-        columns:
-
-          -  type: columnDropdownSelector
-             displayName: Column Name
-             attributeName: sortColName
-
-          -  type: dropdownSelector
-             displayName: Sort Order
-             attributeName: sortOrder
-             default: desc
-             options:
-             - desc
-             - asc
-           
-        isRequired: true
-        enableIf: "{% if node.materializationType != 'view' and config.orderby %} true {% else %} false {% endif %}"
-
-      - displayName: Pre-SQL
+      - displayName: Pre-SQL (Optional)
         attributeName: preSQL
         type: textBox
         syntax: sql
         isRequired: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
-      - displayName: Post-SQL
+      - displayName: Post-SQL (Optional)
         attributeName: postSQL
         type: textBox
         syntax: sql
         isRequired: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      isRequired: false
 
     systemColumns:
     - displayName: SYSTEM_CREATE_DATE

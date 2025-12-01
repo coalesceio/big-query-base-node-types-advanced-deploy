@@ -29,13 +29,13 @@ does not permit copying or modification for any other purpose.
 
     {# == Truncate data before data insertion  == #}
     {% if config.truncateBefore %}
-        {{ stage('Truncate Dimension Table') }}
+        {{ stage('Truncate Dimension Table - ' + node.name) }}
         TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
     {% endif %}
 	
     {% if is_type_2 %}
         {# SCD-Type 2 Dimension == #}
-        {{ stage('MERGE ' + ' Sources' | string) }}
+        {{ stage('Load Dimension Table Using Merge(SCD Type2) - ' + node.name) }}
         MERGE INTO {{ ref_no_link(node.location.name, node.name) }} `TGT`
         USING
         (
@@ -290,7 +290,7 @@ does not permit copying or modification for any other purpose.
     {% else %}
 
         {# SCD-Type 1 Dimension == #}
-        {{ stage('MERGE ' + ' Sources' | string) }}
+        {{ stage('Load Dimension Table Using Merge(SCD Type1) - ' + node.name) }}
         MERGE INTO {{ ref_no_link(node.location.name, node.name) }} `TGT`
         USING
         (
@@ -387,7 +387,7 @@ does not permit copying or modification for any other purpose.
 
 {% else %}
 
-    {{ stage('Load Skipped for View') }}
+    {{ stage('Load Dimension Skipped for View') }}
     -- The node {{node.name}} is materialized as View. Therefore, a Load operation is not supported.
     SELECT 1 FROM UNNEST([1]) AS INFO_MESSAGE WHERE FALSE
 

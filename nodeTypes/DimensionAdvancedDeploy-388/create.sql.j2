@@ -196,8 +196,8 @@ does not permit copying or modification for any other purpose.
             {% if (desiredState.config.tabExpiration
                     and currentState.config.tabExpiration == desiredState.config.tabExpiration
                     and (currentState.config.exprnType != desiredState.config.exprnType
-                    or desiredState.config.timeExprnExpression == currentState.config.timeExprnExpression
-                    or desiredState.config.dayExprnExpression == currentState.config.dayExprnExpression))
+                    or desiredState.config.timeExprnExpression != currentState.config.timeExprnExpression
+                    or desiredState.config.dayExprnExpression != currentState.config.dayExprnExpression))
                     or (desiredState.config.tabExpiration and currentState.config.tabExpiration != desiredState.config.tabExpiration) %}
 
                 {% if alterOptions | length > 0 %}
