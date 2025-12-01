@@ -382,7 +382,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# Build table options - require_partition_filter #}
-            {% if desiredState.config.partitionFilter %}
+            {% if desiredState.config.partitionBy and desiredState.config.partitionFilter %}
                 {% if nsConfigVariables.options | length > 0 %}
                     {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
                 {% endif %}
@@ -390,7 +390,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# Build table options - partition_expiration_days #}
-            {% if desiredState.config.partByColumnConfig != 'Integer Range' and desiredState.config.partExpireDays | length > 0 %}
+            {% if desiredState.config.partitionBy and desiredState.config.partByColumnConfig != 'Integer Range' and desiredState.config.partExpireDays | length > 0 %}
                 {% if nsConfigVariables.options | length > 0 %}
                     {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
                 {% endif %}

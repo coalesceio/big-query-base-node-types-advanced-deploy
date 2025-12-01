@@ -11,7 +11,7 @@ operation:
     defRndMode: ""
     exprnType: DAYS FROM NOW
     groupByAll: false
-    insertStrategy: UNION ALL
+    insertStrategy: UNION DISTINCT
     partByColumn: ""
     partByColumnConfig: Time-Unit Column
     partByIngnTimeExpression: ""
@@ -30,11 +30,11 @@ operation:
     tabExpiration: false
     testsEnabled: false
     timeExprnExpression: ""
-    truncateBefore: true
+    truncateBefore: false
   database: ""
   deployEnabled: true
   description: ""
-  isMultisource: false
+  isMultisource: true
   locationName: TARGET
   materializationType: table
   metadata:
@@ -57,6 +57,8 @@ operation:
         sourceColumnReferences:
           - columnReferences: []
             transform: ""
+          - columnReferences: []
+            transform: ""
       - appliedColumnTests: {}
         columnReference:
           columnCounter: a9816347-5d76-415d-bafe-9750ceef8bbd
@@ -72,6 +74,10 @@ operation:
               - columnCounter: 041263e8-3693-4054-9276-585a49d35092
                 stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
             transform: ""
+          - columnReferences:
+              - columnCounter: cfbea450-4af5-4e70-8538-4c35c58789df
+                stepCounter: 1598a943-d1c4-4767-886c-6f101b123c79
+            transform: ""
       - appliedColumnTests: {}
         columnReference:
           columnCounter: 2c1b1e5c-32a6-4ce4-9d6d-21b07a38db31
@@ -79,12 +85,17 @@ operation:
         config: {}
         dataType: STRING
         description: ""
+        isChangeTracking: true
         name: N_NAME
         nullable: true
         sourceColumnReferences:
           - columnReferences:
               - columnCounter: 932f5024-7aa3-40c9-b84c-f08595a698de
                 stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
+            transform: ""
+          - columnReferences:
+              - columnCounter: 938608d6-2faf-4698-bb61-1b787accdd8d
+                stepCounter: 1598a943-d1c4-4767-886c-6f101b123c79
             transform: ""
       - appliedColumnTests: {}
         columnReference:
@@ -100,6 +111,10 @@ operation:
               - columnCounter: 4cc9417b-f40a-4ea7-be54-643cd8b2a85d
                 stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
             transform: ""
+          - columnReferences:
+              - columnCounter: 919e8345-09d6-416c-9fa1-1d80833e72b0
+                stepCounter: 1598a943-d1c4-4767-886c-6f101b123c79
+            transform: ""
       - appliedColumnTests: {}
         columnReference:
           columnCounter: 3b955fc8-265b-4a40-9c2b-b7552f4943b6
@@ -113,6 +128,10 @@ operation:
           - columnReferences:
               - columnCounter: 3a84694b-6580-4671-a134-a7dbbddcaf04
                 stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
+            transform: ""
+          - columnReferences:
+              - columnCounter: 14ab7dd7-e85c-41b2-97cd-ac4bc19af6f7
+                stepCounter: 1598a943-d1c4-4767-886c-6f101b123c79
             transform: ""
       - acceptedValues:
           strictMatch: true
@@ -129,6 +148,8 @@ operation:
         name: system_version
         nullable: true
         sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
           - columnReferences: []
             transform: ""
       - acceptedValues:
@@ -148,6 +169,8 @@ operation:
         sourceColumnReferences:
           - columnReferences: []
             transform: ""
+          - columnReferences: []
+            transform: ""
       - acceptedValues:
           strictMatch: true
           values: []
@@ -163,6 +186,8 @@ operation:
         name: system_start_date
         nullable: true
         sourceColumnReferences:
+          - columnReferences: []
+            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
           - columnReferences: []
             transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
       - acceptedValues:
@@ -182,6 +207,8 @@ operation:
         sourceColumnReferences:
           - columnReferences: []
             transform: CAST('2999-12-31 00:00:00' AS TIMESTAMP)
+          - columnReferences: []
+            transform: CAST('2999-12-31 00:00:00' AS TIMESTAMP)
       - acceptedValues:
           strictMatch: true
           values: []
@@ -199,6 +226,8 @@ operation:
         sourceColumnReferences:
           - columnReferences: []
             transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - columnReferences: []
+            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
       - acceptedValues:
           strictMatch: true
           values: []
@@ -214,6 +243,8 @@ operation:
         name: system_update_date
         nullable: true
         sourceColumnReferences:
+          - columnReferences: []
+            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
           - columnReferences: []
             transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
     cteString: ""
@@ -234,8 +265,21 @@ operation:
         join:
           joinCondition: |-
             FROM {{ ref('SRC', 'nation1') }} `nation1`
-            where `N_NATIONKEY` = 1
+            where `nation1`.`N_NATIONKEY` = 1
         name: dim_nation1
+        noLinkRefs: []
+      - aliases:
+          nation2: 1598a943-d1c4-4767-886c-6f101b123c79
+        customSQL:
+          customSQL: ""
+        dependencies:
+          - locationName: SRC
+            nodeName: nation2
+        join:
+          joinCondition: |-
+            FROM {{ ref('SRC', 'nation2') }} `nation2`
+            where `nation2`.`N_NATIONKEY` = 2
+        name: NEW_SOURCE
         noLinkRefs: []
   name: dim_nation1
   overrideSQL: true

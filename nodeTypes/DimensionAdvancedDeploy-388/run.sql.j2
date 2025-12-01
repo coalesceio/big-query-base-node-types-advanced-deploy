@@ -40,7 +40,7 @@ does not permit copying or modification for any other purpose.
         USING
         (
             {% for source in sources %}
-
+            (
                 {% set joinclause = source.join %}
             
                 /* New Rows That Don't Exist */
@@ -250,9 +250,9 @@ does not permit copying or modification for any other purpose.
                         {{  get_clause(joinclause)  }}
 
                         {% if config.groupByAll %} GROUP BY ALL {% endif %}
-                    ) 
+                    ))
                 {% endif %}
-                {% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+                {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
                     {{config.insertStrategy}}
                 {% endif %}         
             {% endfor %}
