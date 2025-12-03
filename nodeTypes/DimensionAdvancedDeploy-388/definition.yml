@@ -233,6 +233,73 @@ metadata:
         default: false
         enableIf: "{% if config.selectDistinct or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
 
+      - type: toggleButton
+        attributeName: insertZeroKey
+        displayName: Insert Zero Key Record
+        default: false
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
+
+    - groupName: Zero Key Record Options
+      items:
+
+      - displayName: Default Surrogate Key Value
+        attributeName: insertZeroKeySurrogateKey
+        type: textBox
+        default: "0"
+        isRequired: false
+
+      - displayName: Default String Value
+        attributeName: insertZeroKeyStr
+        type: textBox
+        default: "UNKNOWN"
+        isRequired: false
+
+      - displayName: Default Date Value (DateFormat - DD-MM-YYYY)
+        attributeName: insertZeroKeyDate
+        type: textBox
+        default: "01-01-1900"
+        isRequired: false
+
+      - displayName: Default Timestamp Value (TimestampFormat - YYYY-MM-DD HH24:MI:SS.FF)
+        attributeName: insertZeroKeyTimestamp
+        type: textBox
+        default: "1900-01-01 00:00:00.000"
+        isRequired: false
+
+      - displayName: Default Boolean Value
+        attributeName: insertZeroKeyBool
+        type: dropdownSelector
+        default: "TRUE"
+        isRequired: false
+        options:
+        - "TRUE"
+        - "FALSE"
+
+      - type: toggleButton
+        attributeName: insertZeroKeyAdvanced
+        displayName: Advanced Zero Key Record Options
+        default: false
+
+      - type: tabular
+        displayName: 'Custom Zero Key Values'
+        attributeName: customZeroKeyValues
+        columns:
+
+        - type: columnDropdownSelector
+          displayName: Column
+          attributeName: columnNameDefault
+          isRequired: false
+
+        -  type: textBox
+           displayName: Default Value
+           attributeName: columnValueDefault
+           isRequired: false
+      
+        isRequired: false
+        enableIf: "{% if config.insertZeroKey and config.insertZeroKeyAdvanced and node.materializationType != 'view' %} true {% else %} false {% endif %}"
+        
+      enableIf: "{% if config.insertZeroKey and node.materializationType != 'view' %} true {% else %} false {% endif %}"
+
     - groupName: Other Options
       items:
 

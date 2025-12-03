@@ -21,11 +21,22 @@ operation:
         - clustColumn:
             columnCounter: 3e5dac98-cc70-492c-a4c3-7371e6f87e2b
             stepCounter: 7fd976ce-d996-4ed4-85b9-97cc6285aed8
+    customZeroKeyValues:
+      items:
+        - columnNameDefault: null
+          columnValueDefault: ""
     dayExprnExpression: ""
     defRndMode: ""
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION DISTINCT
+    insertZeroKey: true
+    insertZeroKeyAdvanced: false
+    insertZeroKeyBool: "TRUE"
+    insertZeroKeyDate: 01-01-1900
+    insertZeroKeyStr: UNKNOWN
+    insertZeroKeySurrogateKey: "0"
+    insertZeroKeyTimestamp: "1900-01-01 00:00:00.000"
     partByColumn: ""
     partByColumnConfig: Ingestion Time
     partByIngnTimeExpression: ""
