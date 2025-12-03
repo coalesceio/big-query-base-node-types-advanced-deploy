@@ -63,7 +63,7 @@ macroString: |-
 
     {%- set varPartitionBy = "" -%}
 
-    {% if config.partitionBy %}
+    {% if config.partitionByToggle %}
         {% if config.partByColumnConfig == 'Ingestion Time' %}
           {% if config.partByIngnTimeExpression != "" %}
             {%- set varPartitionBy = config.partByIngnTimeExpression -%}
@@ -98,7 +98,7 @@ macroString: |-
     {# Create namespaces #}
     {% set varClusterBy = "" %}
 
-    {% if config.partitionBy and config.clusterKey and config.clusterKeyConfig is defined %}
+    {% if config.partitionByToggle and config.clusterKeyToggle and config.clusterKeyConfig is defined %}
           {%- set varClusterBy = config.clusterKeyConfig.get('items', [])[:4]
                                           | map(attribute='clustColumn')
                                           | map(attribute='name')
@@ -119,10 +119,10 @@ macroString: |-
     {# Create namespaces #}
     {% set varPrimaryKey = "" %}
 
-    {% if config.primary %}
+    {% if config.primaryToggle %}
         {# Extract column names safely #}
         {% set varPrimaryKey = config.primaryKeyConfig.get('items', [])
-                                        | map(attribute='primaryKey')
+                                        | map(attribute='primaryKeyColumn')
                                         | map(attribute='name')
                                         | list | join(', ') %}
     {% endif %}
@@ -142,7 +142,7 @@ macroString: |-
     {# Create namespaces #}
     {% set varTabExprn = "" %}
 
-    {% if config.tabExpiration and config.exprnType != '' %}
+    {% if config.tabExpirationToggle and config.exprnType != '' %}
       {% if config.exprnType == 'EXACT DATE/DATETIME' and config.timeExprnExpression|trim|length > 0 %}
         {% if config.timeExprnExpression|trim|length > 11 %}
           {% set varTabExprn = 'TIMESTAMP "' + config.timeExprnExpression|trim + '"' %}

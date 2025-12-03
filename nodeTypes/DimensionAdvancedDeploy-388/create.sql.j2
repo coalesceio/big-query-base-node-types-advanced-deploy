@@ -105,12 +105,12 @@ does not permit copying or modification for any other purpose.
         {# Check the conditions for creating new table #}
         {% if currentState != undefined
                 and (currentState.node.materializationType != desiredState.node.materializationType
-                or desiredState.config.partitionBy != currentState.config.partitionBy
+                or desiredState.config.partitionByToggle != currentState.config.partitionByToggle
                 or desiredState.config.get('partByColumnConfig', []) != currentState.config.get('partByColumnConfig', [])
                 or desiredState.config.partByIngnTimeExpression != currentState.config.partByIngnTimeExpression
                 or desiredState.config.partByColumn.name != currentState.config.partByColumn.name
                 or desiredState.config.partBySqlExpression != currentState.config.partBySqlExpression
-                or desiredState.config.clusterKey != currentState.config.clusterKey
+                or desiredState.config.clusterKeyToggle != currentState.config.clusterKeyToggle
                 or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', [])
                 or nsNodeVariables.currentDatabaseSchema != nsNodeVariables.desiredDatabaseSchema) %}
             {% set nsConfigVariables.createTable = true %}
@@ -129,17 +129,16 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# Alter Primary Key #}
-            {% if (desiredState.config.primary
-                    and currentState.config.primary == desiredState.config.primary
+            {% if (currentState.config.primaryToggle == desiredState.config.primaryToggle == true
                     and currentState.config.get('primaryKeyConfig', []) != desiredState.config.get('primaryKeyConfig', []))
-                    or (desiredState.config.primary and currentState.config.primary != desiredState.config.primary) %}
+                    or (desiredState.config.primaryToggle and currentState.config.primaryToggle != desiredState.config.primaryToggle) %}
                 {% if nsConfigVariables.primaryKey | length > 0 %}
                     {{ stage('Alter Table - Add Primary Key Constraint') }}
                     ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                     ADD PRIMARY KEY ( {{ nsConfigVariables.primaryKey}} ) NOT ENFORCED
                 {% endif %}
             {% else %}
-                {% if currentState.config.primary and desiredState.config.primary == false %}
+                {% if currentState.config.primaryToggle and desiredState.config.primaryToggle == false %}
                     {{ stage('Alter Table - Drop Primary Key Constraint') }}
                     ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                     DROP PRIMARY KEY
@@ -148,12 +147,12 @@ does not permit copying or modification for any other purpose.
 
             {# Alter Partition Expiration and Filter #}
             {% set alterOptions = "" %}
-            {% if desiredState.config.partitionFilter %}
-                {% if desiredState.config.partitionFilter != currentState.config.partitionFilter %}
+            {% if desiredState.config.partitionFilterToggle %}
+                {% if desiredState.config.partitionFilterToggle != currentState.config.partitionFilterToggle %}
                     {% set alterOptions = 'require_partition_filter = TRUE' %}
                 {% endif %}
             {% else %}
-                {% if currentState.config.partitionFilter %}
+                {% if currentState.config.partitionFilterToggle %}
                     {% set alterOptions = 'require_partition_filter = FALSE' %}
                 {% endif %}
             {% endif %}
@@ -193,19 +192,18 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# Alter Table Expiration #}
-            {% if (desiredState.config.tabExpiration
-                    and currentState.config.tabExpiration == desiredState.config.tabExpiration
+            {% if (currentState.config.tabExpirationToggle == desiredState.config.tabExpirationToggle == true
                     and (currentState.config.exprnType != desiredState.config.exprnType
                     or desiredState.config.timeExprnExpression != currentState.config.timeExprnExpression
                     or desiredState.config.dayExprnExpression != currentState.config.dayExprnExpression))
-                    or (desiredState.config.tabExpiration and currentState.config.tabExpiration != desiredState.config.tabExpiration) %}
+                    or (desiredState.config.tabExpirationToggle and currentState.config.tabExpirationToggle != desiredState.config.tabExpirationToggle) %}
 
                 {% if alterOptions | length > 0 %}
                     {% set alterOptions = alterOptions + ", " %}
                 {% endif %}
                 {% set alterOptions = alterOptions + 'expiration_timestamp = ' + nsConfigVariables.tabEprnClause %}
             {% else %}
-                {% if currentState.config.tabExpiration and desiredState.config.tabExpiration == false %}
+                {% if currentState.config.tabExpirationToggle and desiredState.config.tabExpirationToggle == false %}
                     {% if alterOptions | length > 0 %}
                         {% set alterOptions = alterOptions + ", " %}
                     {% endif %}
@@ -382,7 +380,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# Build table options - require_partition_filter #}
-            {% if desiredState.config.partitionBy and desiredState.config.partitionFilter %}
+            {% if desiredState.config.partitionByToggle and desiredState.config.partitionFilterToggle %}
                 {% if nsConfigVariables.options | length > 0 %}
                     {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
                 {% endif %}
@@ -390,7 +388,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# Build table options - partition_expiration_days #}
-            {% if desiredState.config.partitionBy and desiredState.config.partByColumnConfig != 'Integer Range' and desiredState.config.partExpireDays | length > 0 %}
+            {% if desiredState.config.partitionByToggle and desiredState.config.partByColumnConfig != 'Integer Range' and desiredState.config.partExpireDays | length > 0 %}
                 {% if nsConfigVariables.options | length > 0 %}
                     {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
                 {% endif %}

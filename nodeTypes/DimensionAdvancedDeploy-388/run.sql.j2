@@ -33,15 +33,15 @@ does not permit copying or modification for any other purpose.
         TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
     {% endif %}
 
-    {% if config.insertZeroKey %}
-        {% if config.insertZeroKeyAdvanced == true %}
+    {% if config.insertZeroKeyToggle %}
+        {% if config.insertZeroKeyAdvancedToggle == true %}
 
             {%- set nsZKAdv = namespace(columnNameDefault = [], columnValueDefault = []) %}
 
-            {% set nsZKAdv.columnNameDefault = config.customZeroKeyValues.get('items')
+            {% set nsZKAdv.columnNameDefault = config.customZeroKeyValuesConfig.get('items')
                                                 | map(attribute='columnNameDefault.name')
                                                 | list%}
-            {% set nsZKAdv.columnValueDefault = config.customZeroKeyValues.get('items')
+            {% set nsZKAdv.columnValueDefault = config.customZeroKeyValuesConfig.get('items')
                                                     | map(attribute='columnValueDefault')
                                                     | list%}
 
@@ -56,7 +56,7 @@ does not permit copying or modification for any other purpose.
 
                 {% if col.isSurrogateKey %}
                     '{{config.insertZeroKeySurrogateKey}}'
-                {% elif config.insertZeroKeyAdvanced and col.name in nsZKAdv.columnNameDefault %}
+                {% elif config.insertZeroKeyAdvancedToggle and col.name in nsZKAdv.columnNameDefault %}
                     {%- for loopColumn in nsZKAdv.columnNameDefault -%}
                         {% if col.name == loopColumn %}
                             {% if col.dataType[:3] | upper in ('VAR','CHA','STR','BIN')%}
@@ -451,8 +451,8 @@ does not permit copying or modification for any other purpose.
 
         {# Create a list of column names to exclude from the merge update, if the feature is enabled #}
         {% if config.excludeMergeToggle %}
-            {%- set excludeColList = config.excludeMergeList.get('items', [])
-                                    | map(attribute='excludeColName.name')
+            {%- set excludeColList = config.excludeMergeConfig.get('items', [])
+                                    | map(attribute='excludeColumn.name')
                                     | list %}
             {%- set includeColList = columns | rejectattr('name', 'in', excludeColList) | list %}
         {% else %}

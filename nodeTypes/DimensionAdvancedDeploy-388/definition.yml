@@ -28,7 +28,7 @@ metadata:
       - type: toggleButton
         displayName: Primary Key
         default: false
-        attributeName: primary
+        attributeName: primaryToggle
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
       - type: tabular   
@@ -38,13 +38,13 @@ metadata:
 
         -  type: columnDropdownSelector
            displayName: Primary Key Columns
-           attributeName: primaryKey
+           attributeName: primaryKeyColumn
 
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.primary %} true {% else %} false {% endif %}"
 
       - type: toggleButton
-        attributeName: partitionBy
+        attributeName: partitionByToggle
         displayName: Enable Partitioning
         default: false
         isRequired: false
@@ -100,7 +100,7 @@ metadata:
 
       #----- Not supported For Now ------#
       - type: toggleButton
-        attributeName: partitionFilter
+        attributeName: partitionFilterToggle
         displayName: Require Partition Filter
         default: false
         isRequired: false
@@ -115,7 +115,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy and ( config.partByColumnConfig == 'Time-Unit Column' or config.partByColumnConfig == 'Ingestion Time' ) %} true {% else %} false {% endif %}"
 
       - type: toggleButton
-        attributeName: clusterKey
+        attributeName: clusterKeyToggle
         displayName: Enable Clustering
         default: false
         isRequired: false
@@ -145,7 +145,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.clusterKey and config.partitionBy %} true {% else %} false {% endif %}"
 
       - type: toggleButton
-        attributeName: tabExpiration
+        attributeName: tabExpirationToggle
         displayName: Table Expiration
         default: false
         isRequired: false
@@ -251,12 +251,12 @@ metadata:
 
       - type: tabular
         displayName: 'Exclude Merge List'
-        attributeName: excludeMergeList
+        attributeName: excludeMergeConfig
         columns:
 
           -  type: columnDropdownSelector
              displayName: Exclude Column Name
-             attributeName: excludeColName
+             attributeName: excludeColumn
            
         isRequired: false
         enableIf: "{% if config.excludeMergeToggle
@@ -291,7 +291,7 @@ metadata:
         enableIf: "{% if config.selectDistinct or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
 
       - type: toggleButton
-        attributeName: insertZeroKey
+        attributeName: insertZeroKeyToggle
         displayName: Insert Zero Key Record
         default: false
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
@@ -333,13 +333,13 @@ metadata:
         - "FALSE"
 
       - type: toggleButton
-        attributeName: insertZeroKeyAdvanced
+        attributeName: insertZeroKeyAdvancedToggle
         displayName: Advanced Zero Key Record Options
         default: false
 
       - type: tabular
         displayName: 'Custom Zero Key Values'
-        attributeName: customZeroKeyValues
+        attributeName: customZeroKeyValuesConfig
         columns:
 
         - type: columnDropdownSelector
@@ -382,7 +382,7 @@ metadata:
       isRequired: false
 
     systemColumns:
-    - displayName: '{{NODE_NAME}}_KEY'
+    - displayName: '{{NODE_NAME}}_key'
       transform: ''
       dataType: STRING
       placement: beginning
