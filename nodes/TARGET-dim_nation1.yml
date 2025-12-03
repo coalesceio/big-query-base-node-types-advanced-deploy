@@ -3,22 +3,36 @@ id: 7fd976ce-d996-4ed4-85b9-97cc6285aed8
 name: dim_nation1
 operation:
   config:
-    clusterKey: false
+    clusterKey: true
     clusterKeyConfig:
       items:
-        - {}
+        - clustColumn:
+            columnCounter: a9816347-5d76-415d-bafe-9750ceef8bbd
+            stepCounter: 7fd976ce-d996-4ed4-85b9-97cc6285aed8
+        - clustColumn:
+            columnCounter: 2c1b1e5c-32a6-4ce4-9d6d-21b07a38db31
+            stepCounter: 7fd976ce-d996-4ed4-85b9-97cc6285aed8
+        - clustColumn:
+            columnCounter: 3c22f9f1-65e1-441f-8ec7-a6cbd193bd56
+            stepCounter: 7fd976ce-d996-4ed4-85b9-97cc6285aed8
+        - clustColumn:
+            columnCounter: 3b955fc8-265b-4a40-9c2b-b7552f4943b6
+            stepCounter: 7fd976ce-d996-4ed4-85b9-97cc6285aed8
+        - clustColumn:
+            columnCounter: 3e5dac98-cc70-492c-a4c3-7371e6f87e2b
+            stepCounter: 7fd976ce-d996-4ed4-85b9-97cc6285aed8
     dayExprnExpression: ""
     defRndMode: ""
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION DISTINCT
     partByColumn: ""
-    partByColumnConfig: Time-Unit Column
+    partByColumnConfig: Ingestion Time
     partByIngnTimeExpression: ""
     partByIntSqlExpression: ""
     partByTimeSqlExpression: DATE(system_end_date)
     partExpireDays: "30"
-    partitionBy: false
+    partitionBy: true
     partitionFilter: false
     postSQL: ""
     preSQL: ""
@@ -34,7 +48,7 @@ operation:
   database: ""
   deployEnabled: true
   description: ""
-  isMultisource: true
+  isMultisource: false
   locationName: TARGET
   materializationType: table
   metadata:
@@ -255,10 +269,7 @@ operation:
         customSQL:
           customSQL: |-
             {{ stage('Override Create SQL') }}
-            DROP TABLE `cls-dev-bigquery`.`DE_TGT`.`dim_nation1` `TGT`
-             `N_COMMENT` AS `N_COMMENT`
-             FROM {{ ref('SRC', 'nation1') }}
-            	)
+               drop table `cls-dev-bigquery`.`DE_TGT`.`dim_nation1`
         dependencies:
           - locationName: SRC
             nodeName: nation1

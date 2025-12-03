@@ -27,7 +27,7 @@ operation:
     partExpireDays: "80"
     partFiltetrQuery: ""
     partitionBy: true
-    partitionFilter: false
+    partitionFilter: true
     postSQL: ""
     preSQL: ""
     primary: false
@@ -35,7 +35,7 @@ operation:
       items:
         - primaryKey: null
     selectDistinct: true
-    tabExpiration: false
+    tabExpiration: true
     testsEnabled: false
     timeExprnExpression: ""
     truncateBefore: true

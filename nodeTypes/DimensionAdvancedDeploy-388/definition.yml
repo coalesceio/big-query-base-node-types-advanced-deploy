@@ -50,6 +50,11 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
+      - type: label
+        displayName: ⚠️ Warning - On Redeployment, PARTITION Changes will Drop and Recreate the Table
+        attributeName: labelPartWarning
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+
       - displayName: Partition By*
         attributeName: partByColumnConfig
         type: dropdownSelector
@@ -93,12 +98,14 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Ingestion Time' %} true {% else %} false {% endif %}"
 
+      #----- Not supported For Now ------#
       - type: toggleButton
         attributeName: partitionFilter
         displayName: Require Partition Filter
         default: false
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+        enableIf: "false"
+      # ----------------------------------#
 
       - type: textBox
         displayName: Partition Expiration Days(Optional) (Ex. 30)
@@ -113,6 +120,16 @@ metadata:
         default: false
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: ⚠️ Warning - On Redeployment, CLUSTER Changes will Drop and Recreate the Table
+        attributeName: labelClustWarning
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.clusterKey %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: ⚠️ Warning - Cluster Columns exceeding the limit of 4
+        attributeName: labelCKWarning
+        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.clusterKey and config.clusterKeyConfig.get('items') | length > 4 %} true {% else %} false {% endif %}"
 
       - type: tabular
         displayName: Cluster By* (Only first 4 rows are processed)
