@@ -267,6 +267,68 @@ does not permit copying or modification for any other purpose.
                     {{  get_clause(joinclause)  }}
                     {% if config.groupByAll %} GROUP BY ALL {% endif %}
                 )
+
+                {% if (config.deleteStrategy == "SOFT DELETE"
+                    or config.deleteStrategy == "HARD DELETE")
+                    and node.isMultisource == false %}
+                    /* Rows To Be Deleted As They No Longer Exist In Source */
+                    UNION ALL
+                    (
+                        SELECT
+                        {% if config.selectDistinct %}
+                            DISTINCT
+                        {% endif %}
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemVersion or col.isSystemCreateDate or col.isSystemStartDate %}
+                                `DIM`.`{{ col.name }}`
+                            {% elif col.isSystemCurrentFlag %}
+                                '0'
+                            {% elif col.isSystemEndDate %}
+                                TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 MILLISECOND)
+                            {% else %}
+                                `DIM`.`{{ col.name }}`
+                            {% endif %}
+                            AS `{{ col.name }}`,
+                        {% endfor -%}
+
+                        {% if config.deleteStrategy == "HARD DELETE" %}
+                            /* Hard delete rows */
+                            'HARD_DELETE_ROWS' AS `DML_OPERATION`
+                        {% else %}
+                            /* soft delete rows */
+                            'SOFT_DELETE_ROWS' AS `DML_OPERATION`
+                        {% endif %}
+
+                        {{  get_clause(joinclause,'from')  }}
+
+                        RIGHT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                                {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
+                        {% endfor %}
+
+                        WHERE
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} IS NULL
+
+                            {% if config.deleteStrategy == 'SOFT DELETE' %}
+                                AND `DIM`.`{{ get_value_by_column_attribute('isSystemCurrentFlag') }}` != '0'
+                            {% endif %}
+                        {% endfor %}
+                    
+                        {{ get_clause(joinclause) }}
+
+                        {% if config.groupByAll %}
+                            GROUP BY ALL
+                        {% endif %}
+                    )
+                {% endif %}
+
                 {# The if-block below avoids unnecessary updates when no type 2 column changes are present #}
                 {% if source.columns 
                     | rejectattr('isSurrogateKey')
@@ -359,6 +421,11 @@ does not permit copying or modification for any other purpose.
         {% endfor %}
         AND `TGT`.`{{ get_value_by_column_attribute("isSystemVersion") }}` = `SRC`.`{{ get_value_by_column_attribute("isSystemVersion") }}`
 
+		{% if config.deleteStrategy == "HARD DELETE" %}
+		    WHEN MATCHED AND SRC.DML_OPERATION = 'HARD_DELETE_ROWS'
+            THEN DELETE
+		{% endif %}
+
         WHEN MATCHED THEN UPDATE SET
         {%- for col in columns if not (col.isBusinessKey or col.isSurrogateKey or col.isSystemCreateDate) %}
             `TGT`.`{{ col.name }}` = `SRC`.`{{ col.name }}`
@@ -381,6 +448,16 @@ does not permit copying or modification for any other purpose.
         )
 
     {% else %}
+
+        {# Create a list of column names to exclude from the merge update, if the feature is enabled #}
+        {% if config.excludeMergeToggle %}
+            {%- set excludeColList = config.excludeMergeList.get('items', [])
+                                    | map(attribute='excludeColName.name')
+                                    | list %}
+            {%- set includeColList = columns | rejectattr('name', 'in', excludeColList) | list %}
+        {% else %}
+            {%- set includeColList = columns | list %}
+        {% endif %}
 
         {# SCD-Type 1 Dimension == #}
         {{ stage('Load Dimension Table Using Merge(SCD Type1) - ' + node.name) }}
@@ -409,6 +486,49 @@ does not permit copying or modification for any other purpose.
                     {% if config.groupByAll %} GROUP BY ALL {% endif %}
 
                 )
+
+                {% if (config.deleteStrategy == "SOFT DELETE"
+                    or config.deleteStrategy == "HARD DELETE")
+                    and node.isMultisource == false %}
+                    /* Rows To Be Deleted As They No Longer Exist In Source */
+                    UNION ALL
+                    (
+                        SELECT
+                        {% if config.selectDistinct %}
+                            DISTINCT
+                        {% endif %}
+                        {%- for col in source.columns if not col.isSurrogateKey %}
+                            {% if col.isSystemCurrentFlag %}
+                                '0'
+                            {% elif col.isSystemEndDate %}
+                                TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 MILLISECOND)
+                            {% else %}
+                                "DIM"."{{ col.name }}"
+                            {% endif %}
+                            AS "{{ col.name }}"
+                            {%- if not loop.last %}, {% endif %}
+                        {% endfor -%}
+
+                        {{ source.join }}
+
+                        RIGHT JOIN {{ ref_no_link(node.location.name, node.name) }} "DIM" ON
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} = "DIM"."{{ col.name }}"
+                        {% endfor %}
+
+                        WHERE
+                        {% for col in source.columns if col.isBusinessKey -%}
+                            {% if not loop.first %}
+                                AND
+                            {% endif %}
+                            {{ get_source_transform(col) }} IS NULL
+                        {% endfor %}
+                    )
+                {% endif %}
+
                 {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
                     {{config.insertStrategy}}
                 {% endif %}
@@ -422,8 +542,27 @@ does not permit copying or modification for any other purpose.
             `SRC`.`{{ col.name }}` = `TGT`.`{{ col.name }}`
         {% endfor %}
 
+        {% if (config.deleteStrategy == "SOFT DELETE"
+            or config.deleteStrategy == "HARD DELETE")
+            and node.isMultisource == false %}
+
+            WHEN MATCHED AND "SRC"."{{ get_value_by_column_attribute("isSystemCurrentFlag") }}" = '0'
+            {% if config.deleteStrategy == "HARD DELETE" %}
+                /* Hard delete rows */
+                THEN DELETE
+            {% else %}
+                /* Soft delete rows */
+                THEN UPDATE SET
+                {% for col in columns if (col.isSystemCurrentFlag
+                                            or col.isSystemEndDate) %}
+                        {% if not loop.first %} , {% endif %}
+                    "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+
         WHEN MATCHED
-        {% for col in columns if not (   col.isBusinessKey or
+        {% for col in includeColList if not (   col.isBusinessKey or
                                                 col.isSurrogateKey or
                                                 col.isSystemVersion or
                                                 col.isSystemCurrentFlag or
@@ -445,7 +584,7 @@ does not permit copying or modification for any other purpose.
         {% endfor %}
                 
         THEN UPDATE SET
-        {%- for col in columns if not (  col.isBusinessKey or
+        {%- for col in includeColList if not (  col.isBusinessKey or
                                                 col.isSurrogateKey or
                                                 col.isSystemVersion or
                                                 col.isSystemCurrentFlag or

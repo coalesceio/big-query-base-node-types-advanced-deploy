@@ -203,6 +203,26 @@ metadata:
         isRequired: false
         enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"
 
+      - displayName: Update Strategy
+        attributeName: updateStrategy
+        type: dropdownSelector
+        default: MERGE
+        options:
+        - "MERGE"
+        - "INSERT/UPDATE"
+        isRequired: false
+
+      - displayName: Unmatched Record Strategy
+        attributeName: deleteStrategy
+        type: dropdownSelector
+        default: "NO DELETE"
+        options:
+        - "NO DELETE"
+        - "SOFT DELETE"
+        - "HARD DELETE"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.updateStrategy == 'MERGE' and node.isMultisource == false %} true {% else %} false {% endif %}"
+
       - type: businessKeyColumns
         isRequired: true
 
@@ -211,9 +231,46 @@ metadata:
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       - type: label
-        displayName: Note - SCD2 if selected, else SCD1
+        displayName: Note - SCD Type 2 if selected, Else SCD Type 1
         attributeName: labelCT
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - displayName: Exclude Columns from Merge (For SCD Type 1)
+        attributeName: excludeMergeToggle
+        type: toggleButton
+        default: false
+        enableIf: "{% if node.materializationType != 'view' 
+                        and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0 and config.updateStrategy == 'MERGE' %}
+                      true
+                    {% else %} 
+                      false
+                    {% endif %}"
+
+      - type: tabular
+        displayName: 'Exclude Merge List'
+        attributeName: excludeMergeList
+        columns:
+
+          -  type: columnDropdownSelector
+             displayName: Exclude Column Name
+             attributeName: excludeColName
+           
+        isRequired: false
+        enableIf: "{% if config.excludeMergeToggle
+                        and node.materializationType != 'view'
+                        and config.updateStrategy == 'MERGE'
+                        and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                           %}
+                      true
+                    {% else %} 
+                      false
+                    {% endif %}"
 
       - displayName: Truncate Before
         attributeName: truncateBefore
