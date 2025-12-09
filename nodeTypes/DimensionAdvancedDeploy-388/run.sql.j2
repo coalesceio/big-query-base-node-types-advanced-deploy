@@ -29,7 +29,7 @@ does not permit copying or modification for any other purpose.
 
     {# == Truncate data before data insertion  == #}
     {% if config.truncateBefore %}
-        {{ stage('Truncate Dimension Table - ' + node.name) }}
+        {{ stage('Truncate Dimension Table') }}
         TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
     {% endif %}
 
@@ -265,7 +265,7 @@ does not permit copying or modification for any other purpose.
     {%- if varUpdateStrategy == 'MERGE' -%}
         {% if is_type_2 %}
             {# SCD-Type 2 Dimension == #}
-            {{ stage('Load Dimension Table Using Merge(SCD Type2) - ' + node.name) }}
+            {{ stage('Load Dimension Table Using Merge(SCD Type2)') }}
             MERGE INTO {{ ref_no_link(node.location.name, node.name) }} `TGT`
             USING
             (
@@ -598,7 +598,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# SCD-Type 1 Dimension == #}
-            {{ stage('Load Dimension Table Using Merge(SCD Type1) - ' + node.name) }}
+            {{ stage('Load Dimension Table Using Merge(SCD Type1)') }}
             MERGE INTO {{ ref_no_link(node.location.name, node.name) }} `TGT`
             USING
             (
@@ -753,7 +753,7 @@ does not permit copying or modification for any other purpose.
     {% else %}
 
         {% if is_type_2 %}
-            {{ stage('Load Dimension Table Using Insert/Update(SCD Type2) - ' + node.name | string) }}		
+            {{ stage('Load Dimension Table Using Insert/Update(SCD Type2)') }}		
             BEGIN
             -- =====================================
             -- Common Subquery 
@@ -1029,7 +1029,7 @@ does not permit copying or modification for any other purpose.
         {# == INSERT/UPDATE for SCD Type 1 == #}
         {% else %}
 
-		    {{ stage('Load Dimension Table Using Insert/Update(SCD Type1) - ' + node.name | string) }}
+		    {{ stage('Load Dimension Table Using Insert/Update(SCD Type1)') }}
             BEGIN
 
             -- Step 1: UPDATE existing rows

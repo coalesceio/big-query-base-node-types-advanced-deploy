@@ -211,6 +211,7 @@ metadata:
         - "MERGE"
         - "INSERT/UPDATE"
         isRequired: false
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
       - displayName: Unmatched Record Strategy
         attributeName: deleteStrategy
@@ -226,20 +227,44 @@ metadata:
       - type: businessKeyColumns
         isRequired: true
 
+      - type: toggleButton
+        attributeName: lastModifiedCompToggle
+        displayName: Last Modified Comparison
+        default: false
+        enableIf: "{% if node.materializationType != 'view' and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+        
+      - type: columnDropdownSelector
+        attributeName: lastModifiedColumn
+        displayName: Last Modified Column*
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: treatNullAsCurrentTimestamp
+        displayName: Treat NULL as Current Timestamp
+        default: false
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: type2Dimension
+        displayName: Enable SCD Type 2 (OFF = SCD Type 1)
+        default: false
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+
       - type: changeTrackingColumns
         isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle == false %} true {% else %} false {% endif %}"
 
       - type: label
         displayName: Note - SCD Type 2 if selected, Else SCD Type 1
         attributeName: labelCT
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle == false %} true {% else %} false {% endif %}"
 
       - displayName: Exclude Columns from Merge (For SCD Type 1)
         attributeName: excludeMergeToggle
         type: toggleButton
         default: false
         enableIf: "{% if node.materializationType != 'view' 
+                        and config.lastModifiedCompToggle == false
                         and columns
                             | selectattr('isChangeTracking')
                             | list
@@ -262,6 +287,7 @@ metadata:
         enableIf: "{% if config.excludeMergeToggle
                         and node.materializationType != 'view'
                         and config.updateStrategy == 'MERGE'
+                        and config.lastModifiedCompToggle == false
                         and columns
                             | selectattr('isChangeTracking')
                             | list
