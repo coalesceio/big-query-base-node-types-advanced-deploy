@@ -119,17 +119,17 @@ metadata:
         displayName: Enable Clustering
         default: false
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
       - type: label
         displayName: ⚠️ Warning - On Redeployment, CLUSTER Changes will Drop and Recreate the Table
         attributeName: labelClustWarning
-        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.clusterKeyToggle %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle %} true {% else %} false {% endif %}"
 
       - type: label
         displayName: ⚠️ Warning - Cluster Columns exceeding the limit of 4
         attributeName: labelCKWarning
-        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.clusterKeyToggle and config.clusterKeyConfig.get('items') | length > 4 %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle and config.clusterKeyConfig.get('items') | length > 4 %} true {% else %} false {% endif %}"
 
       - type: tabular
         displayName: Cluster By* (Only first 4 rows are processed)
@@ -142,7 +142,7 @@ metadata:
            isRequired: false
       
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle and config.partitionByToggle %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: tabExpirationToggle
