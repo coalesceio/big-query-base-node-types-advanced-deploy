@@ -584,7 +584,7 @@ does not permit copying or modification for any other purpose.
                 {% endfor -%}
             )
 
-        {# == Merge Load for SCD Type 1 == %}
+        {# == Merge Load for SCD Type 1 == #}
         {% else %}
 
             {# Create a list of column names to exclude from the merge update, if the feature is enabled #}
@@ -749,11 +749,11 @@ does not permit copying or modification for any other purpose.
             )
         {% endif %}
 
-    {# == Load incase of Update Strategy == #}
+    {# == Load incase of Insert/Update Strategy == #}
     {% else %}
 
         {% if is_type_2 %}
-            {{ stage('INSERT/UPDATE ' + ' Sources' | string) }}		
+            {{ stage('Load Dimension Table Using Insert/Update(SCD Type2) - ' + node.name | string) }}		
             BEGIN
             -- =====================================
             -- Common Subquery 
@@ -973,13 +973,14 @@ does not permit copying or modification for any other purpose.
                         ) 
                         {% endif %}
                     )
-                    {% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+                    {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
                         {{config.insertStrategy}}
                     {% endif %} 
                 {% endfor %}  
             );
             $$;
-            {# SCD-Type 2 Dimension update== #}
+
+            {# SCD-Type 2 Dimension Update== #}
             BEGIN TRANSACTION;
             EXECUTE IMMEDIATE $$
             -- =====================================
@@ -1001,7 +1002,8 @@ does not permit copying or modification for any other purpose.
                 {%- endfor %}
                 AND TGT."{{ get_value_by_column_attribute("isSystemVersion") }}" = SRC."{{ get_value_by_column_attribute("isSystemVersion") }}" ;
             $$;
-            {# SCD-Type 2 Dimension insert == #}
+
+            {# SCD-Type 2 Dimension Insert == #}
             EXECUTE IMMEDIATE $$
             -- =====================================
             -- INSERT Statement
@@ -1024,10 +1026,10 @@ does not permit copying or modification for any other purpose.
             COMMIT;
             END
         
-        {# == INSERT/UPDATE for SCD Type 1}
+        {# == INSERT/UPDATE for SCD Type 1 == #}
         {% else %}
 
-		    {{ stage('INSERT/UPDATE ' + ' Sources' | string) }}
+		    {{ stage('Load Dimension Table Using Insert/Update(SCD Type1) - ' + node.name | string) }}
             BEGIN
 
             -- Step 1: UPDATE existing rows
@@ -1067,7 +1069,7 @@ does not permit copying or modification for any other purpose.
                         GROUP BY ALL
                         {% endif %}
                     )     
-                    {% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+                    {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
                         {{config.insertStrategy}}
                     {% endif %}
                 {% endfor %}
@@ -1140,7 +1142,7 @@ does not permit copying or modification for any other purpose.
                         GROUP BY ALL
                         {% endif %}
                     )     
-                    {% if config.insertStrategy in ['UNION', 'UNION ALL'] and not loop.last %}
+                    {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
                         {{config.insertStrategy}}
                     {% endif %}
                 {% endfor %}
@@ -1156,7 +1158,6 @@ does not permit copying or modification for any other purpose.
                     {% if not loop.first %} AND {% endif %}
                     TGT."{{ col.name }}" IS NULL
                 {%- endfor %};
-
             END;
 
         {% endif %}

@@ -12,7 +12,7 @@ does not permit copying or modification for any other purpose.
 {% set nsNodeVariables = namespace(currentDatabaseSchema = "",
                         desiredDatabaseSchema = "",
                         desObjectNameFullPath = "",
-                        curObjectFullPath = "") %}
+                        curObjectNameFullPath = "") %}
 {{ initializeNodeVariables(nsNodeVariables) }}
 
 {% if desiredState %}
@@ -53,7 +53,7 @@ does not permit copying or modification for any other purpose.
 
             {# Create new view #}
             {% if currentState == undefined or currentState != desiredState %}
-                {{ stage('Create Dimension View - ' + desiredState.node.name, true, "sql", "create") }}
+                {{ stage('Create Dimension View', true, "sql", "create") }}
 
                 CREATE OR REPLACE VIEW {{ nsNodeVariables.desObjectNameFullPath }}
                 (
@@ -410,7 +410,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# Create table with all the config/mapping options #}
-            {{ stage('Create Dimension Table - ' + desiredState.node.name ) }}
+            {{ stage('Create Dimension Table', true, "sql", "create")}}
             CREATE OR REPLACE TABLE {{ nsNodeVariables.desObjectNameFullPath }}
             (
                 {% for col in columns %}
@@ -446,7 +446,7 @@ does not permit copying or modification for any other purpose.
     {% set fullyQualifiedTargetObjectName = ref_no_link(currentState.node.location.name, currentState.node.name) %}
 
     {# Drop the table/view in undeployment #}
-    {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name ) }}
+    {{ stage('Drop Current ' + currentState.node.materializationType ) }}
     DROP {{ currentState.node.materializationType }} IF EXISTS {{ fullyQualifiedTargetObjectName }}
 
 {% endif %}
