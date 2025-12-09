@@ -5,8 +5,8 @@ Unauthorized reproduction, distribution, or disclosure of this material is stric
 Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
 does not permit copying or modification for any other purpose.  
 #}
-{# == Node Type Name           : Dimension Advanced Deploy == #}
-{# == Node Type Description    : This node creates dimension table, view and also override create
+{# == Node Type Name           : Work Advanced Deploy == #}
+{# == Node Type Description    : This node creates Work table, view and also override create
                                  sql for view with advanced deployment strategy == #}
 
 {% set nsNodeVariables = namespace(currentDatabaseSchema = "",
@@ -53,7 +53,7 @@ does not permit copying or modification for any other purpose.
 
             {# Create new view #}
             {% if currentState == undefined or currentState != desiredState %}
-                {{ stage('Create Dimension View', true, "sql", "create") }}
+                {{ stage('Create Work View', true, "sql", "create") }}
 
                 CREATE OR REPLACE VIEW {{ nsNodeVariables.desObjectNameFullPath }}
                 (
@@ -93,10 +93,10 @@ does not permit copying or modification for any other purpose.
 
     {% elif desiredState.node.materializationType == 'table' %}
 
-        {% set nsConfigVariables = namespace(options = "", partitionBy = "", clusterBy = "", primaryKey = "", tabEprnClause = "", createTable = false, defRndMode = "") %}
+        {% set nsConfigVariables = namespace(options = "", partionBy = "", clusterBy = "", primaryKey = "", tabEprnClause = "", createTable = false, defRndMode = "") %}
 
         {# Initialise the variables necessary for create/alter of table #}
-        {%- set nsConfigVariables.partitionBy = getPartitionBy() | trim -%}
+        {%- set nsConfigVariables.partionBy = getPartitionBy() | trim -%}
         {%- set nsConfigVariables.clusterBy = getClusterBy() | trim -%}
         {%- set nsConfigVariables.primaryKey = getPrimaryKey() | trim -%}
         {%- set nsConfigVariables.tabEprnClause = getTabExpirationClause() | trim -%}
@@ -410,7 +410,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {# Create table with all the config/mapping options #}
-            {{ stage('Create Dimension Table', true, "sql", "create")}}
+            {{ stage('Create Work Table', true, "sql", "create")}}
             CREATE OR REPLACE TABLE {{ nsNodeVariables.desObjectNameFullPath }}
             (
                 {% for col in columns %}
@@ -428,8 +428,8 @@ does not permit copying or modification for any other purpose.
                     , PRIMARY KEY ( {{ nsConfigVariables.primaryKey}} ) NOT ENFORCED
                 {% endif %}
             )
-                {% if nsConfigVariables.partitionBy | length > 0 %}
-                    PARTITION BY {{ nsConfigVariables.partitionBy }}
+                {% if nsConfigVariables.partionBy | length > 0 %}
+                    PARTITION BY {{ nsConfigVariables.partionBy }}
                 {% endif %}
                 {% if nsConfigVariables.clusterBy | length > 0 %}
                     CLUSTER BY  {{ nsConfigVariables.clusterBy }} 
