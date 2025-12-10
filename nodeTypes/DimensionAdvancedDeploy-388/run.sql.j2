@@ -344,11 +344,7 @@ does not permit copying or modification for any other purpose.
                                 {% else %}
                                     {{ get_source_transform(col) }}
                                 {% endif %}
-                                {% if col.name != lastModifiedColumn %}
-                                    AS `{{ col.name }}` ,
-                                {% else %}
-                                    ,
-                                {% endif %}
+                                AS `{{ col.name }}`,
                             {% endfor %}
                             'INSERT_NEW_VERSION_ROWS' AS `DML_OPERATION`
                             {{  get_clause(joinclause, 'from')  }}
@@ -410,11 +406,7 @@ does not permit copying or modification for any other purpose.
                                 {% else %}
                                     `DIM`.`{{ col.name }}`
                                 {% endif %}
-                               {% if col.name != lastModifiedColumn %}
-                                    AS `{{ col.name }}`,
-                                {% else %}
-                                    ,
-                                {% endif %}
+                                AS `{{ col.name }}`,
                             {% endfor -%}
                             'update_expired_version_rows' AS `DML_OPERATION`
                             {{  get_clause(joinclause,'from')  }}
@@ -478,11 +470,7 @@ does not permit copying or modification for any other purpose.
                                     {% else %}
                                         `DIM`.`{{ col.name }}`
                                     {% endif %}
-                                   {% if col.name != lastModifiedColumn %}
-                                        AS `{{ col.name }}`,
-                                    {% else %}
-                                        ,
-                                    {% endif %}
+                                    AS `{{ col.name }}`,
                                 {% endfor -%}
 
                                 {% if config.deleteStrategy == "HARD DELETE" %}
@@ -624,23 +612,11 @@ does not permit copying or modification for any other purpose.
                 THEN DELETE
             {% endif %}
 
-            {% if config.deleteStrategy == "SOFT DELETE" and config.lastModifiedCompToggle %}
-                WHEN MATCHED AND (SRC.DML_OPERATION = 'SOFT_DELETE_ROWS' OR SRC.DML_OPERATION = 'update_expired_version_rows' ) 
-                THEN UPDATE SET 
-                {% for col in columns if (col.isSystemCurrentFlag
-                                                    or col.isSystemEndDate) %}
-                                {% if not loop.first %} , {% endif %}
-                            "TGT"."{{ col.name }}" = "SRC"."{{ col.name }}"
-                {% endfor %}
-            {% endif %}
-
-            {% if not config.lastModifiedCompToggle %}
-                WHEN MATCHED THEN UPDATE SET
-                {%- for col in columns if not (col.isBusinessKey or col.isSurrogateKey or col.isSystemCreateDate) %}
-                    `TGT`.`{{ col.name }}` = `SRC`.`{{ col.name }}`
-                    {% if not loop.last %}, {% endif %}
-                {% endfor -%}
-            {% endif %}
+            WHEN MATCHED THEN UPDATE SET
+            {%- for col in columns if not (col.isBusinessKey or col.isSurrogateKey or col.isSystemCreateDate) %}
+                `TGT`.`{{ col.name }}` = `SRC`.`{{ col.name }}`
+                {% if not loop.last %}, {% endif %}
+            {% endfor -%}
 
             WHEN NOT MATCHED THEN INSERT
             (
@@ -687,24 +663,22 @@ does not permit copying or modification for any other purpose.
                             {% elif col.isSystemCurrentFlag %}
                                 'Y'
                             {% elif col.name == lastModifiedColumn %}
-                                {{ get_source_transform(col) }} AS `{{ col.name }}`,
                                 {% if useCurrentTimeStamp %}
                                     COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) as COMPARISON_VALUE,
                                 {% else %}
                                     {{ get_source_transform(col) }} AS COMPARISON_VALUE,
                                 {% endif %}
-                                MAX (`DIM`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE
+                                MAX (`DIM`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE,
+                                {{ get_source_transform(col) }}
                             {% else %}
                                 {{ get_source_transform(col) }}
                             {% endif %}
-                            {% if col.name != lastModifiedColumn %}
-                                AS `{{ col.name }}`
-                            {% endif %}
+                            AS `{{ col.name }}`
                             {%- if not loop.last %}, {% endif %}
                         {% endfor %}
-                        {{  get_clause(source.join, 'from')  }}
 
                         {% if config.lastModifiedCompToggle %}
+                            {{  get_clause(source.join, 'from')  }}
                             LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
                             {% for col in source.columns if col.isBusinessKey -%}
                                 {% if not loop.first %}
@@ -712,8 +686,10 @@ does not permit copying or modification for any other purpose.
                                 {% endif %}
                                 {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                             {% endfor %}
+                            {{  get_clause(source.join)  }}
+                        {% else %}
+                            {{ source.join }}
                         {% endif %}
-                        {{  get_clause(source.join)  }}
 
                         {% if config.groupByAll or config.lastModifiedCompToggle %} GROUP BY ALL {% endif %}
                     )
@@ -745,9 +721,7 @@ does not permit copying or modification for any other purpose.
                                 {% else %}
                                     `DIM`.`{{ col.name }}`
                                 {% endif %}
-                                {% if col.name != lastModifiedColumn %}
-                                    AS "{{ col.name }}"
-                                {% endif %}
+                                AS "{{ col.name }}"
                                 {%- if not loop.last %}, {% endif %}
                             {% endfor -%}
 
