@@ -145,32 +145,34 @@ does not permit copying or modification for any other purpose.
                 {% endif %}
             {% endif %}
 
-            {# Alter Partition Expiration and Filter #}
             {% set alterOptions = "" %}
-            {% if desiredState.config.partitionFilterToggle %}
-                {% if desiredState.config.partitionFilterToggle != currentState.config.partitionFilterToggle %}
-                    {% set alterOptions = 'require_partition_filter = TRUE' %}
-                {% endif %}
-            {% else %}
-                {% if currentState.config.partitionFilterToggle %}
-                    {% set alterOptions = 'require_partition_filter = FALSE' %}
-                {% endif %}
-            {% endif %}
-
-            {% if desiredState.config.partByColumnConfig != 'Integer Range' %}
-                {% if desiredState.config.partExpireDays | trim | length > 0 %}
-                    {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
-                        {% if alterOptions | length > 0 %}
-                            {% set alterOptions = alterOptions + ", " %}
-                        {% endif %}
-                        {% set alterOptions = alterOptions + 'partition_expiration_days = ' +  desiredState.config.partExpireDays %}
+            {% if desiredState.config.partitionByToggle %}
+                {# Alter Partition Expiration and Filter #}
+                {% if desiredState.config.partitionFilterToggle %}
+                    {% if desiredState.config.partitionFilterToggle != currentState.config.partitionFilterToggle %}
+                        {% set alterOptions = 'require_partition_filter = TRUE' %}
                     {% endif %}
                 {% else %}
-                    {% if currentState.config.partExpireDays | trim | length > 0 %}
-                        {% if alterOptions | length > 0 %}
-                            {% set alterOptions = alterOptions + ", " %}
+                    {% if currentState.config.partitionFilterToggle %}
+                        {% set alterOptions = 'require_partition_filter = FALSE' %}
+                    {% endif %}
+                {% endif %}
+
+                {% if desiredState.config.partByColumnConfig != 'Integer Range' %}
+                    {% if desiredState.config.partExpireDays | trim | length > 0 %}
+                        {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
+                            {% if alterOptions | length > 0 %}
+                                {% set alterOptions = alterOptions + ", " %}
+                            {% endif %}
+                            {% set alterOptions = alterOptions + 'partition_expiration_days = ' +  desiredState.config.partExpireDays %}
                         {% endif %}
-                        {% set alterOptions = alterOptions + 'partition_expiration_days = NULL' %}
+                    {% else %}
+                        {% if currentState.config.partExpireDays | trim | length > 0 %}
+                            {% if alterOptions | length > 0 %}
+                                {% set alterOptions = alterOptions + ", " %}
+                            {% endif %}
+                            {% set alterOptions = alterOptions + 'partition_expiration_days = NULL' %}
+                        {% endif %}
                     {% endif %}
                 {% endif %}
             {% endif %}
@@ -212,7 +214,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {% if alterOptions | trim | length > 0 %}
-                {{ stage('Alter Table - Partition Options') }}
+                {{ stage('Alter Table - Option Attributes') }}
                 ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                 SET OPTIONS ( {{ alterOptions }} )
             {% endif %}

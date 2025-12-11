@@ -82,6 +82,7 @@ metadata:
         displayName: Partition By Column (dataType-DATE)
         attributeName: partByColumn
         isRequired: false
+        default: ''
         enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: textBox
