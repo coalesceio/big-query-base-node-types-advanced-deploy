@@ -302,7 +302,7 @@ operation:
           - locationName: SRC
             nodeName: customer
         join:
-          joinCondition: FROM {{ ref('SRC', 'customer') }} `customer` where `c_custkey` = 1283
+          joinCondition: FROM {{ ref('SRC', 'customer') }} `customer` where `customer`.`c_custkey` = 1283
         name: dim_customer
         noLinkRefs: []
   name: dim_customer

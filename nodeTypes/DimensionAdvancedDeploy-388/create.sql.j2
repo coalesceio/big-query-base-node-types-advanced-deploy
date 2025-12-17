@@ -182,7 +182,7 @@ does not permit copying or modification for any other purpose.
                 {% if alterOptions | length > 0 %}
                     {% set alterOptions = alterOptions + ", " %}
                 {% endif %}
-                {% set alterOptions = alterOptions + 'description = ' + desiredState.node.description | escape %}
+                {% set alterOptions = alterOptions + "description = '" + desiredState.node.description | escape + "'" %}
             {% endif %}
 
             {# Change Default Rounding Mode #}
@@ -280,7 +280,7 @@ does not permit copying or modification for any other purpose.
                         {% if descriptionTest == false %}
                             {% if ns.attributeColCount > 1 %} , {% endif %}
                             ALTER COLUMN `{{ desiredColumnName }}`
-                            SET OPTIONS (description = '{{ desiredDescription | escape }}')
+                            SET OPTIONS (description = "{{ desiredDescription | escape }}")
                         {% endif %}
 
                         {% if defaultValueTest == false %}
@@ -369,8 +369,8 @@ does not permit copying or modification for any other purpose.
         {% elif currentState == undefined or nsConfigVariables.createTable %}
 
             {# Build table options - description #}
-            {% if node.description | length > 0 %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + "description = '" + node.description | escape + "'" %}
+            {% if desiredState.node.description | length > 0 %}
+                {% set nsConfigVariables.options = nsConfigVariables.options + "description = '" + desiredState.node.description | escape + "'" %}
             {% endif %}
 
             {# Build table options - expiration_timestamp #}
