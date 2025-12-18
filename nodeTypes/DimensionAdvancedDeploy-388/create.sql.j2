@@ -250,7 +250,7 @@ does not permit copying or modification for any other purpose.
                     {% set descriptionTest = curCol.description == desiredDescription %}
 
                     {% if datatypeTest == false 
-                        or nullableTest == false
+                        or (nullableTest == false and desiredNullable)
                         or defaultValueTest == false
                         or descriptionTest == false %}
 
@@ -269,18 +269,14 @@ does not permit copying or modification for any other purpose.
 
                         {% if nullableTest == false %}
                             {% if ns.attributeColCount > 1 %} , {% endif %}
-                            {% if desiredNullable == false %}
-                                ALTER COLUMN `{{ desiredColumnName }}`
-                                DROP NOT NULL
-                            {% else %}
-                                {# Not possible for GBQ as of now #}
-                            {% endif %}
+                            ALTER COLUMN `{{ desiredColumnName }}`
+                            DROP NOT NULL
                         {% endif %}
 
                         {% if descriptionTest == false %}
                             {% if ns.attributeColCount > 1 %} , {% endif %}
                             ALTER COLUMN `{{ desiredColumnName }}`
-                            SET OPTIONS (description = "{{ desiredDescription | escape }}")
+                            SET OPTIONS (description = '{{ desiredDescription | escape }}')
                         {% endif %}
 
                         {% if defaultValueTest == false %}
@@ -422,7 +418,7 @@ does not permit copying or modification for any other purpose.
                     {% endif %}
                     {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }} {%endif%}
                     {% if not col.nullable %} NOT NULL {% endif%}
-                    {%- if col.description | length > 0 %} OPTIONS(description="{{ col.description | escape }}") {% endif %}
+                    {%- if col.description | length > 0 %} OPTIONS(description='{{ col.description | escape }}') {% endif %}
                     {%- if not loop.last -%}, {% endif %}
                 {% endfor %}
 

@@ -1,0 +1,84 @@
+fileVersion: 1
+id: a8812f53-2234-4595-882f-1c556648a17d
+name: sample_table_for_last_modified
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: SRC
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 441a820c-2b2f-4bf6-af0b-94faad68a0a0
+          stepCounter: a8812f53-2234-4595-882f-1c556648a17d
+        config: {}
+        dataType: NUMERIC
+        defaultValue: "NULL"
+        description: ""
+        name: metric_value
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: c4786194-6d81-4472-a0dd-ecd1cbc0cab9
+          stepCounter: a8812f53-2234-4595-882f-1c556648a17d
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: event_ts
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: af3e181f-b4e7-4916-b32c-d2f5186e4a00
+          stepCounter: a8812f53-2234-4595-882f-1c556648a17d
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: status
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 75407af9-807c-4cff-ac89-a588f99effff
+          stepCounter: a8812f53-2234-4595-882f-1c556648a17d
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: comments
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+  name: sample_table_for_last_modified
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node

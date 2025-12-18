@@ -53,7 +53,9 @@ operation:
     preSQL: ""
     primaryKeyConfig:
       items:
-        - {}
+        - primaryKeyColumn:
+            columnCounter: 8695c270-5db9-404d-b952-cf76b360f460
+            stepCounter: 56ebe27c-8318-483a-9ef2-ecea36598d72
     primaryToggle: false
     selectDistinct: false
     tabExpirationToggle: true
@@ -65,7 +67,7 @@ operation:
     updateStrategy: MERGE
   database: ""
   deployEnabled: true
-  description: ""
+  description: This is table descriptiojn
   isMultisource: false
   locationName: TARGET
   materializationType: table
@@ -82,7 +84,7 @@ operation:
         config: {}
         dataType: STRING
         defaultValue: ""
-        description: ""
+        description: This is the dimension surrogate key
         isSurrogateKey: true
         name: dim_lineitem_key
         nullable: true

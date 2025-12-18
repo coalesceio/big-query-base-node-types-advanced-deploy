@@ -30,7 +30,7 @@ operation:
     deleteStrategy: NO DELETE
     exprnType: DAYS FROM NOW
     groupByAll: false
-    insertStrategy: UNION DISTINCT
+    insertStrategy: UNION ALL
     insertZeroKey: true
     insertZeroKeyAdvanced: false
     insertZeroKeyBool: "TRUE"
@@ -61,7 +61,7 @@ operation:
   database: ""
   deployEnabled: true
   description: ""
-  isMultisource: false
+  isMultisource: true
   locationName: TARGET
   materializationType: table
   metadata:

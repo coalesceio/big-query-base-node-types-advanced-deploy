@@ -39,6 +39,7 @@ metadata:
         -  type: columnDropdownSelector
            displayName: Primary Key Columns
            attributeName: primaryKeyColumn
+           default: ''
 
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.primaryToggle %} true {% else %} false {% endif %}"
@@ -139,6 +140,7 @@ metadata:
 
         -  type: columnDropdownSelector
            displayName: Cluster By Columns
+           default: ''
            attributeName: clustColumn
            isRequired: false
       
@@ -237,6 +239,7 @@ metadata:
       - type: columnDropdownSelector
         attributeName: lastModifiedColumn
         displayName: Last Modified Comparison Column* (DataType - TIMESTAMP or NUMERIC)
+        default: ''
         enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
 
       - type: toggleButton
@@ -283,6 +286,7 @@ metadata:
           -  type: columnDropdownSelector
              displayName: Exclude Column Name
              attributeName: excludeColumn
+             default: ''
            
         isRequired: false
         enableIf: "{% if config.excludeMergeToggle
@@ -371,6 +375,7 @@ metadata:
 
         - type: columnDropdownSelector
           displayName: Column
+          default: ''
           attributeName: columnNameDefault
           isRequired: false
 
