@@ -250,7 +250,7 @@ metadata:
 
       - type: toggleButton
         attributeName: type2Dimension
-        displayName: SCD Type1 ↔️ SCD Type2
+        displayName: Enable SCD Type2
         default: false
         enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
 

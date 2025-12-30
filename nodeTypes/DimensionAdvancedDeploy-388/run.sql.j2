@@ -375,9 +375,7 @@ does not permit copying or modification for any other purpose.
                                     {% else %}
                                         OR
                                     {% endif %}
-                                    (
-                                        {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
-                                    )
+                                    {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
                                     {% if loop.last %} ) {% endif %}
                                 {% endfor %}
                             {% endif %}
@@ -440,9 +438,7 @@ does not permit copying or modification for any other purpose.
                                     {% else %}
                                         OR
                                     {% endif %}
-                                    (
-                                        {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
-                                    )
+                                    {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
                                     {% if loop.last %} ) {% endif %}
                                 {% endfor %}
                             {% endif %}
@@ -504,7 +500,7 @@ does not permit copying or modification for any other purpose.
                                     {% endif %}
                                 {% endfor %}
                             
-                                {{ get_clause(joinclause) }}
+                                {# {{ get_clause(joinclause) }} #}
 
                                 {% if config.groupByAll %}
                                     GROUP BY ALL
@@ -557,15 +553,15 @@ does not permit copying or modification for any other purpose.
                                         {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                                     {% endfor %}
                                     WHERE `DIM`.`{{ get_value_by_column_attribute("isSystemCurrentFlag") }}` = 'Y'
-                                    AND
-                                    (
-                                        {% for col in source.columns if (col.isChangeTracking) -%}
-                                            {% if not loop.first %}
-                                                AND
-                                            {% endif %}
-                                            {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
-                                        {% endfor %}
-                                    )
+                                AND
+                                (
+                                    {% for col in source.columns if (col.isChangeTracking) -%}
+                                        {% if not loop.first %}
+                                            AND
+                                        {% endif %}
+                                        {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
+                                    {% endfor %}
+                                )
                                     
                                     {% for col in source.columns if not (   col.isBusinessKey or
                                                                             col.isChangeTracking or
@@ -582,9 +578,7 @@ does not permit copying or modification for any other purpose.
                                         {% if not loop.first %}
                                             OR
                                         {% endif %}
-                                        (
-                                            {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
-                                        )
+                                        {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
                                         {% if loop.last %} ) {% endif %}
                                     {% endfor %}
                                     {{  get_clause(joinclause)  }}
@@ -821,9 +815,7 @@ does not permit copying or modification for any other purpose.
                         {% else %}
                             OR
                         {% endif %}
-                        (
                         `SRC`.`{{ col.name }}` IS DISTINCT FROM `TGT`.`{{ col.name }}`
-                        )
                     {% if loop.last %}
                         )
                     {% endif %}

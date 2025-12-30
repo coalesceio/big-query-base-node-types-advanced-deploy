@@ -32,7 +32,7 @@ operation:
     lastModifiedColumn:
       columnCounter: e3392fc5-b368-4532-887e-82eac3d0fb2d
       stepCounter: 6cdf71e5-c279-442b-9052-102424540914
-    lastModifiedCompToggle: false
+    lastModifiedCompToggle: true
     partByColumn: ""
     partByColumnConfig: Time-Unit Column
     partByIngnTimeExpression: ""
@@ -51,9 +51,9 @@ operation:
     tabExpirationToggle: false
     testsEnabled: false
     timeExprnExpression: ""
-    treatNullAsCurrentTimestamp: false
+    treatNullAsCurrentTimestamp: true
     truncateBefore: false
-    type2Dimension: false
+    type2Dimension: true
     updateStrategy: MERGE
   database: ""
   deployEnabled: true
@@ -132,6 +132,7 @@ operation:
         config: {}
         dataType: STRING
         description: ""
+        isChangeTracking: true
         name: N_COMMENT
         nullable: true
         sourceColumnReferences:
