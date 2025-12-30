@@ -238,7 +238,7 @@ metadata:
         
       - type: columnDropdownSelector
         attributeName: lastModifiedColumn
-        displayName: Last Modified Comparison Column* (DataType - TIMESTAMP or NUMERIC)
+        displayName: Comparison Column* (DataType - TIMESTAMP or NUMERIC)
         default: ''
         enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
 
