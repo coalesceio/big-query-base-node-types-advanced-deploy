@@ -1,0 +1,122 @@
+fileVersion: 1
+id: dbc708b4-340c-4dbe-a89e-e601ff495e29
+name: Temp_table_for_Display
+operation:
+  config:
+    groupByAll: false
+    insertStrategy: INSERT
+    orderby: false
+    orderbycolumn:
+      items:
+        - {}
+    postSQL: ""
+    preSQL: ""
+    selectDistinct: false
+    testsEnabled: false
+    truncateBefore: true
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: TARGET
+  materializationType: view
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 4315c13a-7e74-47d4-ba8e-5061f0bab01a
+          stepCounter: dbc708b4-340c-4dbe-a89e-e601ff495e29
+        config: {}
+        dataType: INT64
+        description: ""
+        name: N_NATIONKEY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: d6ff6603-bc76-4610-bb88-cfc6ee9ed67e
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 364fa25c-20ad-4120-979a-8a0383df6854
+          stepCounter: dbc708b4-340c-4dbe-a89e-e601ff495e29
+        config: {}
+        dataType: STRING
+        description: ""
+        name: N_NAME
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 214c2fde-4e6f-4d6e-9d6b-1bf9a819a2da
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 8c679c58-3261-4948-8563-be4df39d1fa7
+          stepCounter: dbc708b4-340c-4dbe-a89e-e601ff495e29
+        config: {}
+        dataType: INT64
+        description: ""
+        name: N_REGIONKEY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: a8db8c68-e9a2-4b8a-81d0-0b717d3b5358
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 07ee0728-5114-4fcb-ad25-a7ae4625416e
+          stepCounter: dbc708b4-340c-4dbe-a89e-e601ff495e29
+        config: {}
+        dataType: STRING
+        description: ""
+        name: N_COMMENT
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 739bafda-bf0e-4c25-9714-5a1dafe8bbf5
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
+            transform: ""
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases:
+          nation2: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
+        customSQL:
+          customSQL: |-
+            {{ stage('Override Create SQL') }}
+            create or replace table `cls-dev-bigquery`.`DE_TGT`.`Temp_table_for_Display`
+            as
+                  SELECT `nation2`.`N_NATIONKEY` AS `N_NATIONKEY`,
+                    `nation2`.`N_NAME` AS `N_NAME`,
+                    `nation2`.`N_REGIONKEY` AS `N_REGIONKEY`,
+                    `nation2`.`N_COMMENT` AS `N_COMMENT`,
+                    NULL AS `last_modified`,
+                    `DIM`.`system_version` + 1 AS `system_version`,
+                    'Y' AS `system_current_flag`,
+                    CAST(CURRENT_TIMESTAMP AS TIMESTAMP) AS `system_start_date`,
+                    CAST('2999-12-31 00:00:00' AS TIMESTAMP) AS `system_end_date`,
+                    CAST(CURRENT_TIMESTAMP AS TIMESTAMP) AS `system_create_date`,
+                    CAST(CURRENT_TIMESTAMP AS TIMESTAMP) AS `system_update_date`,
+                    'INSERT_NEW_VERSION_ROWS' AS `DML_OPERATION`
+                  FROM `cls-qa`.`tpch_sf001`.`nation2` `nation2`
+                    INNER JOIN `cls-dev-bigquery`.`DE_TGT`.`dim_nation1` `DIM` ON `nation2`.`N_NATIONKEY` = `DIM`.`N_NATIONKEY`
+                  WHERE `DIM`.`system_current_flag` = 'Y'
+                    AND COALESCE(NULL, CURRENT_TIMESTAMP()) > `DIM`.`last_modified`
+                    AND `nation2`.`N_NATIONKEY` = 2
+        dependencies:
+          - locationName: SRC
+            nodeName: nation2
+        join:
+          joinCondition: FROM {{ ref('SRC', 'nation2') }} `nation2`
+        name: Temp_table_for_Display
+        noLinkRefs: []
+  name: Temp_table_for_Display
+  overrideSQL: true
+  schema: ""
+  sqlType: Stage
+  type: sql
+  version: 1
+type: Node

@@ -342,16 +342,16 @@ metadata:
         default: "UNKNOWN"
         isRequired: false
 
-      - displayName: Default Date Value (DateFormat - DD-MM-YYYY)
+      - displayName: Default Date Value (DD-MM-YYYY)
         attributeName: insertZeroKeyDate
         type: textBox
         default: "01-01-1900"
         isRequired: false
 
-      - displayName: Default Timestamp Value (TimestampFormat - YYYY-MM-DD HH24:MI:SS.FF)
+      - displayName: Default Timestamp Value (YYYY-MM-DD HH24:MI:SS)
         attributeName: insertZeroKeyTimestamp
         type: textBox
-        default: "1900-01-01 00:00:00.000"
+        default: "1900-01-01 00:00:00"
         isRequired: false
 
       - displayName: Default Boolean Value
@@ -397,14 +397,14 @@ metadata:
         type: toggleButton
         default: false
 
-      - displayName: Pre-SQL (Optional)
+      - displayName: Pre-SQL
         attributeName: preSQL
         type: textBox
         syntax: sql
         isRequired: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
-      - displayName: Post-SQL (Optional)
+      - displayName: Post-SQL
         attributeName: postSQL
         type: textBox
         syntax: sql

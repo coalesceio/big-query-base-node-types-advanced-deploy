@@ -76,10 +76,14 @@ does not permit copying or modification for any other purpose.
                     {% elif config.insertZeroKeyAdvancedToggle and col.name in nsZKAdv.columnNameDefault %}
                         {%- for loopColumn in nsZKAdv.columnNameDefault -%}
                             {% if col.name == loopColumn %}
-                                {% if col.dataType[:3] | upper in ('VAR','CHA','STR','BIN')%}
-                                    '{{ nsZKAdv.columnValueDefault[loop.index0]}}'
-                                {% else %} 
-                                    {{ nsZKAdv.columnValueDefault[loop.index0]}}
+                                {% if col.dataType | upper == 'STRING' %}
+                                    '{{ nsZKAdv.columnValueDefault[loop.index0] }}'
+
+                                {% elif col.dataType | upper == 'BYTES' %}
+                                    CAST('{{ nsZKAdv.columnValueDefault[loop.index0] }}' AS BYTES)
+
+                                {% else %}
+                                    {{ nsZKAdv.columnValueDefault[loop.index0] }}
                                 {% endif %}
                             {% endif %}					
                         {% endfor -%}
@@ -89,20 +93,20 @@ does not permit copying or modification for any other purpose.
                         {{ get_source_transform(col) }}
                     {% elif col.isSystemVersion %}
                         1
-                    {% elif col.dataType | upper in ('BOOLEAN') %}
-                        {{ config.insertZeroKeyBol }}
-                    {% elif col.dataType[:3] | upper in ('NUM','INT','DEC','FLO') %}
+                    {% elif col.dataType | upper in ('BOOL') %}
+                        {{ config.insertZeroKeyBool }}
+                    {% elif col.dataType | upper in ('INT64', 'FLOAT64', 'NUMERIC', 'BIGNUMERIC') %}
                         0
-                    {% elif col.dataType [:12] | upper in ('TIMESTAMP_LT','TIMESTAMP_NT','TIMESTAMP_TZ') %}
-                        '{{config.insertZeroKeyTimestamp}}' ::{{ col.dataType |upper}}
-                    {% elif col.dataType[:4] | upper in ('DATE','TIME') %}
-                        CAST(TO_TIMESTAMP( '{{config.insertZeroKeyDate}}', 'DD-MM-YYYY') AS {{ col.dataType }})
-                    {% elif col.dataType[:3] | upper in ('VAR','CHA','STR','BIN') %}
-                        {% if dtparams[0] and dtparams[0] | int < config.insertZeroKeyStr | length %}
-                            SUBSTRING('{{config.insertZeroKeyStr}}',1,{{ dtparams[0] }})
-                        {% else %}
-                            '{{config.insertZeroKeyStr}}'
-                        {% endif %}
+                    {% elif col.dataType | upper in ('TIMESTAMP','DATETIME') %}
+                        CAST(PARSE_{{ col.dataType | upper }}('%Y-%m-%d %H:%M:%S', '{{ config.insertZeroKeyTimestamp }}') AS {{ col.dataType }})
+                    {% elif col.dataType | upper in ('TIME') %}
+                        TIME(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', '{{ config.insertZeroKeyTimestamp }}'))
+                    {% elif col.dataType | upper in ('DATE') %}
+                        CAST(PARSE_DATE('%d-%m-%Y', '{{config.insertZeroKeyDate}}') AS {{ col.dataType }})
+                    {% elif col.dataType | upper == 'STRING' %}
+                        '{{ config.insertZeroKeyStr }}'
+                    {% elif col.dataType | upper == 'BYTES' %}
+                        CAST('{{ config.insertZeroKeyStr }}' AS {{ col.dataType }})
                     {% elif col.nullable %}
                         NULL
                     {% else %}
@@ -171,20 +175,20 @@ does not permit copying or modification for any other purpose.
                                 {{ get_source_transform(col) }}
                             {% elif col.isSystemVersion%}
                                 1
-                            {% elif col.dataType | upper in ('BOOLEAN') %}
-                                {{ config.insertZeroKeyBol }}
-                            {% elif col.dataType[:3] | upper in ('NUM','INT','DEC','FLO') %}
+                            {% elif col.dataType | upper in ('BOOL') %}
+                                {{ config.insertZeroKeyBool }}
+                            {% elif col.dataType | upper in ('INT64', 'FLOAT64', 'NUMERIC', 'BIGNUMERIC') %}
                                 0
-                            {% elif col.dataType [:12] | upper in ('TIMESTAMP_LT','TIMESTAMP_NT','TIMESTAMP_TZ') %}
-                                `{{config.insertZeroKeyTimestamp}}` ::{{ col.dataType |upper}}
-                            {% elif col.dataType[:4] | upper in ('DATE','TIME') %}
-                                CAST(TO_TIMESTAMP('{{config.insertZeroKeyDate}}', 'DD-MM-YYYY') AS {{ col.dataType }})
-                            {% elif col.dataType[:3] | upper in ('VAR','CHA','STR','BIN') %}
-                                {% if dtparams[0] and dtparams[0] | int < config.insertZeroKeyStr | length  %}
-                                    SUBSTRING('{{config.insertZeroKeyStr}}',1,{{ dtparams[0] }})
-                                {% else %}
-                                    '{{config.insertZeroKeyStr}}'
-                                {% endif %}
+                            {% elif col.dataType | upper in ('TIMESTAMP','DATETIME') %}
+                                CAST(PARSE_{{ col.dataType | upper }}('%Y-%m-%d %H:%M:%S', '{{ config.insertZeroKeyTimestamp }}') AS {{ col.dataType }})
+                            {% elif col.dataType | upper in ('TIME') %}
+                                TIME(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', '{{ config.insertZeroKeyTimestamp }}'))
+                            {% elif col.dataType | upper in ('DATE') %}
+                                CAST(PARSE_DATE('%d-%m-%Y', '{{config.insertZeroKeyDate}}') AS {{ col.dataType }})
+                            {% elif col.dataType | upper == 'STRING' %}
+                                '{{ config.insertZeroKeyStr }}'
+                            {% elif col.dataType | upper == 'BYTES' %}
+                                CAST('{{ config.insertZeroKeyStr }}' AS {{ col.dataType }})
                             {% elif col.nullable %}
                                 NULL
                             {% else %}
@@ -220,11 +224,15 @@ does not permit copying or modification for any other purpose.
                         {% elif config.insertZeroKeyAdvanced == true and col.name in ns.varColumnNameDefault %}
                             {%- for loopColumn in ns.varColumnNameDefault  -%}
                                 {% if col.name == loopColumn %}
-                                    {% if col.dataType[:3] | upper in ('VAR','CHA','STR','BIN')%}
-                                        '{{ ns.varColumnValueDefault[loop.index0]}}'
-                                    {%else%} 
-                                        {{ ns.varColumnValueDefault[loop.index0]}}
-                                    {%endif%}                               
+                                    {% if col.dataType | upper == 'STRING' %}
+                                        '{{ nsZKAdv.columnValueDefault[loop.index0] }}'
+
+                                    {% elif col.dataType | upper == 'BYTES' %}
+                                        CAST('{{ nsZKAdv.columnValueDefault[loop.index0] }}' AS BYTES)
+
+                                    {% else %}
+                                        {{ nsZKAdv.columnValueDefault[loop.index0] }}
+                                    {% endif %}                              
                                 {% endif %}						
                             {% endfor -%}
                         {% elif col.isSystemCurrentFlag %}
@@ -233,20 +241,20 @@ does not permit copying or modification for any other purpose.
                             {{ get_source_transform(col) }}
                         {% elif col.isSystemVersion%}
                             1
-                        {% elif col.dataType | upper in ('BOOLEAN') %}
-                            {{ config.insertZeroKeyBol }}
-                        {% elif col.dataType[:3] | upper in ('NUM','INT','DEC','FLO') %}
+                        {% elif col.dataType | upper in ('BOOL') %}
+                            {{ config.insertZeroKeyBool }}
+                        {% elif col.dataType | upper in ('INT64', 'FLOAT64', 'NUMERIC', 'BIGNUMERIC') %}
                             0
-                        {% elif col.dataType [:12] | upper in ('TIMESTAMP_LT','TIMESTAMP_NT','TIMESTAMP_TZ') %}
-                            '{{config.insertZeroKeyTimestamp}}' ::{{ col.dataType |upper}}
-                        {% elif col.dataType[:4] | upper in ('DATE','TIME') %}
-                            CAST(TO_TIMESTAMP('{{config.insertZeroKeyDate}}', 'DD-MM-YYYY') AS {{ col.dataType }})
-                        {% elif col.dataType[:3] | upper in ('VAR','CHA','STR','BIN') %}
-                            {% if dtparams[0] and dtparams[0] | int < config.insertZeroKeyStr | length  %}
-                                SUBSTRING('{{config.insertZeroKeyStr}}',1,{{ dtparams[0] }})
-                            {% else %}
-                                '{{config.insertZeroKeyStr}}'
-                            {% endif %}
+                        {% elif col.dataType | upper in ('TIMESTAMP','DATETIME') %}
+                            CAST(PARSE_{{ col.dataType | upper }}('%Y-%m-%d %H:%M:%S', '{{ config.insertZeroKeyTimestamp }}') AS {{ col.dataType }})
+                        {% elif col.dataType | upper in ('TIME') %}
+                            TIME(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S', '{{ config.insertZeroKeyTimestamp }}'))
+                        {% elif col.dataType | upper in ('DATE') %}
+                            CAST(PARSE_DATE('%d-%m-%Y', '{{config.insertZeroKeyDate}}') AS {{ col.dataType }})
+                        {% elif col.dataType | upper == 'STRING' %}
+                            '{{ config.insertZeroKeyStr }}'
+                        {% elif col.dataType | upper == 'BYTES' %}
+                            CAST('{{ config.insertZeroKeyStr }}' AS {{ col.dataType }})
                         {% elif col.nullable %}
                             NULL
                         {% else %}
@@ -295,6 +303,8 @@ does not permit copying or modification for any other purpose.
                                     1
                                 {% elif col.isSystemCurrentFlag %}
                                     'Y'
+                                {% elif col.name == lastModifiedColumn and useCurrentTimeStamp %}
+                                    COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP())
                                 {% else %}
                                     {{ get_source_transform(col) }}
                                 {% endif %}
@@ -342,6 +352,8 @@ does not permit copying or modification for any other purpose.
                                     `DIM`.`{{ col.name }}` + 1
                                 {% elif col.isSystemCurrentFlag %}
                                     'Y'
+                                {% elif col.name == lastModifiedColumn and useCurrentTimeStamp %}
+                                    COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP())
                                 {% else %}
                                     {{ get_source_transform(col) }}
                                 {% endif %}
@@ -399,7 +411,7 @@ does not permit copying or modification for any other purpose.
                             {% endif %}
                             {%- for col in source.columns if not col.isSurrogateKey %}
                                 {% if col.isSystemEndDate %}
-                                        TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 MILLISECOND)
+                                    TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 MILLISECOND)
                                 {% elif col.isSystemCurrentFlag %}
                                     'N'
                                 {% else %}
@@ -674,13 +686,14 @@ does not permit copying or modification for any other purpose.
                             {% elif col.isSystemCurrentFlag %}
                                 'Y'
                             {% elif col.name == lastModifiedColumn %}
+                                MAX (`DIM`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE,
                                 {% if useCurrentTimeStamp %}
                                     COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) as COMPARISON_VALUE,
+                                    COALESCE({{ get_source_transform(col) }},CURRENT_TIMESTAMP())
                                 {% else %}
                                     {{ get_source_transform(col) }} AS COMPARISON_VALUE,
+                                    {{ get_source_transform(col) }}
                                 {% endif %}
-                                MAX (`DIM`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE,
-                                {{ get_source_transform(col) }}
                             {% else %}
                                 {{ get_source_transform(col) }}
                             {% endif %}

@@ -1,0 +1,220 @@
+fileVersion: 1
+id: 49958516-b3d7-4f5b-bae0-81257d18da89
+name: all_types_table
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: SRC
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 633b3e9e-0a15-43e6-883d-a52399ca47c8
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: id
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: c218281f-3c6a-4d94-9434-942b6c93c75e
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: NUMERIC
+        defaultValue: "NULL"
+        description: ""
+        name: price
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: a04cb807-5bb7-4d36-9ac4-49a816da54fc
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: FLOAT64
+        defaultValue: "NULL"
+        description: ""
+        name: rating
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 136f6df9-84fe-4dd9-9e57-836416216858
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: BOOL
+        defaultValue: "NULL"
+        description: ""
+        name: is_active
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 78972400-1468-4499-b48c-ba28ef4789b4
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: description
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 5969d106-bfc0-45a3-8dc6-3a8e218e83a9
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: DATE
+        defaultValue: "NULL"
+        description: ""
+        name: created_date
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: dcf90a2f-9aaa-474e-bfd0-1620d609955a
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: TIME
+        defaultValue: "NULL"
+        description: ""
+        name: created_time
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: a80ad497-384e-440a-af2f-4e6198b3aae9
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: DATETIME
+        defaultValue: "NULL"
+        description: ""
+        name: created_dt
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: c5d6b844-d5ce-4b03-bcac-be7c809680d3
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: created_ts
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 568a23a1-c688-4b58-ab05-c307d13826b6
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: JSON
+        defaultValue: "NULL"
+        description: ""
+        name: json_data
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: d2e82764-ba69-493a-8fa0-82af4ba8fd96
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: ARRAY<STRING>
+        defaultValue: "NULL"
+        description: ""
+        name: tags
+        nullable: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 361e23fe-0d63-492c-b9e8-a1562c8be480
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: ARRAY<STRUCT<SUBJECT STRING, MARKS INT64>>
+        defaultValue: "NULL"
+        description: ""
+        name: scores
+        nullable: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+  name: all_types_table
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node
