@@ -17,39 +17,25 @@ does not permit copying or modification for any other purpose.
 
 {% if desiredState %}
 
+    {% if currentState != undefined
+            and (currentState.node.materializationType != desiredState.node.materializationType
+            or nsNodeVariables.desiredDatabaseSchema != nsNodeVariables.currentDatabaseSchema) %}
+
+        {# Drop current table before creating #}
+        {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
+        DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
+        
+    {% endif %}
+
     {# Override CreateSQL for view #}
     {% if desiredState.node.materializationType == 'view' %}
         
         {% if desiredState.node.override.create.enabled and desiredState.node.override.create.script | trim != "" %}
 
-            {# Drop current table before overriding #}
-            {% if currentState != undefined %}
-                {% if currentState.node.materializationType != 'view' %}
-                    {{ stage('Drop Current Table - ' + currentState.node.name) }}
-                    DROP TABLE IF EXISTS {{ nsNodeVariables.curObjectNameFullPath }}
-                {% endif %}
-            {% endif %}
-
             {# Run the overriding script #}
             {{ desiredState.node.override.create.script }}
 
         {% else %}
-
-            {% if currentState != undefined %}		
-                {% if currentState.node.materializationType != 'view' %}
-
-                    {# Drop current table before creating #}
-                    {{ stage('Drop Current Table - ' + currentState.node.name, true, "sql", "drop") }}
-                    DROP TABLE IF EXISTS {{ nsNodeVariables.curObjectNameFullPath }}
-
-                {% elif  desiredState.node.name != currentState.node.name
-                            or nsNodeVariables.desiredDatabaseSchema != nsNodeVariables.currentDatabaseSchema  %}
-
-                    {# Drop current view if renamed or moved #}
-                    {{ stage('Drop Current View - ' + currentState.node.name, true, "sql", "drop") }}
-                    DROP VIEW IF EXISTS {{ nsNodeVariables.curObjectNameFullPath }}                    
-                {% endif %}
-            {% endif %}
 
             {# Create new view #}
             {% if currentState == undefined or currentState != desiredState %}
@@ -401,12 +387,6 @@ does not permit copying or modification for any other purpose.
                 {% set nsConfigVariables.options = nsConfigVariables.options + 'default_rounding_mode = ' + nsConfigVariables.defRndMode %}
             {% endif %}
 
-            {% if currentState != undefined %}		
-                {# Drop current table/view before creating #}
-                {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
-                DROP {{ currentState.node.materializationType }} IF EXISTS {{ nsNodeVariables.curObjectNameFullPath }}
-            {% endif %}
-
             {# Create table with all the config/mapping options #}
             {{ stage('Create Dimension Table', true, "sql", "create")}}
             CREATE OR REPLACE TABLE {{ nsNodeVariables.desObjectNameFullPath }}
@@ -445,6 +425,6 @@ does not permit copying or modification for any other purpose.
 
     {# Drop the table/view in undeployment #}
     {{ stage('Drop Current ' + currentState.node.materializationType ) }}
-    DROP {{ currentState.node.materializationType }} IF EXISTS {{ fullyQualifiedTargetObjectName }}
+    DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.fullyQualifiedTargetObjectName }}
 
 {% endif %}

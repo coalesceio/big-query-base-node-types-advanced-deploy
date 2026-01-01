@@ -178,5 +178,44 @@ macroString: |-
     {{ varDefRndMd }}
 
   {% endmacro %}
+
+  {###########################################################################################
+  Purpose:
+  Determines the correct BigQuery DROP object syntax based on the materialization type.
+
+  Input:
+  - materialization (string): The BigQuery object type to be dropped
+    (e.g., table, view, materialized view, external table, snapshot, clone).
+
+  Returns:
+  - string: The appropriate DROP object keyword with IF EXISTS
+    (e.g., 'TABLE IF EXISTS', 'VIEW IF EXISTS', 'MATERIALIZED VIEW IF EXISTS').
+  #############################################################################################}
+  {% macro dropMaterialization(materialization) %}
+
+      {% if materialization in ['table', 'clone'] %}
+          TABLE IF EXISTS
+
+      {% elif materialization == 'snapshot' %}
+          SNAPSHOT TABLE IF EXISTS
+
+      {% elif materialization in ['view', 'authorized view'] %}
+          VIEW IF EXISTS
+
+      {% elif materialization == 'materialized view' %}
+          MATERIALIZED VIEW IF EXISTS
+
+      {% elif materialization == 'external table', 'BigLake table' %}
+          EXTERNAL TABLE IF EXISTS
+
+      {% elif materialization == 'temporary table' %}
+          TABLE IF EXISTS   {# temp tables usually don’t need DROP, but kept for symmetry #}
+
+      {% else %}
+          TABLE IF EXISTS   {# safe default for BigQuery #}
+
+      {% endif %}
+
+  {% endmacro %}
 name: macro
 type: Macro
