@@ -64,7 +64,7 @@ does not permit copying or modification for any other purpose.
         {% endif %}
 
         {%- if updateStrategy == 'MERGE' -%}
-            {{ stage('Insert Zero Record') }}
+            {{ stage('Insert/Update Zero Record') }}
             MERGE INTO {{ ref_no_link(node.location.name, node.name) }} USING
             (
                 SELECT 
@@ -121,7 +121,7 @@ does not permit copying or modification for any other purpose.
             ) AS SOURCE_ZERO
             ON
             {%- for col in columns if col.isSurrogateKey %}
-                {{ node.name }}.{{ col.name }} = '{{ config.insertZeroKeySurrogateKey }}'
+                {{ node.name }}.{{ col.name }} = {% if col.dataType | upper in ['BYTES', 'STRING', 'DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] %}'{% endif %}{{ config.insertZeroKeySurrogateKey }}{% if col.dataType | upper in ['BYTES', 'STRING', 'DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] %}'{% endif %}
             {% endfor -%}
                 
             WHEN MATCHED THEN UPDATE
@@ -147,7 +147,8 @@ does not permit copying or modification for any other purpose.
             )
 
         {% else %}
-            BEGIN
+            {{ stage('Insert/Update Zero Record') }}
+            BEGIN TRANSACTION;
                 {#BEGIN TRANSACTION#}
                 -- Update Zero Key Record if it exists
                 UPDATE {{ ref_no_link(node.location.name, node.name) }}
@@ -162,12 +163,20 @@ does not permit copying or modification for any other purpose.
                         {% for col in sources[0].columns %}
                             {% set dtparams = col.dataType.partition('(')[-1].rpartition(')')[0].split(',') %}
                             {% if col.isSurrogateKey %}
-                                {{config.insertZeroKeySurrogateKey}}
-                            {% elif config.insertZeroKeyAdvanced == true and col.name in ns.varColumnNameDefault %}
-                                {%- for loopColumn in ns.varColumnNameDefault  -%}
+                                '{{config.insertZeroKeySurrogateKey}}'
+                            {% elif config.insertZeroKeyAdvancedToggle and col.name in nsZKAdv.columnNameDefault %}
+                                {%- for loopColumn in nsZKAdv.columnNameDefault -%}
                                     {% if col.name == loopColumn %}
-                                        {{ ns.varColumnValueDefault[loop.index0] }} 
-                                    {% endif %}						
+                                        {% if col.dataType | upper == 'STRING' %}
+                                            '{{ nsZKAdv.columnValueDefault[loop.index0] }}'
+
+                                        {% elif col.dataType | upper == 'BYTES' %}
+                                            CAST('{{ nsZKAdv.columnValueDefault[loop.index0] }}' AS BYTES)
+
+                                        {% else %}
+                                            {{ nsZKAdv.columnValueDefault[loop.index0] }}
+                                        {% endif %}
+                                    {% endif %}					
                                 {% endfor -%}
                             {% elif col.isSystemCurrentFlag %}
                                 'Y'
@@ -205,7 +214,7 @@ does not permit copying or modification for any other purpose.
                         {% else %}
                             AND
                         {% endif %}
-                        {{ node.name}}.{{ col.name}} = {{config.insertZeroKeySurrogateKey}}
+                        {{ node.name}}.{{ col.name}} = {% if col.dataType | upper in ['BYTES', 'STRING', 'DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] %}'{% endif %}{{ config.insertZeroKeySurrogateKey }}{% if col.dataType | upper in ['BYTES', 'STRING', 'DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] %}'{% endif %}
                     {% endfor %}
                 ;
                 -- Insert Zero Key Record if it does not exist
@@ -220,7 +229,7 @@ does not permit copying or modification for any other purpose.
                     {% for col in sources[0].columns %}
                         {% set dtparams = col.dataType.partition('(')[-1].rpartition(')')[0].split(',') %}
                         {% if col.isSurrogateKey %}
-                            {{config.insertZeroKeySurrogateKey}}
+                            '{{config.insertZeroKeySurrogateKey}}'
                         {% elif config.insertZeroKeyAdvanced == true and col.name in ns.varColumnNameDefault %}
                             {%- for loopColumn in ns.varColumnNameDefault  -%}
                                 {% if col.name == loopColumn %}
@@ -273,11 +282,10 @@ does not permit copying or modification for any other purpose.
                         {% else %}
                             AND
                         {% endif %}
-                        {{ node.name}}.{{ col.name}} = {{config.insertZeroKeySurrogateKey}}
+                        {{ node.name}}.{{ col.name}} = {% if col.dataType | upper in ['BYTES', 'STRING', 'DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] %}'{% endif %}{{ config.insertZeroKeySurrogateKey }}{% if col.dataType | upper in ['BYTES', 'STRING', 'DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] %}'{% endif %}
                     {% endfor %}
                 );
             COMMIT;
-            END
         {% endif %}
     {% endif %}
 
@@ -869,7 +877,7 @@ does not permit copying or modification for any other purpose.
         {# == INSERT/UPDATE for SCD Type2 == #}
         {% if isSCDType2 %}
             {{ stage('Load Dimension Table Using Insert/Update(SCD Type2)') }}
-            BEGIN
+            BEGIN TRANSACTION;
                 EXECUTE IMMEDIATE """
                     -- Step 1: Create a temporary table to hold SRC data
                     CREATE OR REPLACE TEMP TABLE SRC_STAGE AS
@@ -1136,13 +1144,12 @@ does not permit copying or modification for any other purpose.
                     ;
                 """;
             COMMIT;
-            END;
         
         {# == INSERT/UPDATE for SCD Type1 == #}
         {% else %}
 
 		    {{ stage('Load Dimension Table Using Insert/Update(SCD Type1)') }}
-            BEGIN
+            BEGIN TRANSACTION;
                 -- Step 1: Update existing rows
                 UPDATE {{ ref_no_link(node.location.name, node.name) }} 
                 SET
@@ -1261,9 +1268,6 @@ does not permit copying or modification for any other purpose.
                         {% if not loop.first %} AND {% endif %}
                         TGT.`{{ col.name }}` IS NULL
                     {%- endfor %};
-
-            END;
-
         {% endif %}
     {% endif %}
 

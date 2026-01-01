@@ -25,13 +25,13 @@ operation:
     insertStrategy: UNION ALL
     insertZeroKeyAdvancedToggle: true
     insertZeroKeyBool: "FALSE"
-    insertZeroKeyDate: 01-01-2000
-    insertZeroKeyStr: UNKNOWN
+    insertZeroKeyDate: 01-01-9999
+    insertZeroKeyStr: super
     insertZeroKeySurrogateKey: "0"
     insertZeroKeyTimestamp: "1900-01-01 00:00:00"
     insertZeroKeyToggle: true
     lastModifiedColumn: ""
-    lastModifiedCompToggle: false
+    lastModifiedCompToggle: true
     partByColumn: ""
     partByColumnConfig: Time-Unit Column
     partByIngnTimeExpression: ""
@@ -40,7 +40,7 @@ operation:
     partExpireDays: ""
     partitionByToggle: false
     partitionFilterToggle: false
-    postSQL: select * FROM UNNEST([1])
+    postSQL: ""
     preSQL: ""
     primaryKeyConfig:
       items:
@@ -48,12 +48,12 @@ operation:
     primaryToggle: false
     selectDistinct: false
     tabExpirationToggle: false
-    testsEnabled: true
+    testsEnabled: false
     timeExprnExpression: ""
     treatNullAsCurrentTimestamp: false
     truncateBefore: false
     type2Dimension: false
-    updateStrategy: MERGE
+    updateStrategy: INSERT/UPDATE
   database: ""
   deployEnabled: true
   description: ""
@@ -66,7 +66,9 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests: {}
+        appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: 0a6058d1-dd56-41b4-8278-d0327fc42be1
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -80,7 +82,9 @@ operation:
         sourceColumnReferences:
           - columnReferences: []
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: d5aa518b-b52f-4077-8600-6de6300aa136
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -95,7 +99,9 @@ operation:
               - columnCounter: 633b3e9e-0a15-43e6-883d-a52399ca47c8
                 stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: 2dba24fa-aa5f-4d94-af90-700c0da3be28
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -109,7 +115,9 @@ operation:
               - columnCounter: c218281f-3c6a-4d94-9434-942b6c93c75e
                 stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: true
         columnReference:
           columnCounter: 1ca86b80-2b3a-499e-973d-b9948c994941
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -123,7 +131,9 @@ operation:
               - columnCounter: a04cb807-5bb7-4d36-9ac4-49a816da54fc
                 stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: 560e8b55-2245-4054-b6be-3df63d6f0895
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -137,7 +147,9 @@ operation:
               - columnCounter: 136f6df9-84fe-4dd9-9e57-836416216858
                 stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: 6d27962d-fed8-4c3d-a9d2-e7af50637192
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -151,7 +163,9 @@ operation:
               - columnCounter: 78972400-1468-4499-b48c-ba28ef4789b4
                 stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: 2a2328b2-985d-4adc-a179-158b712bd092
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -165,7 +179,9 @@ operation:
               - columnCounter: 5969d106-bfc0-45a3-8dc6-3a8e218e83a9
                 stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: f3a99ec0-f13d-49c5-9906-c38e1ce55635
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -179,7 +195,9 @@ operation:
               - columnCounter: dcf90a2f-9aaa-474e-bfd0-1620d609955a
                 stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: 6baac5a1-a3fc-4c75-a55d-9640c516ff9d
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -193,7 +211,9 @@ operation:
               - columnCounter: a80ad497-384e-440a-af2f-4e6198b3aae9
                 stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
             transform: ""
-      - appliedColumnTests: {}
+      - appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: a78a1feb-a561-4822-a0b2-fe1a2b5cf5c9
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -210,7 +230,9 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests: {}
+        appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: d161045a-a09a-4bb5-a717-e0c407380e8c
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -227,7 +249,9 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests: {}
+        appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: 0f2db500-47d0-44d9-a09d-a4588f2f78c6
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -244,7 +268,9 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests: {}
+        appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: 47971015-7ede-40b1-b39f-e091addf9239
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -261,7 +287,9 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests: {}
+        appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: cffed0fe-6c07-4dc0-b89d-ac2dffd7ae4c
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -278,7 +306,9 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests: {}
+        appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: ade04750-1575-423a-9d2e-1385459ccf24
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -295,7 +325,9 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests: {}
+        appliedColumnTests:
+          hasNull: false
+          isDistinct: false
         columnReference:
           columnCounter: f9a2cf31-caa6-4b85-bcd7-4393b2399841
           stepCounter: 4084f9cc-c559-4e00-ac76-e43233831c3d
@@ -310,7 +342,9 @@ operation:
           - columnReferences: []
             transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
     cteString: ""
-    enabledColumnTestIDs: []
+    enabledColumnTestIDs:
+      - hasNull
+      - isDistinct
     sourceMapping:
       - aliases:
           all_types_table: 49958516-b3d7-4f5b-bae0-81257d18da89
