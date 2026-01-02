@@ -10,9 +10,10 @@ does not permit copying or modification for any other purpose.
                                  sql for view with advanced deployment strategy == #}
 
 {% set nsNodeVariables = namespace(currentDatabaseSchema = "",
-                        desiredDatabaseSchema = "",
-                        desObjectNameFullPath = "",
-                        curObjectNameFullPath = "") %}
+                                    desiredDatabaseSchema = "",
+                                    desObjectNameFullPath = "",
+                                    curObjectNameFullPath = "",
+                                    metadataChanges = false) %}
 {{ initializeNodeVariables(nsNodeVariables) }}
 
 {% if desiredState %}
@@ -100,6 +101,7 @@ does not permit copying or modification for any other purpose.
                 or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', [])
                 or nsNodeVariables.currentDatabaseSchema != nsNodeVariables.desiredDatabaseSchema) %}
             {% set nsConfigVariables.createTable = true %}
+            {% set nsNodeVariables.metadataChanges = true %}
         {% endif %}
 
         {# Alter table incase of any chnages in states and alter is allowed #}
@@ -111,6 +113,7 @@ does not permit copying or modification for any other purpose.
                 {{ stage('Alter Table - Rename') }}
                 ALTER TABLE  {{nsNodeVariables.currentDatabaseSchema}}.{{currentState.node.name}}
                 RENAME TO  {{ desiredState.node.name }}
+                {% set nsNodeVariables.metadataChanges = true %}
         
             {% endif %}
 
@@ -122,12 +125,14 @@ does not permit copying or modification for any other purpose.
                     {{ stage('Alter Table - Add Primary Key Constraint') }}
                     ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                     ADD PRIMARY KEY ( {{ nsConfigVariables.primaryKey}} ) NOT ENFORCED
+                    {% set nsNodeVariables.metadataChanges = true %}
                 {% endif %}
             {% else %}
                 {% if currentState.config.primaryToggle and desiredState.config.primaryToggle == false %}
                     {{ stage('Alter Table - Drop Primary Key Constraint') }}
                     ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                     DROP PRIMARY KEY
+                    {% set nsNodeVariables.metadataChanges = true %}
                 {% endif %}
             {% endif %}
 
@@ -203,6 +208,7 @@ does not permit copying or modification for any other purpose.
                 {{ stage('Alter Table - Option Attributes') }}
                 ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                 SET OPTIONS ( {{ alterOptions }} )
+                {% set nsNodeVariables.metadataChanges = true %}
             {% endif %}
 
             {# Rename/Attributes Change/Drop Columns #}
@@ -220,6 +226,7 @@ does not permit copying or modification for any other purpose.
                     {# Rename Column #}
                     {% if curCol.name != desiredColumnName %}
                         {% set ns.renameColCount = ns.renameColCount + 1 %}
+                        {% set nsNodeVariables.metadataChanges = true %}
                         {% if ns.renameColCount == 1 %}
                             {{ stage('Alter Table - Rename Column/s') }}
                             ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
@@ -241,6 +248,7 @@ does not permit copying or modification for any other purpose.
                         or descriptionTest == false %}
 
                         {% set ns.attributeColCount = ns.attributeColCount + 1 %}
+                        {% set nsNodeVariables.metadataChanges = true %}
 
                         {% if ns.attributeColCount == 1 %}
                             {{ stage('Alter Table - Change Column Attributes') }}
@@ -251,6 +259,7 @@ does not permit copying or modification for any other purpose.
                             {% if ns.attributeColCount > 1 %} , {% endif %}
                             ALTER COLUMN `{{ desiredColumnName }}`
                             SET DATA TYPE {{ desiredDatatype }}
+                            
                         {% endif %}
 
                         {% if nullableTest == false %}
@@ -281,6 +290,7 @@ does not permit copying or modification for any other purpose.
                 {# Drop Column #}
                 {% if curCol.id not in desiredState.columns | map(attribute="id") %}
                     {% set ns.dropColCount = ns.dropColCount + 1 %}
+                    {% set nsNodeVariables.metadataChanges = true %}
                     {% if ns.dropColCount == 1 %}
                         {{ stage('Alter Table - Drop Column/s') }}
                         ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
@@ -297,53 +307,54 @@ does not permit copying or modification for any other purpose.
                 {% if addDesCol.id not in currentState.columns | map(attribute="id") %}
 
                     {% set ns.addCount = ns.addCount + 1 %}
+                    {% set nsNodeVariables.metadataChanges = true %}
                     {% if ns.addCount == 1 %}
                         {{ stage('Alter Table - Add Columns') }}
                         ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                     {% else %}
                         ,
                     {% endif %}
-                        ADD COLUMN `{{ addDesCol.name }}` {{ addDesCol.dataType }}
-                        {%- if addDesCol.defaultValue | length > 0 %} DEFAULT {{ addDesCol.defaultValue }} {%endif%}
-                        {% if not addDesCol.nullable %} NOT NULL {% endif%}
-                        {%- if addDesCol.description | length > 0 %} OPTIONS(description="{{ addDesCol.description | escape }}")
-                    {% endif %}
-
+                    ADD COLUMN `{{ addDesCol.name }}` {{ addDesCol.dataType }}
+                    {%- if addDesCol.defaultValue | length > 0 %} DEFAULT {{ addDesCol.defaultValue }} {%endif%}
+                    {% if not addDesCol.nullable %} NOT NULL {% endif%}
+                    {%- if addDesCol.description | length > 0 %} OPTIONS(description="{{ addDesCol.description | escape }}"){% endif %}
                 {% endif %}
             {% endfor %}
 
-            {# Metadata Changes - Join #}
-            {% set nsMetaVariables = namespace(joinTest = true) %}
-            {% set nsMetaVariables.joinTest = currentState.sources | count == desiredState.sources | count %}
-            {% if nsMetaVariables.joinTest %}
-                {% for src in desiredState.sources %}
-                    {% set matchingSource = currentState.sources | selectattr('name', 'equalto', src.name) | first %}
-                    {% if matchingSource %}
+            {# Other Metadata Changes #}
+            {% if nsNodeVariables.metadataChanges == false %}
+                {% set nsMetaVariables = namespace(joinTest = true) %}
+                {% set nsMetaVariables.joinTest = currentState.sources | count == desiredState.sources | count %}
+                {% if nsMetaVariables.joinTest %}
+                    {% for src in desiredState.sources %}
+                        {% set matchingSource = currentState.sources | selectattr('name', 'equalto', src.name) | first %}
+                        {% if matchingSource %}
 
-                        {# Join comparison #}
-                        {% set desiredStateSources = src.join | replace("{{", '"{{"') | replace("}}", '"}}"') | replace('/*', '/ *') | replace('*/', '* /') %}
-                        {% set currentStateSources = matchingSource.join | replace("{{", '"{{"') | replace("}}", '"}}"') | replace('/*', '/ *') | replace('*/', '* /') %}
+                            {# Join comparison #}
+                            {% set desiredStateSources = src.join | replace("{{", '"{{"') | replace("}}", '"}}"') | replace('/*', '/ *') | replace('*/', '* /') %}
+                            {% set currentStateSources = matchingSource.join | replace("{{", '"{{"') | replace("}}", '"}}"') | replace('/*', '/ *') | replace('*/', '* /') %}
 
-                        {% set nsMetaVariables.joinTest = desiredStateSources == currentStateSources %}
-                        {% if nsMetaVariables.joinTest == false %}
-                            {{ stage('Metadata Updates - Join') }}
-                            /* "is": {{ desiredStateSources }} , "was": {{ currentStateSources }} */
-                            select 1=0
+                            {% set nsMetaVariables.joinTest = desiredStateSources == currentStateSources %}
+                            {% if nsMetaVariables.joinTest == false %}
+                                {{ stage('Metadata Updates - Join') }}
+                                /* "is": {{ desiredStateSources }} , "was": {{ currentStateSources }} */
+                                select 1=0
+                            {% endif %}
+
                         {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {# Source count mismatch — compare source names instead #}
+                    {% set desiredStateSources = desiredState.sources | map(attribute='name') | list | sort %}
+                    {% set currentStateSources = currentState.sources | map(attribute='name') | list | sort %}
 
+                    {% set nsMetaVariables.joinTest = desiredStateSources == currentStateSources %}
+
+                    {% if nsMetaVariables.joinTest == false %}
+                        {{ stage('Metadata Updates - Join') }}
+                        /* "is": {{ desiredStateSources }} , "was": {{ currentStateSources }} */
+                        select 1=0
                     {% endif %}
-                {% endfor %}
-            {% else %}
-                {# Source count mismatch — compare source names instead #}
-                {% set desiredStateSources = desiredState.sources | map(attribute='name') | list | sort %}
-                {% set currentStateSources = currentState.sources | map(attribute='name') | list | sort %}
-
-                {% set nsMetaVariables.joinTest = desiredStateSources == currentStateSources %}
-
-                {% if nsMetaVariables.joinTest == false %}
-                    {{ stage('Metadta Updates - Join') }}
-                    /* "is": {{ desiredStateSources }} , "was": {{ currentStateSources }} */
-                    select 1=0
                 {% endif %}
             {% endif %}
 
