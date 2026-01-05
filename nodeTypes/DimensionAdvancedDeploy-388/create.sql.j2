@@ -151,17 +151,17 @@ does not permit copying or modification for any other purpose.
                 {% if desiredState.config.partByColumnConfig != 'Integer Range' %}
                     {% if desiredState.config.partExpireDays | trim | length > 0 %}
                         {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
-                            {% if alterOptions | length > 0 %}
-                                {% set alterOptions = alterOptions + ", " %}
-                            {% endif %}
-                            {% set alterOptions = alterOptions + 'partition_expiration_days = ' +  desiredState.config.partExpireDays %}
+                            {% set alterOptions = alterOptions
+                                                    ~ (", " if alterOptions)
+                                                    ~ "partition_expiration_days = " ~ desiredState.config.partExpireDays %}
+
                         {% endif %}
                     {% else %}
                         {% if currentState.config.partExpireDays | trim | length > 0 %}
-                            {% if alterOptions | length > 0 %}
-                                {% set alterOptions = alterOptions + ", " %}
-                            {% endif %}
-                            {% set alterOptions = alterOptions + 'partition_expiration_days = NULL' %}
+                            {% set alterOptions = alterOptions
+                                                    ~ (", " if alterOptions)
+                                                    ~ "partition_expiration_days = NULL" %}
+
                         {% endif %}
                     {% endif %}
                 {% endif %}
@@ -169,18 +169,18 @@ does not permit copying or modification for any other purpose.
 
             {# Change Table Description #}
             {% if currentState.node.description != desiredState.node.description %}
-                {% if alterOptions | length > 0 %}
-                    {% set alterOptions = alterOptions + ", " %}
-                {% endif %}
-                {% set alterOptions = alterOptions + "description = '" + desiredState.node.description | escape + "'" %}
+                {% set alterOptions = alterOptions
+                                        ~ (", " if alterOptions)
+                                        ~ "description = '" ~ (desiredState.node.description | escape) ~ "'" %}
+
             {% endif %}
 
             {# Change Default Rounding Mode #}
             {% if currentState.config.defRndMode != desiredState.config.defRndMode %}
-                {% if alterOptions | length > 0 %}
-                    {% set alterOptions = alterOptions + ", " %}
-                {% endif %}
-                {% set alterOptions = alterOptions + 'default_rounding_mode = ' + nsConfigVariables.defRndMode %}
+                {% set alterOptions = alterOptions
+                                        ~ (", " if alterOptions)
+                                        ~ "default_rounding_mode = " ~ nsConfigVariables.defRndMode %}
+
             {% endif %}
 
             {# Alter Table Expiration #}
@@ -190,16 +190,15 @@ does not permit copying or modification for any other purpose.
                     or desiredState.config.dayExprnExpression != currentState.config.dayExprnExpression))
                     or (desiredState.config.tabExpirationToggle and currentState.config.tabExpirationToggle != desiredState.config.tabExpirationToggle) %}
 
-                {% if alterOptions | length > 0 %}
-                    {% set alterOptions = alterOptions + ", " %}
-                {% endif %}
-                {% set alterOptions = alterOptions + 'expiration_timestamp = ' + nsConfigVariables.tabEprnClause %}
+                    {% set alterOptions = alterOptions
+                                            ~ (", " if alterOptions)
+                                            ~ "expiration_timestamp = " ~ nsConfigVariables.tabEprnClause %}
+
             {% else %}
                 {% if currentState.config.tabExpirationToggle and desiredState.config.tabExpirationToggle == false %}
-                    {% if alterOptions | length > 0 %}
-                        {% set alterOptions = alterOptions + ", " %}
-                    {% endif %}
-                    {% set alterOptions = alterOptions + 'expiration_timestamp = NULL' %}
+                    {% set alterOptions = alterOptions
+                                            ~ (", " if alterOptions)
+                                            ~ "expiration_timestamp = NULL" %}
                 {% endif %}
             {% endif %}
 
@@ -367,34 +366,34 @@ does not permit copying or modification for any other purpose.
 
             {# Build table options - expiration_timestamp #}
             {% if nsConfigVariables.tabEprnClause | length > 0 %}
-                {% if nsConfigVariables.options | length > 0 %}
-                    {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
-                {% endif %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + "expiration_timestamp=" + nsConfigVariables.tabEprnClause %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "expiration_timestamp=" ~ nsConfigVariables.tabEprnClause %}
+
             {% endif %}
 
             {# Build table options - require_partition_filter #}
             {% if desiredState.config.partitionByToggle and desiredState.config.partitionFilterToggle %}
-                {% if nsConfigVariables.options | length > 0 %}
-                    {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
-                {% endif %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + "require_partition_filter=true" %}
+               {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "require_partition_filter=true" %}
+
             {% endif %}
 
             {# Build table options - partition_expiration_days #}
             {% if desiredState.config.partitionByToggle and desiredState.config.partByColumnConfig != 'Integer Range' and desiredState.config.partExpireDays | length > 0 %}
-                {% if nsConfigVariables.options | length > 0 %}
-                    {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
-                {% endif %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + "partition_expiration_days=" + desiredState.config.partExpireDays %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "partition_expiration_days=" ~ desiredState.config.partExpireDays %}
+
             {% endif %}
 
             {# Build table options - Default Rounding Mode #}
             {% if desiredState.config.defRndMode != '' %}
-                {% if nsConfigVariables.options | length > 0 %}
-                    {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
-                {% endif %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + 'default_rounding_mode = ' + nsConfigVariables.defRndMode %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "default_rounding_mode = " ~ nsConfigVariables.defRndMode %}
+
             {% endif %}
 
             {# Drop current table before creating #}
