@@ -6,9 +6,9 @@ metadata:
   error: null
   nodeMetadataSpec: |-
     capitalized: Fact Advanced Deploy
+    short: fct
+    tagColor: '#1E339A'
     plural: Facts
-    short: FCT
-    tagColor: '#D9A438'
 
     deployStrategy: advanced
 
@@ -28,7 +28,7 @@ metadata:
       - type: toggleButton
         displayName: Primary Key
         default: false
-        attributeName: primary
+        attributeName: primaryToggle
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
       - type: tabular   
@@ -38,17 +38,23 @@ metadata:
 
         -  type: columnDropdownSelector
            displayName: Primary Key Columns
-           attributeName: primaryKey
+           attributeName: primaryKeyColumn
+           default: ''
 
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.primary %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.primaryToggle %} true {% else %} false {% endif %}"
 
       - type: toggleButton
-        attributeName: partitionBy
+        attributeName: partitionByToggle
         displayName: Enable Partitioning
         default: false
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: ⚠️ Warning - On Redeployment, PARTITION Changes will Drop and Recreate the Table
+        attributeName: labelPartWarning
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle %} true {% else %} false {% endif %}"
 
       - displayName: Partition By*
         attributeName: partByColumnConfig
@@ -59,60 +65,73 @@ metadata:
         - "Integer Range"
         - "Ingestion Time"
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle %} true {% else %} false {% endif %}"
 
       - type: textBox
         displayName: "Time-Unit Expression (Ex: DATE_TRUNC(columnName, MONTH))"
         attributeName: partByTimeSqlExpression
         default: ""
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: label
         displayName: -- OR --
         attributeName: labelOR
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: columnDropdownSelector
         displayName: Partition By Column (dataType-DATE)
         attributeName: partByColumn
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+        default: ''
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: textBox
         displayName: "Integer Range Expression* (Ex: RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200)))"
         attributeName: partByIntSqlExpression
         default: ""
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Integer Range' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Integer Range' %} true {% else %} false {% endif %}"
 
       - type: textBox
         displayName: Ingestion-time Expression(Optional) (Ex. DATE_TRUNC(_PARTITIONTIME, MONTH))
         attributeName: partByIngnTimeExpression
         default: ''
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partByColumnConfig == 'Ingestion Time' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Ingestion Time' %} true {% else %} false {% endif %}"
 
+      #----- Not supported For Now ------#
       - type: toggleButton
-        attributeName: partitionFilter
+        attributeName: partitionFilterToggle
         displayName: Require Partition Filter
         default: false
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+        enableIf: "false"
+      # ----------------------------------#
 
       - type: textBox
         displayName: Partition Expiration Days(Optional) (Ex. 30)
         attributeName: partExpireDays
         default: ''
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and ( config.partByColumnConfig == 'Time-Unit Column' or config.partByColumnConfig == 'Ingestion Time' ) %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and ( config.partByColumnConfig == 'Time-Unit Column' or config.partByColumnConfig == 'Ingestion Time' ) %} true {% else %} false {% endif %}"
 
       - type: toggleButton
-        attributeName: clusterKey
+        attributeName: clusterKeyToggle
         displayName: Enable Clustering
         default: false
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: ⚠️ Warning - On Redeployment, CLUSTER Changes will Drop and Recreate the Table
+        attributeName: labelClustWarning
+        enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: ⚠️ Warning - Cluster Columns exceeding the limit of 4
+        attributeName: labelCKWarning
+        enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle and config.clusterKeyConfig.get('items') | length > 4 %} true {% else %} false {% endif %}"
 
       - type: tabular
         displayName: Cluster By* (Only first 4 rows are processed)
@@ -121,14 +140,15 @@ metadata:
 
         -  type: columnDropdownSelector
            displayName: Cluster By Columns
+           default: ''
            attributeName: clustColumn
            isRequired: false
       
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.clusterKey and config.partitionBy %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle %} true {% else %} false {% endif %}"
 
       - type: toggleButton
-        attributeName: tabExpiration
+        attributeName: tabExpirationToggle
         displayName: Table Expiration
         default: false
         isRequired: false
@@ -142,21 +162,21 @@ metadata:
         - "EXACT DATE/DATETIME"
         - "DAYS FROM NOW"
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration %} true {% else %} flase {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle %} true {% else %} flase {% endif %}"
 
       - type: textBox
         displayName: 'Expiration Value* (Ex: 2024-12-31 | 2024-12-31 23:59:59)'
         attributeName: timeExprnExpression
         default: ""
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'EXACT DATE/DATETIME' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle and config.exprnType == 'EXACT DATE/DATETIME' %} true {% else %} false {% endif %}"
 
       - type: textBox
         displayName: 'Expiration Value* (Ex: 30)'
         attributeName: dayExprnExpression
         default: ""
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.tabExpiration and config.exprnType == 'DAYS FROM NOW' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle and config.exprnType == 'DAYS FROM NOW' %} true {% else %} false {% endif %}"
 
       - displayName: Default Rounding Mode(Optional)
         attributeName: defRndMode
@@ -168,18 +188,10 @@ metadata:
         - "ROUND_HALF_EVEN"
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} flase {% endif %}"
-
+        
     - groupName: Load Fact Options
 
       items:
-
-      - type: textBox
-        displayName: Partition Filter Query* (Ex. <partByCluase> > current_time())
-        attributeName: partFiltetrQuery
-        syntax: sql
-        default: ""
-        isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.partitionBy and config.partitionFilter %} true {% else %} false {% endif %}"
 
       - type: multisourceToggle
         enableIf: "{% if node.materializationType == 'view' and node.override.create.enabled %} false {% else %} true {% endif %}"
@@ -194,9 +206,98 @@ metadata:
         isRequired: false
         enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"
 
+      - displayName: Update Strategy
+        attributeName: updateStrategy
+        type: dropdownSelector
+        default: MERGE
+        options:
+        - "MERGE"
+        - "INSERT/UPDATE"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
+
+      - displayName: Unmatched Record Strategy
+        attributeName: deleteStrategy
+        type: dropdownSelector
+        default: "NO DELETE"
+        options:
+        - "NO DELETE"
+        - "SOFT DELETE"
+        - "HARD DELETE"
+        isRequired: false
+        enableIf: "{% if node.materializationType != 'view' and config.updateStrategy == 'MERGE' and node.isMultisource == false %} true {% else %} false {% endif %}"
+
       - type: businessKeyColumns
         isRequired: false
-        enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
+
+      - type: toggleButton
+        attributeName: lastModifiedCompToggle
+        displayName: Last Modified Comparison
+        default: false
+        enableIf: "{% if node.materializationType != 'view' and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+        
+      - type: columnDropdownSelector
+        attributeName: lastModifiedColumn
+        displayName: Comparison Column* (DataType - TIMESTAMP or NUMERIC)
+        default: ''
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: treatNullAsCurrentTimestamp
+        displayName: Treat NULL as Current Timestamp
+        default: false
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: type2Dimension
+        displayName: Enable SCD Type2
+        default: false
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: Note - SCD Type2 if selected, Else SCD Type1
+        attributeName: labelCT
+        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle == false %} true {% else %} false {% endif %}"
+
+      - displayName: Exclude Columns from Merge (For SCD Type1)
+        attributeName: excludeMergeToggle
+        type: toggleButton
+        default: false
+        enableIf: "{% if node.materializationType != 'view' 
+                        and config.lastModifiedCompToggle == false
+                        and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0 and config.updateStrategy == 'MERGE' %}
+                      true
+                    {% else %} 
+                      false
+                    {% endif %}"
+
+      - type: tabular
+        displayName: 'Exclude Merge List'
+        attributeName: excludeMergeConfig
+        columns:
+
+          -  type: columnDropdownSelector
+             displayName: Exclude Column Name
+             attributeName: excludeColumn
+             default: ''
+           
+        isRequired: false
+        enableIf: "{% if config.excludeMergeToggle
+                        and node.materializationType != 'view'
+                        and config.updateStrategy == 'MERGE'
+                        and config.lastModifiedCompToggle == false
+                        and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                           %}
+                      true
+                    {% else %} 
+                      false
+                    {% endif %}"
 
       - displayName: Truncate Before
         attributeName: truncateBefore
@@ -207,16 +308,14 @@ metadata:
       - displayName: Distinct
         attributeName: selectDistinct
         type: toggleButton
-        enableIf: "{% if config.groupByAll %} false {% else %} true {% endif %}"
+        enableIf: "{% if config.groupByAll or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
         default: false
         
       - displayName: Group By All
         attributeName: groupByAll
         type: toggleButton
         default: false
-        enableIf: "{% if config.selectDistinct %} false {% else %} true {% endif %}"
-
-      enableIf: "{% if node.materializationType == 'view' and node.override.create.enabled %} false {% else %} true {% endif %}"
+        enableIf: "{% if config.selectDistinct or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
 
     - groupName: Other Options
       items:
@@ -226,14 +325,14 @@ metadata:
         type: toggleButton
         default: false
 
-      - displayName: Pre-SQL (Optional)
+      - displayName: Pre-SQL
         attributeName: preSQL
         type: textBox
         syntax: sql
         isRequired: false
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
-      - displayName: Post-SQL (Optional)
+      - displayName: Post-SQL
         attributeName: postSQL
         type: textBox
         syntax: sql
@@ -243,13 +342,14 @@ metadata:
       isRequired: false
 
     systemColumns:
-    - displayName: SYSTEM_CREATE_DATE
+
+    - displayName: system_create_date
       transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
       dataType: TIMESTAMP
       placement: end
       attributeName: isSystemCreateDate
 
-    - displayName: SYSTEM_UPDATE_DATE
+    - displayName: system_update_date
       transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
       dataType: TIMESTAMP
       placement: end

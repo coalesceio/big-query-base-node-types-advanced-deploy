@@ -9,8 +9,8 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Description    : This node creates dimension table, view and also override create
                                  sql for view with advanced deployment strategy == #}
 
-{% set nsNodeVariables = namespace(currentDatabaseSchema = "",
-                                    desiredDatabaseSchema = "",
+{% set nsNodeVariables = namespace(currentProjectDataset = "",
+                                    desiredProjectDataset = "",
                                     desObjectNameFullPath = "",
                                     curObjectNameFullPath = "",
                                     metadataChanges = false) %}
@@ -18,18 +18,16 @@ does not permit copying or modification for any other purpose.
 
 {% if desiredState %}
 
-    {% if currentState != undefined
-            and (currentState.node.materializationType != desiredState.node.materializationType
-            or nsNodeVariables.desiredDatabaseSchema != nsNodeVariables.currentDatabaseSchema) %}
-
-        {# Drop current table before creating #}
-        {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
-        DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
-        
-    {% endif %}
-
     {# Override CreateSQL for view #}
     {% if desiredState.node.materializationType == 'view' %}
+
+        {% if currentState != undefined
+            and (currentState.node.materializationType != desiredState.node.materializationType
+            or nsNodeVariables.currentProjectDataset != nsNodeVariables.desiredProjectDataset) %}
+                {# Drop current table before creating #}
+                {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
+                DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
+        {% endif %}
         
         {% if desiredState.node.override.create.enabled and desiredState.node.override.create.script | trim != "" %}
 
@@ -91,19 +89,20 @@ does not permit copying or modification for any other purpose.
 
         {# Check the conditions for creating new table #}
         {% if currentState != undefined
-                and (currentState.node.materializationType != desiredState.node.materializationType
-                or desiredState.config.partitionByToggle != currentState.config.partitionByToggle
-                or desiredState.config.get('partByColumnConfig', []) != currentState.config.get('partByColumnConfig', [])
-                or desiredState.config.partByIngnTimeExpression != currentState.config.partByIngnTimeExpression
-                or desiredState.config.partByColumn.name != currentState.config.partByColumn.name
-                or desiredState.config.partBySqlExpression != currentState.config.partBySqlExpression
-                or desiredState.config.clusterKeyToggle != currentState.config.clusterKeyToggle
-                or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', [])
-                or nsNodeVariables.currentDatabaseSchema != nsNodeVariables.desiredDatabaseSchema) %}
+            and (currentState.node.materializationType != desiredState.node.materializationType
+            or nsNodeVariables.currentProjectDataset != nsNodeVariables.desiredProjectDataset
+            or desiredState.config.partitionByToggle != currentState.config.partitionByToggle
+            or desiredState.config.get('partByColumnConfig', []) != currentState.config.get('partByColumnConfig', [])
+            or desiredState.config.partByIngnTimeExpression != currentState.config.partByIngnTimeExpression
+            or desiredState.config.partByColumn.name != currentState.config.partByColumn.name
+            or desiredState.config.partBySqlExpression != currentState.config.partBySqlExpression
+            or desiredState.config.clusterKeyToggle != currentState.config.clusterKeyToggle
+            or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', [])) 
+        %}
             {% set nsConfigVariables.createTable = true %}
             {% set nsNodeVariables.metadataChanges = true %}
-        {% endif %}
-
+        {% endif %}        
+    
         {# Alter table incase of any chnages in states and alter is allowed #}
         {% if currentState != undefined and currentState != desiredState and nsConfigVariables.createTable == false %}
 
@@ -111,7 +110,7 @@ does not permit copying or modification for any other purpose.
             {% if currentState.node.name != desiredState.node.name %}
 
                 {{ stage('Alter Table - Rename') }}
-                ALTER TABLE  {{nsNodeVariables.currentDatabaseSchema}}.{{currentState.node.name}}
+                ALTER TABLE  {{nsNodeVariables.currentProjectDataset}}.{{currentState.node.name}}
                 RENAME TO  {{ desiredState.node.name }}
                 {% set nsNodeVariables.metadataChanges = true %}
         
@@ -396,6 +395,12 @@ does not permit copying or modification for any other purpose.
                     {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
                 {% endif %}
                 {% set nsConfigVariables.options = nsConfigVariables.options + 'default_rounding_mode = ' + nsConfigVariables.defRndMode %}
+            {% endif %}
+
+            {# Drop current table before creating #}
+            {% if nsConfigVariables.createTable %}
+                {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
+                DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
             {% endif %}
 
             {# Create table with all the config/mapping options #}

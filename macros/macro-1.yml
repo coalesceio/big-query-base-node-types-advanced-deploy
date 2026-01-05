@@ -21,30 +21,30 @@ macroString: |-
   {% macro initializeNodeVariables(nsNodeVariables) %}
 
     {% if currentState is defined %}
-      {% set currentDatabase = currentState.storageLocations 
+      {% set currentProject = currentState.storageLocations 
                                 | selectattr('name', 'equalto', currentState.node.location.name)
                                 | map(attribute='database')
                                 | first %}
-      {% set currentSchema = currentState.storageLocations
+      {% set currentDataset = currentState.storageLocations
                               | selectattr('name', 'equalto', currentState.node.location.name)
                               | map(attribute='schema')
                               | first %}
-      {% set nsNodeVariables.currentDatabaseSchema = currentDatabase + '.' + currentSchema %}
+      {% set nsNodeVariables.currentProjectDatasetDataset = currentProject + '.' + currentDataset %}
 
       {% set nsNodeVariables.curObjectNameFullPath = ref_no_link(currentState.node.location.name, currentState.node.name) %}
 
     {% endif %}
 
     {% if desiredState is defined %}
-      {% set desiredDatabase = desiredState.storageLocations
+      {% set desiredProject = desiredState.storageLocations
                                 | selectattr('name', 'equalto', desiredState.node.location.name)
                                 | map(attribute='database')
                                 | first %}
-      {% set desiredSchema = desiredState.storageLocations
+      {% set desiredDataset = desiredState.storageLocations
                                 | selectattr('name', 'equalto', desiredState.node.location.name)
                                 | map(attribute='schema')
                                 | first %}
-      {% set nsNodeVariables.desiredDatabaseSchema = desiredDatabase + '.' + desiredSchema %}
+      {% set nsNodeVariables.desiredProjectDataset = desiredProject + '.' + desiredDataset %}
 
       {% set nsNodeVariables.desObjectNameFullPath = ref_no_link(desiredState.node.location.name, desiredState.node.name) %}
 
