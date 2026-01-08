@@ -212,6 +212,23 @@ operation:
           - columnReferences: []
             transform: ""
         transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 0d19d254-5165-4d1a-bc23-91b4f40575f5
+          stepCounter: 49958516-b3d7-4f5b-bae0-81257d18da89
+        config: {}
+        dataType: GEOGRAPHY
+        defaultValue: "NULL"
+        description: ""
+        name: geography_data
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
   name: all_types_table
   schema: ""
   sqlType: Source

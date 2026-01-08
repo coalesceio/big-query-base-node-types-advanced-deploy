@@ -8,9 +8,8 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Name           : Fact Advance Deploy == #}
 {# == Node Type Description    : This node loads data into fact table using config options distinct, groupby all, order by, multi-source  == #}
 
-{# == List of all business Key value columns == #}
+{# == List of all business Key value columns Length == #}
 {%- set businessColList = columns | selectattr('isBusinessKey') | list %}
-
 {% set hasBusinessKey = businessColList | length > 0 %}
 
 {# == Variable to hold last modified value (date or version) == #}
@@ -41,8 +40,8 @@ does not permit copying or modification for any other purpose.
 
         {# Create a list of column names to exclude from the merge update, if the feature is enabled #}
         {% if config.excludeMergeToggle and config.lastModifiedCompToggle == false %}
-            {%- set excludeColList = config.excludeMergeList.get('items', [])
-                                    | map(attribute='excludeColName.name')
+            {%- set excludeColList = config.excludeMergeConfig.get('items', [])
+                                    | map(attribute='excludeColumn.name')
                                     | list %}
             {%- set includeColList = columns | rejectattr('name', 'in', excludeColList) | list %}
         {% else %}
@@ -55,38 +54,40 @@ does not permit copying or modification for any other purpose.
         (
             {% for source in sources %}
                 {% set joinclause= source.join %}
+                {%- set businessColList = source.columns | selectattr('isBusinessKey') | list %}
                 (
                     SELECT
                     {% if config.selectDistinct %} DISTINCT {% endif %}
                     {% for col in source.columns %}
-                        {% if col.name == lastModifiedColumn and useCurrentTimeStamp %}
-                            COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) AS COMPARISON_VALUE,
+                        {% if col.name == lastModifiedColumn %}
                             MAX (`DIM`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE,
-                            COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) AS `{{ col.name }}`    
-                        {% elif col.name == lastModifiedColumn and not useCurrentTimeStamp%}
-                            {{ get_source_transform(col) }} AS COMPARISON_VALUE,
-                            MAX (`DIM`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE,
-                            {{ get_source_transform(col) }} AS `{{ col.name }}`
+                            {% if useCurrentTimeStamp %}
+                                COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) AS COMPARISON_VALUE,
+                                COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) AS `{{ col.name }}`
+                            {% else %}
+                                {{ get_source_transform(col) }} AS COMPARISON_VALUE,
+                                {{ get_source_transform(col) }} AS `{{ col.name }}`
+                            {% endif %}
                         {% else %}
                             {{ get_source_transform(col) }} AS `{{ col.name }}`
                         {% endif %}
                         {%- if not loop.last %}, {% endif %}
                     {% endfor %}
                     {{ get_clause(joinclause, 'from') }}
-                    {% if config.lastModifiedComparison %}	        
+                    {% if config.lastModifiedCompToggle %}	        
                         LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                        {% for col in businessColList -%}
+                        {% for col in source.columns | selectattr('isBusinessKey') | list -%}
                             {% if not loop.first %}
                                 AND
                             {% endif %}
-                            {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
+                           {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                         {% endfor %}
                     {% endif %}
                     {% set clause = get_clause(joinclause) %}
                     {% if clause %}
                         {{ ("WHERE " ~ clause.strip()[3:].strip()) if clause.strip().upper().startswith('AND') else clause }}
                     {% endif %}
-                    {% if config.groupByAll or config.lastModifiedComparison %} GROUP BY ALL {% endif %}
+                    {% if config.groupByAll or config.lastModifiedCompToggle %} GROUP BY ALL {% endif %}
 
                     {% if config.deleteStrategy == "HARD DELETE" and node.isMultisource == false %}
                         /* Rows To Be Deleted As They No Longer Exist In Source */
@@ -97,14 +98,15 @@ does not permit copying or modification for any other purpose.
                             {%- for col in source.columns %}
                                 {% if col.isSystemUpdateDate %}
                                     NULL
-                                {% elif col.name == lastModifiedColumn and useCurrentTimeStamp %}
-                                    COALESCE(`DIM`.`{{lastModifiedColumn}}`, CURRENT_TIMESTAMP()) as COMPARISON_VALUE,
+                                {% elif col.name == lastModifiedColumn %}
                                     MAX (`DIM`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE,
-                                    `DIM`.`{{col.name}}`		    
-                                {% elif col.name == lastModifiedColumn and not useCurrentTimeStamp %}
-                                    `DIM`.`{{lastModifiedColumn}}` AS COMPARISON_VALUE,
-                                    MAX (`DIM`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE,
-                                    `DIM`.`{{col.name}}`
+                                    {% if useCurrentTimeStamp %}
+                                        COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) AS COMPARISON_VALUE,
+                                        COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP())
+                                    {% else %}
+                                        {{ get_source_transform(col) }} AS COMPARISON_VALUE,
+                                        {{ get_source_transform(col) }}
+                                    {% endif %}
                                 {% else %}
                                     `DIM`.`{{ col.name }}`
                                 {% endif %}
@@ -131,7 +133,7 @@ does not permit copying or modification for any other purpose.
 
                             {# {{ get_clause(joinclause) }} #}
 
-                            {% if config.groupByAll or config.lastModifiedComparison %} GROUP BY ALL {% endif %}
+                            {% if config.groupByAll or config.lastModifiedCompToggle %} GROUP BY ALL {% endif %}
                         )       
                     {% endif %}
                 )
@@ -155,7 +157,7 @@ does not permit copying or modification for any other purpose.
         {% endif %}
 
         WHEN MATCHED
-        {% if not config.lastModifiedComparison %}
+        {% if not config.lastModifiedCompToggle %}
             {% for col in includeColList if not (col.isBusinessKey or col.isSystemUpdateDate or col.isSystemCreateDate) %}
                 
                 {% if loop.first %}
@@ -166,34 +168,18 @@ does not permit copying or modification for any other purpose.
                 {% if col.dataType == 'GEOGRAPHY' %}
                     (
                         ST_DISTANCE(
-                            (CASE 
-                                WHEN `SRC`.`{{ col.name }}` IS NULL THEN TO_GEOGRAPHY('POINT(0 0)') 
-                                ELSE `SRC`.`{{ col.name }}` 
-                            END),
-                            (CASE 
-                                WHEN `TGT`.`{{ col.name }}` IS NULL THEN TO_GEOGRAPHY('POINT(0 0)') 
-                                ELSE `TGT`.`{{ col.name }}` 
-                            END)
-                        ) > 0
-                    )
-                {% elif col.dataType == 'GEOMETRY' %}
-                    (
-                        ST_DISTANCE(
-                            (CASE 
-                                WHEN `SRC`.`{{ col.name }}` IS NULL THEN TO_GEOMETRY('POINT(0 0)') 
-                                ELSE `SRC`.`{{ col.name }}` 
-                            END),
-                            (CASE 
-                                WHEN `TGT`.`{{ col.name }}` IS NULL THEN TO_GEOMETRY('POINT(0 0)') 
-                                ELSE `TGT`.`{{ col.name }}` 
-                            END)
+                            CASE
+                                WHEN SRC.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                ELSE SRC.`{{ col.name }}`
+                            END,
+                            CASE
+                                WHEN TGT.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                ELSE TGT.`{{ col.name }}`
+                            END
                         ) > 0
                     )
                 {% else %}
-                    (
-                        NVL(CAST(`SRC`.`{{ col.name }}` AS STRING), '**NULL**') <> 
-                        NVL(CAST(`TGT`.`{{ col.name }}` AS STRING), '**NULL**')
-                    )
+                    `SRC`.`{{ col.name }}` IS DISTINCT FROM `TGT`.`{{ col.name }}`
                 {% endif %}
                 {% if loop.last %} ) {% endif %}
             {% endfor %}  

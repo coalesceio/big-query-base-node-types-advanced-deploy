@@ -10,7 +10,7 @@ operation:
     clusterKeyToggle: true
     dayExprnExpression: "30"
     defRndMode: ""
-    deleteStrategy: NO DELETE
+    deleteStrategy: HARD DELETE
     excludeMergeConfig:
       items:
         - {}
@@ -18,8 +18,10 @@ operation:
     exprnType: EXACT DATE/DATETIME
     groupByAll: false
     insertStrategy: UNION ALL
-    lastModifiedColumn: ""
-    lastModifiedCompToggle: false
+    lastModifiedColumn:
+      columnCounter: d2781796-c232-434f-93b6-dc7f3705abf5
+      stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
+    lastModifiedCompToggle: true
     partByColumn:
       columnCounter: d2781796-c232-434f-93b6-dc7f3705abf5
       stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
@@ -35,11 +37,11 @@ operation:
     primaryKeyConfig:
       items:
         - {}
-        - {}
+        - primaryKeyColumn: null
     primaryToggle: false
     selectDistinct: false
     tabExpirationToggle: true
-    testsEnabled: true
+    testsEnabled: false
     timeExprnExpression: "2026-12-31"
     treatNullAsCurrentTimestamp: false
     truncateBefore: false
