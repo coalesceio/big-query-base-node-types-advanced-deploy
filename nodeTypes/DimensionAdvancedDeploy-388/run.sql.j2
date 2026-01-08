@@ -390,7 +390,22 @@ does not permit copying or modification for any other purpose.
                                     {% else %}
                                         OR
                                     {% endif %}
-                                    {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                    {% if col.dataType == 'GEOGRAPHY' %}
+                                        (
+                                            ST_DISTANCE(
+                                                CASE
+                                                    WHEN {{ get_source_transform(col) }} IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                    ELSE {{ get_source_transform(col) }}
+                                                END,
+                                                CASE
+                                                    WHEN `DIM`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                    ELSE `DIM`.`{{ col.name }}`
+                                                END
+                                            ) > 0
+                                        )
+                                    {% else %}
+                                        {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                    {% endif %}
                                     {% if loop.last %} ) {% endif %}
                                 {% endfor %}
                             {% endif %}
@@ -453,7 +468,22 @@ does not permit copying or modification for any other purpose.
                                     {% else %}
                                         OR
                                     {% endif %}
-                                    {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                    {% if col.dataType == 'GEOGRAPHY' %}
+                                        (
+                                            ST_DISTANCE(
+                                                CASE
+                                                    WHEN {{ get_source_transform(col) }} IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                    ELSE {{ get_source_transform(col) }}
+                                                END,
+                                                CASE
+                                                    WHEN `DIM`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                    ELSE `DIM`.`{{ col.name }}`
+                                                END
+                                            ) > 0
+                                        )
+                                    {% else %}
+                                        {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                    {% endif %}
                                     {% if loop.last %} ) {% endif %}
                                 {% endfor %}
                             {% endif %}
@@ -593,7 +623,22 @@ does not permit copying or modification for any other purpose.
                                         {% if not loop.first %}
                                             OR
                                         {% endif %}
-                                        {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                        {% if col.dataType == 'GEOGRAPHY' %}
+                                            (
+                                                ST_DISTANCE(
+                                                    CASE
+                                                        WHEN {{ get_source_transform(col) }} IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                        ELSE {{ get_source_transform(col) }}
+                                                    END,
+                                                    CASE
+                                                        WHEN `DIM`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                        ELSE `DIM`.`{{ col.name }}`
+                                                    END
+                                                ) > 0
+                                            )
+                                        {% else %}
+                                            {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                        {% endif %}
                                         {% if loop.last %} ) {% endif %}
                                     {% endfor %}
                                     {{  get_clause(joinclause)  }}
@@ -831,7 +876,22 @@ does not permit copying or modification for any other purpose.
                         {% else %}
                             OR
                         {% endif %}
-                        `SRC`.`{{ col.name }}` IS DISTINCT FROM `TGT`.`{{ col.name }}`
+                        {% if col.dataType == 'GEOGRAPHY' %}
+                            (
+                                ST_DISTANCE(
+                                    CASE
+                                        WHEN `SRC`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                        ELSE `SRC`.`{{ col.name }}`
+                                    END,
+                                    CASE
+                                        WHEN `TGT`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                        ELSE `TGT`.`{{ col.name }}`
+                                    END
+                                ) > 0
+                            )
+                        {% else %}
+                            `SRC`.`{{ col.name }}` IS DISTINCT FROM `TGT`.`{{ col.name }}`
+                        {% endif %}
                     {% if loop.last %}
                         )
                     {% endif %}
@@ -957,7 +1017,22 @@ does not permit copying or modification for any other purpose.
                                 {% else %}
                                     OR
                                 {% endif %}
-                                {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                {% if col.dataType == 'GEOGRAPHY' %}
+                                    (
+                                        ST_DISTANCE(
+                                            CASE
+                                                WHEN {{ get_source_transform(col) }} IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                ELSE {{ get_source_transform(col) }}
+                                            END,
+                                            CASE
+                                                WHEN `DIM`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                ELSE `DIM`.`{{ col.name }}`
+                                            END
+                                        ) > 0
+                                    )
+                                {% else %}
+                                    {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                {% endif %}
                                 {% if loop.last %}
                                     )
                                 {% endif %}
@@ -1004,7 +1079,22 @@ does not permit copying or modification for any other purpose.
                                 {% else %}
                                     OR
                                 {% endif %}
-                                {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                {% if col.dataType == 'GEOGRAPHY' %}
+                                    (
+                                        ST_DISTANCE(
+                                            CASE
+                                                WHEN {{ get_source_transform(col) }} IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                ELSE {{ get_source_transform(col) }}
+                                            END,
+                                            CASE
+                                                WHEN `DIM`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                ELSE `DIM`.`{{ col.name }}`
+                                            END
+                                        ) > 0
+                                    )
+                                {% else %}
+                                    {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                {% endif %}
                                 {% if loop.last %}
                                     )
                                 {% endif %}
@@ -1076,7 +1166,22 @@ does not permit copying or modification for any other purpose.
                                     {% if not loop.first %}
                                         OR
                                     {% endif %}
-                                    {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                    {% if col.dataType == 'GEOGRAPHY' %}
+                                        (
+                                            ST_DISTANCE(
+                                                CASE
+                                                    WHEN {{ get_source_transform(col) }} IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                    ELSE {{ get_source_transform(col) }}
+                                                END,
+                                                CASE
+                                                    WHEN `DIM`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                                    ELSE `DIM`.`{{ col.name }}`
+                                                END
+                                            ) > 0
+                                        )
+                                    {% else %}
+                                        {{ get_source_transform(col) }} IS DISTINCT FROM `DIM`.`{{ col.name }}`
+                                    {% endif %}
                                     {% if loop.last %}
                                         )
                                     {% endif %}
@@ -1207,7 +1312,22 @@ does not permit copying or modification for any other purpose.
                     {% else %}
                         OR
                     {% endif %}
-                    `SRC`.`{{ col.name }}` IS DISTINCT FROM `TGT`.`{{ col.name }}`
+                    {% if col.dataType == 'GEOGRAPHY' %}
+                        (
+                            ST_DISTANCE(
+                                CASE
+                                    WHEN `SRC`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                    ELSE `SRC`.`{{ col.name }}`
+                                END,
+                                CASE
+                                    WHEN `TGT`.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                    ELSE `TGT`.`{{ col.name }}`
+                                END
+                            ) > 0
+                        )
+                    {% else %}
+                        `SRC`.`{{ col.name }}` IS DISTINCT FROM `TGT`.`{{ col.name }}`
+                    {% endif %}
                     {% if loop.last %} ) {% endif %}
                 {% endfor %};
 
