@@ -7,7 +7,7 @@ metadata:
   nodeMetadataSpec: |-
     capitalized: Fact Advanced Deploy
     short: fct
-    tagColor: '#1E339A'
+    tagColor: '#D9A438'
     plural: Facts
 
     deployStrategy: advanced
@@ -206,26 +206,20 @@ metadata:
         isRequired: false
         enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) and node.isMultisource %} true {% else %} false {% endif %}"
 
-      - displayName: Update Strategy
-        attributeName: updateStrategy
-        type: dropdownSelector
-        default: MERGE
-        options:
-        - "MERGE"
-        - "INSERT/UPDATE"
-        isRequired: false
-        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
-
       - displayName: Unmatched Record Strategy
         attributeName: deleteStrategy
         type: dropdownSelector
         default: "NO DELETE"
         options:
         - "NO DELETE"
-        - "SOFT DELETE"
         - "HARD DELETE"
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.updateStrategy == 'MERGE' and node.isMultisource == false %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view'
+                          and node.isMultisource == false 
+                          and (columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0) %} true {% else %} false {% endif %}"
 
       - type: businessKeyColumns
         isRequired: false
@@ -234,41 +228,49 @@ metadata:
         attributeName: lastModifiedCompToggle
         displayName: Last Modified Comparison
         default: false
-        enableIf: "{% if node.materializationType != 'view' and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view'
+                      and (columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0) %} true {% else %} false {% endif %}"
         
       - type: columnDropdownSelector
         attributeName: lastModifiedColumn
-        displayName: Comparison Column* (DataType - TIMESTAMP or NUMERIC)
+        displayName: Comparison Column* (dataType - TIMESTAMP or NUMERIC)
         default: ''
-        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view'
+                    and config.lastModifiedCompToggle 
+                    and (columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0) %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: treatNullAsCurrentTimestamp
         displayName: Treat NULL as Current Timestamp
         default: false
-        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' 
+                  and config.lastModifiedCompToggle
+                  and ('TIMESTAMP' in config.lastModifiedColumn.dataType | upper)
+                  and (columns
+                      | selectattr('isBusinessKey')
+                      | list
+                      | length > 0) %}
+                      true
+                    {% else %} 
+                      false
+                    {% endif %}"
 
-      - type: toggleButton
-        attributeName: type2Dimension
-        displayName: Enable SCD Type2
-        default: false
-        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
-
-      - type: label
-        displayName: Note - SCD Type2 if selected, Else SCD Type1
-        attributeName: labelCT
-        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle == false %} true {% else %} false {% endif %}"
-
-      - displayName: Exclude Columns from Merge (For SCD Type1)
+      - displayName: Exclude Columns from Merge
         attributeName: excludeMergeToggle
         type: toggleButton
         default: false
         enableIf: "{% if node.materializationType != 'view' 
                         and config.lastModifiedCompToggle == false
                         and columns
-                            | selectattr('isChangeTracking')
+                            | selectattr('isBusinessKey')
                             | list
-                            | length == 0 and config.updateStrategy == 'MERGE' %}
+                            | length > 0 %}
                       true
                     {% else %} 
                       false
@@ -287,17 +289,11 @@ metadata:
         isRequired: false
         enableIf: "{% if config.excludeMergeToggle
                         and node.materializationType != 'view'
-                        and config.updateStrategy == 'MERGE'
                         and config.lastModifiedCompToggle == false
-                        and columns
-                            | selectattr('isChangeTracking')
+                        and (columns
+                            | selectattr('isBusinessKey')
                             | list
-                            | length == 0
-                           %}
-                      true
-                    {% else %} 
-                      false
-                    {% endif %}"
+                            | length > 0) %} true {% else %} false {% endif %}"
 
       - displayName: Truncate Before
         attributeName: truncateBefore

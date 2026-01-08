@@ -38,7 +38,7 @@ operation:
     partByIntSqlExpression: ""
     partByTimeSqlExpression: ""
     partExpireDays: ""
-    partitionByToggle: false
+    partitionByToggle: true
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""

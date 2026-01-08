@@ -238,7 +238,7 @@ metadata:
         
       - type: columnDropdownSelector
         attributeName: lastModifiedColumn
-        displayName: Comparison Column* (DataType - TIMESTAMP or NUMERIC)
+        displayName: Comparison Column* (dataType - TIMESTAMP or NUMERIC)
         default: ''
         enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
 
@@ -246,7 +246,10 @@ metadata:
         attributeName: treatNullAsCurrentTimestamp
         displayName: Treat NULL as Current Timestamp
         default: false
-        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle and config.updateStrategy == 'MERGE' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' 
+                  and config.lastModifiedCompToggle
+                  and config.updateStrategy == 'MERGE'
+                  and ('TIMESTAMP' in config.lastModifiedColumn.dataType | upper) %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: type2Dimension

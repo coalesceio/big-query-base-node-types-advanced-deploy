@@ -100,7 +100,9 @@ macroString: |-
 
     {% if config.clusterKeyToggle and config.clusterKeyConfig is defined %}
           {%- set varClusterBy = config.clusterKeyConfig.get('items', [])[:4]
+                                          | selectattr('clustColumn', 'defined')
                                           | map(attribute='clustColumn')
+                                          | selectattr('name', 'defined')
                                           | map(attribute='name')
                                           | list | join(', ') -%}
     {% endif %}
@@ -205,7 +207,7 @@ macroString: |-
       {% elif materialization == 'materialized view' %}
           MATERIALIZED VIEW IF EXISTS
 
-      {% elif materialization == 'external table', 'BigLake table' %}
+      {% elif materialization == 'external table' %}
           EXTERNAL TABLE IF EXISTS
 
       {% elif materialization == 'temporary table' %}
@@ -216,6 +218,50 @@ macroString: |-
 
       {% endif %}
 
+  {% endmacro %}
+
+  {# ========================================================================
+    Purpose          : Executes data quality tests associated with the node
+                       and its columns, based on the configured run order.
+                       Supports running tests either before or after data
+                       insertion, and respects the test continuation
+                       behavior on failure.
+    Input Parameters : runOrder (String)
+                       - Determines when the tests should be executed.
+                         Expected values: 'Before' or 'After'
+    Returns          : Rendered SQL statements for executing the applicable
+                       node-level and column-level data quality tests.
+                       No output is generated if tests are disabled.
+  ========================================================================= #}
+  {% macro runTests(runOrder) %}
+
+      {% if config.testsEnabled %}
+          {# == To run data quality tests before data insertion == #}
+          {% for test in node.tests %}
+              {% if runOrder == 'Before' %}
+                  {% if test.runOrder == 'Before' %}
+                      {{ test_stage(test.name, test.continueOnFailure) }}
+                      {{ test.templateString }}
+                  {% endif %}
+              {% endif %}
+
+              {% if runOrder == 'After' %}
+                  {% if test.runOrder == 'After' %}
+                      {{ test_stage(test.name, test.continueOnFailure) }}
+                      {{ test.templateString }}
+                  {% endif %}
+              {% endif %}
+          {% endfor %}
+
+          {% if runOrder == 'After' %}
+              {% for column in columns %}
+                  {% for test in column.tests %}
+                      {{ test_stage(column.name + ": " + test.name) }}
+                      {{ test.templateString }}
+                  {% endfor %}
+              {% endfor %}
+          {% endif %}
+      {% endif %}
   {% endmacro %}
 name: macro
 type: Macro

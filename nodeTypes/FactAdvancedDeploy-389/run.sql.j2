@@ -8,22 +8,19 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Name           : Fact Advance Deploy == #}
 {# == Node Type Description    : This node loads data into fact table using config options distinct, groupby all, order by, multi-source  == #}
 
-{% set hasBusinessKey = columns | selectattr("isBusinessKey") | list | length > 0 %}
+{# == List of all business Key value columns == #}
+{%- set businessColList = columns | selectattr('isBusinessKey') | list %}
+
+{% set hasBusinessKey = businessColList | length > 0 %}
 
 {# == Variable to hold last modified value (date or version) == #}
 {% set lastModifiedColumn = config.lastModifiedColumn.name | default('') if config.lastModifiedCompToggle %}
 
 {# == Variable to hold Now replacement == #}
-{% set useCurrentTimeStamp = config.treatNullAsCurrentTimestamp | default(false)
-if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.dataType) else false %}
+{% set useCurrentTimeStamp = config.treatNullAsCurrentTimestamp | default(false) if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.dataType | upper) else false %}
 
 {# == To run data quality tests before data insertion == #}
-{% for test in node.tests if config.testsEnabled %}
-    {% if test.runOrder == 'Before' %}
-        {{ test_stage(test.name, test.continueOnFailure) }}
-        {{ test.templateString }}
-    {% endif %}
-{% endfor %}
+{{ runTests('Before') }}
 
 {% if node.materializationType == 'table' %}
 
@@ -36,7 +33,7 @@ if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.d
     {# == Truncate data before data insertion  == #}
     {% if config.truncateBefore %}
         {{ stage('Truncate Fact Table') }}
-        TRUNCATE IF EXISTS {{ ref_no_link(node.location.name, node.name) }}
+        TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
     {% endif %}
         
     {# == Check if business key is specified  == #}        
@@ -52,7 +49,7 @@ if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.d
                 {%- set includeColList = columns | list %}
         {% endif %}
 
-        {{ stage('MERGE ' + ' Sources' | string ) }}
+        {{ stage('Load Fact Table Using Merge') }}
         MERGE INTO {{ ref_no_link(node.location.name, node.name) }} `TGT`
         USING
         (
@@ -75,10 +72,10 @@ if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.d
                         {% endif %}
                         {%- if not loop.last %}, {% endif %}
                     {% endfor %}
-                    {{ get_clause(joinclause, 'from')}}
-                    {%if config.lastModifiedComparison %}	        
+                    {{ get_clause(joinclause, 'from') }}
+                    {% if config.lastModifiedComparison %}	        
                         LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                        {% for col in source.columns if col.isBusinessKey -%}
+                        {% for col in businessColList -%}
                             {% if not loop.first %}
                                 AND
                             {% endif %}
@@ -111,13 +108,13 @@ if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.d
                                 {% else %}
                                     `DIM`.`{{ col.name }}`
                                 {% endif %}
-                                AS `{{ col.name }}` {% endif %}
+                                AS `{{ col.name }}`
                                 {%- if not loop.last %}, {% endif %}
                             {% endfor -%}
                             {{ get_clause(joinclause, 'from') }}
 
                             RIGHT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                            {% for col in source.columns if col.isBusinessKey -%}
+                            {% for col in businessColList -%}
                                 {% if not loop.first %}
                                     AND
                                 {% endif %}
@@ -125,14 +122,14 @@ if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.d
                             {% endfor %}
 
                             WHERE
-                            {% for col in source.columns if col.isBusinessKey -%}
+                            {% for col in businessColList -%}
                                 {% if not loop.first %}
                                     AND
                                 {% endif %}
                                 {{ get_source_transform(col) }} IS NULL
                             {% endfor %}
 
-                            {{ get_clause(joinclause) }}
+                            {# {{ get_clause(joinclause) }} #}
 
                             {% if config.groupByAll or config.lastModifiedComparison %} GROUP BY ALL {% endif %}
                         )       
@@ -144,7 +141,7 @@ if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.d
             {% endfor %}  
         ) AS `SRC`
         ON
-        {% for col in columns if col.isBusinessKey -%}
+        {% for col in businessColList -%}
             {% if not loop.first %}
                 AND
             {% endif %}
@@ -226,11 +223,11 @@ if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.d
                 {% if not loop.last %}, {% endif %}
             {% endfor -%}
         )
-        
+
+    {# == Execute if business key is not specified  == #}        
     {% else %}
 
-        {# == Executed if business key is not specified  == #}
-        {{ stage('Insert ' + ' Sources' | string ) }}
+        {{ stage('Load Dimension Table Using Insert') }}
         INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
         (
             {% for col in columns %}
@@ -268,18 +265,4 @@ if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.d
 {% endif %}
 
 {# == To run data quality tests after data insertion == #}
-{% if config.testsEnabled %}
-    {% for test in node.tests %}
-        {% if test.runOrder == 'After' %}
-            {{ test_stage(test.name, test.continueOnFailure) }}
-            {{ test.templateString }}
-        {% endif %}
-    {% endfor %}
-
-    {% for column in columns %}
-        {% for test in column.tests %}
-            {{ test_stage(column.name + ": " + test.name) }}
-            {{ test.templateString }}
-        {% endfor %}
-    {% endfor %}
-{% endif %}
+{{ runTests('After') }}

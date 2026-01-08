@@ -9,8 +9,8 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Description    : This node creates fact table, view and also override create
                                  sql for view with advanced deployment strategy == #}
 
-{% set nsNodeVariables = namespace(currentDatabaseSchema = "",
-                                    desiredDatabaseSchema = "",
+{% set nsNodeVariables = namespace(currentProjectDataset = "",
+                                    desiredProjectDataset = "",
                                     desObjectNameFullPath = "",
                                     curObjectNameFullPath = "",
                                     metadataChanges = false) %}
@@ -18,19 +18,17 @@ does not permit copying or modification for any other purpose.
 
 {% if desiredState %}
 
-    {% if currentState != undefined
-            and (currentState.node.materializationType != desiredState.node.materializationType
-            or nsNodeVariables.desiredDatabaseSchema != nsNodeVariables.currentDatabaseSchema) %}
-
-        {# Drop current table before creating #}
-        {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
-        DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
-        
-    {% endif %}
-
     {# Override CreateSQL for view #}
     {% if desiredState.node.materializationType == 'view' %}
-        
+
+        {% if currentState != undefined
+                and (currentState.node.materializationType != desiredState.node.materializationType
+                or nsNodeVariables.currentProjectDataset != nsNodeVariables.desiredProjectDataset) %}
+            {# Drop current table before creating #}
+            {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
+            DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
+        {% endif %}
+            
         {% if desiredState.node.override.create.enabled and desiredState.node.override.create.script | trim != "" %}
 
             {# Run the overriding script #}
@@ -92,14 +90,15 @@ does not permit copying or modification for any other purpose.
         {# Check the conditions for creating new table #}
         {% if currentState != undefined
                 and (currentState.node.materializationType != desiredState.node.materializationType
+                or nsNodeVariables.currentProjectDataset != nsNodeVariables.desiredProjectDataset
                 or desiredState.config.partitionByToggle != currentState.config.partitionByToggle
                 or desiredState.config.get('partByColumnConfig', []) != currentState.config.get('partByColumnConfig', [])
                 or desiredState.config.partByIngnTimeExpression != currentState.config.partByIngnTimeExpression
                 or desiredState.config.partByColumn.name != currentState.config.partByColumn.name
                 or desiredState.config.partBySqlExpression != currentState.config.partBySqlExpression
                 or desiredState.config.clusterKeyToggle != currentState.config.clusterKeyToggle
-                or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', [])
-                or nsNodeVariables.currentDatabaseSchema != nsNodeVariables.desiredDatabaseSchema) %}
+                or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', []))
+            %}
             {% set nsConfigVariables.createTable = true %}
             {% set nsNodeVariables.metadataChanges = true %}
         {% endif %}
@@ -111,7 +110,7 @@ does not permit copying or modification for any other purpose.
             {% if currentState.node.name != desiredState.node.name %}
 
                 {{ stage('Alter Table - Rename') }}
-                ALTER TABLE  {{nsNodeVariables.currentDatabaseSchema}}.{{currentState.node.name}}
+                ALTER TABLE  {{nsNodeVariables.currentProjectDataset}}.{{currentState.node.name}}
                 RENAME TO  {{ desiredState.node.name }}
                 {% set nsNodeVariables.metadataChanges = true %}
         
@@ -152,17 +151,17 @@ does not permit copying or modification for any other purpose.
                 {% if desiredState.config.partByColumnConfig != 'Integer Range' %}
                     {% if desiredState.config.partExpireDays | trim | length > 0 %}
                         {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
-                            {% if alterOptions | length > 0 %}
-                                {% set alterOptions = alterOptions + ", " %}
-                            {% endif %}
-                            {% set alterOptions = alterOptions + 'partition_expiration_days = ' +  desiredState.config.partExpireDays %}
+                            {% set alterOptions = alterOptions
+                                                    ~ (", " if alterOptions)
+                                                    ~ "partition_expiration_days = " ~ desiredState.config.partExpireDays %}
+
                         {% endif %}
                     {% else %}
                         {% if currentState.config.partExpireDays | trim | length > 0 %}
-                            {% if alterOptions | length > 0 %}
-                                {% set alterOptions = alterOptions + ", " %}
-                            {% endif %}
-                            {% set alterOptions = alterOptions + 'partition_expiration_days = NULL' %}
+                            {% set alterOptions = alterOptions
+                                                    ~ (", " if alterOptions)
+                                                    ~ "partition_expiration_days = NULL" %}
+
                         {% endif %}
                     {% endif %}
                 {% endif %}
@@ -170,18 +169,18 @@ does not permit copying or modification for any other purpose.
 
             {# Change Table Description #}
             {% if currentState.node.description != desiredState.node.description %}
-                {% if alterOptions | length > 0 %}
-                    {% set alterOptions = alterOptions + ", " %}
-                {% endif %}
-                {% set alterOptions = alterOptions + "description = '" + desiredState.node.description | escape + "'" %}
+                {% set alterOptions = alterOptions
+                                        ~ (", " if alterOptions)
+                                        ~ "description = '" ~ (desiredState.node.description | escape) ~ "'" %}
+
             {% endif %}
 
             {# Change Default Rounding Mode #}
             {% if currentState.config.defRndMode != desiredState.config.defRndMode %}
-                {% if alterOptions | length > 0 %}
-                    {% set alterOptions = alterOptions + ", " %}
-                {% endif %}
-                {% set alterOptions = alterOptions + 'default_rounding_mode = ' + nsConfigVariables.defRndMode %}
+                {% set alterOptions = alterOptions
+                                        ~ (", " if alterOptions)
+                                        ~ "default_rounding_mode = " ~ nsConfigVariables.defRndMode %}
+
             {% endif %}
 
             {# Alter Table Expiration #}
@@ -191,16 +190,15 @@ does not permit copying or modification for any other purpose.
                     or desiredState.config.dayExprnExpression != currentState.config.dayExprnExpression))
                     or (desiredState.config.tabExpirationToggle and currentState.config.tabExpirationToggle != desiredState.config.tabExpirationToggle) %}
 
-                {% if alterOptions | length > 0 %}
-                    {% set alterOptions = alterOptions + ", " %}
-                {% endif %}
-                {% set alterOptions = alterOptions + 'expiration_timestamp = ' + nsConfigVariables.tabEprnClause %}
+                    {% set alterOptions = alterOptions
+                                            ~ (", " if alterOptions)
+                                            ~ "expiration_timestamp = " ~ nsConfigVariables.tabEprnClause %}
+
             {% else %}
                 {% if currentState.config.tabExpirationToggle and desiredState.config.tabExpirationToggle == false %}
-                    {% if alterOptions | length > 0 %}
-                        {% set alterOptions = alterOptions + ", " %}
-                    {% endif %}
-                    {% set alterOptions = alterOptions + 'expiration_timestamp = NULL' %}
+                    {% set alterOptions = alterOptions
+                                            ~ (", " if alterOptions)
+                                            ~ "expiration_timestamp = NULL" %}
                 {% endif %}
             {% endif %}
 
@@ -368,35 +366,41 @@ does not permit copying or modification for any other purpose.
 
             {# Build table options - expiration_timestamp #}
             {% if nsConfigVariables.tabEprnClause | length > 0 %}
-                {% if nsConfigVariables.options | length > 0 %}
-                    {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
-                {% endif %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + "expiration_timestamp=" + nsConfigVariables.tabEprnClause %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "expiration_timestamp=" ~ nsConfigVariables.tabEprnClause %}
+
             {% endif %}
 
             {# Build table options - require_partition_filter #}
             {% if desiredState.config.partitionByToggle and desiredState.config.partitionFilterToggle %}
-                {% if nsConfigVariables.options | length > 0 %}
-                    {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
-                {% endif %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + "require_partition_filter=true" %}
+               {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "require_partition_filter=true" %}
+
             {% endif %}
 
             {# Build table options - partition_expiration_days #}
             {% if desiredState.config.partitionByToggle and desiredState.config.partByColumnConfig != 'Integer Range' and desiredState.config.partExpireDays | length > 0 %}
-                {% if nsConfigVariables.options | length > 0 %}
-                    {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
-                {% endif %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + "partition_expiration_days=" + desiredState.config.partExpireDays %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "partition_expiration_days=" ~ desiredState.config.partExpireDays %}
+
             {% endif %}
 
             {# Build table options - Default Rounding Mode #}
             {% if desiredState.config.defRndMode != '' %}
-                {% if nsConfigVariables.options | length > 0 %}
-                    {% set nsConfigVariables.options = nsConfigVariables.options + ", " %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "default_rounding_mode = " ~ nsConfigVariables.defRndMode %}
+
                 {% endif %}
-                {% set nsConfigVariables.options = nsConfigVariables.options + 'default_rounding_mode = ' + nsConfigVariables.defRndMode %}
-            {% endif %}
+
+                {# Drop current table before creating #}
+                {% if nsConfigVariables.createTable %}
+                    {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
+                    DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
+                {% endif %}
 
             {# Create table with all the config/mapping options #}
             {{ stage('Create Fact Table', true, "sql", "create")}}
@@ -429,10 +433,8 @@ does not permit copying or modification for any other purpose.
 
 {% elif currentState != undefined and desiredState == undefined %}
 
-    {% set fullyQualifiedTargetObjectName = ref_no_link(currentState.node.location.name, currentState.node.name) %}
-
     {# Drop the table/view in undeployment #}
     {{ stage('Drop Current ' + currentState.node.materializationType ) }}
-    DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.fullyQualifiedTargetObjectName }}
+    DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
 
 {% endif %}
