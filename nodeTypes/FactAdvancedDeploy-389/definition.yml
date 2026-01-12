@@ -75,7 +75,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: label
-        displayName: -- OR --
+        displayName: 【OR】
         attributeName: labelOR
         enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
@@ -129,7 +129,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle %} true {% else %} false {% endif %}"
 
       - type: label
-        displayName: ⚠️ Warning - Cluster Columns exceeding the limit of 4
+        displayName: ❗ Warning - Cluster Columns exceeding the limit of 4
         attributeName: labelCKWarning
         enableIf: "{% if node.materializationType != 'view' and config.clusterKeyToggle and config.clusterKeyConfig.get('items') | length > 4 %} true {% else %} false {% endif %}"
 

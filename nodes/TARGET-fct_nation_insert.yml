@@ -1,52 +1,56 @@
 fileVersion: 1
-id: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
-name: fct_nation3
+id: 22703526-612a-471f-b072-62ab0f0e8b44
+name: fct_nation_insert
 operation:
   config:
     clusterKeyConfig:
       items:
-        - clustColumn: null
-        - clustColumn: null
+        - clustColumn:
+            columnCounter: f1c6b1d2-bd60-4bc8-9dd3-70e4482199b7
+            stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+        - clustColumn:
+            columnCounter: 2d96e2b5-0fb1-4bb3-aca8-f8a7d3cbd85f
+            stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
     clusterKeyToggle: true
-    dayExprnExpression: "30"
-    defRndMode: ""
-    deleteStrategy: HARD DELETE
+    dayExprnExpression: "60"
+    defRndMode: ROUND_HALF_EVEN
+    deleteStrategy: NO DELETE
     excludeMergeConfig:
       items:
         - {}
     excludeMergeToggle: false
-    exprnType: EXACT DATE/DATETIME
+    exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    lastModifiedColumn:
-      columnCounter: d2781796-c232-434f-93b6-dc7f3705abf5
-      stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
-    lastModifiedCompToggle: true
+    lastModifiedColumn: ""
+    lastModifiedCompToggle: false
     partByColumn:
-      columnCounter: d2781796-c232-434f-93b6-dc7f3705abf5
-      stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
-    partByColumnConfig: Integer Range
-    partByIngnTimeExpression: DATE(_PARTITIONTIME)
-    partByIntSqlExpression: RANGE_BUCKET(N_NATIONKEY, GENERATE_ARRAY(1, 100, 200))
+      columnCounter: e014ab65-9c90-45a0-9791-d1d2ae100fa4
+      stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+    partByColumnConfig: Time-Unit Column
+    partByIngnTimeExpression: ""
+    partByIntSqlExpression: ""
     partByTimeSqlExpression: DATE_TRUNC(last_modified, MONTH)
-    partExpireDays: "80"
+    partExpireDays: "30"
     partitionByToggle: true
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""
     primaryKeyConfig:
       items:
-        - {}
-        - primaryKeyColumn: null
-    primaryToggle: false
-    selectDistinct: false
+        - primaryKeyColumn:
+            columnCounter: f1c6b1d2-bd60-4bc8-9dd3-70e4482199b7
+            stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+        - primaryKeyColumn:
+            columnCounter: 2de89a4d-169c-40a1-a5bd-a17306a9b244
+            stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+    primaryToggle: true
+    selectDistinct: true
     tabExpirationToggle: true
     testsEnabled: false
-    timeExprnExpression: "2026-12-31"
+    timeExprnExpression: ""
     treatNullAsCurrentTimestamp: false
     truncateBefore: false
-    type2Dimension: false
-    updateStrategy: MERGE
   database: ""
   deployEnabled: true
   description: ""
@@ -54,23 +58,15 @@ operation:
   locationName: TARGET
   materializationType: table
   metadata:
-    appliedNodeTests:
-      - continueOnFailure: true
-        description: ""
-        name: Test
-        runOrder: Before
-        templateString: select current_timestamp() from UNNEST([1])
+    appliedNodeTests: []
     columns:
-      - appliedColumnTests:
-          hasNull: false
-          isDistinct: false
+      - appliedColumnTests: {}
         columnReference:
-          columnCounter: ce68c6fe-297f-4cf9-800c-da5c63b1e74c
-          stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
+          columnCounter: f1c6b1d2-bd60-4bc8-9dd3-70e4482199b7
+          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
         config: {}
         dataType: INT64
         description: ""
-        isBusinessKey: true
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
@@ -78,12 +74,10 @@ operation:
               - columnCounter: 041263e8-3693-4054-9276-585a49d35092
                 stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
             transform: ""
-      - appliedColumnTests:
-          hasNull: false
-          isDistinct: false
+      - appliedColumnTests: {}
         columnReference:
-          columnCounter: 3c65a0e3-9cce-4265-ae12-f1d84ec34a1f
-          stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
+          columnCounter: 2d96e2b5-0fb1-4bb3-aca8-f8a7d3cbd85f
+          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
         config: {}
         dataType: STRING
         description: ""
@@ -94,12 +88,10 @@ operation:
               - columnCounter: 932f5024-7aa3-40c9-b84c-f08595a698de
                 stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
             transform: ""
-      - appliedColumnTests:
-          hasNull: false
-          isDistinct: true
+      - appliedColumnTests: {}
         columnReference:
-          columnCounter: 482acda0-92fd-4da2-a958-ac47e9a7b6bd
-          stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
+          columnCounter: 2de89a4d-169c-40a1-a5bd-a17306a9b244
+          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
         config: {}
         dataType: INT64
         description: ""
@@ -110,12 +102,10 @@ operation:
               - columnCounter: 4cc9417b-f40a-4ea7-be54-643cd8b2a85d
                 stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
             transform: ""
-      - appliedColumnTests:
-          hasNull: true
-          isDistinct: false
+      - appliedColumnTests: {}
         columnReference:
-          columnCounter: 5f611436-bcd1-4228-8a65-403b871d34a1
-          stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
+          columnCounter: 43092183-db7b-4763-8de0-f6c79966280b
+          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
         config: {}
         dataType: STRING
         description: ""
@@ -126,12 +116,10 @@ operation:
               - columnCounter: 3a84694b-6580-4671-a134-a7dbbddcaf04
                 stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
             transform: ""
-      - appliedColumnTests:
-          hasNull: false
-          isDistinct: false
+      - appliedColumnTests: {}
         columnReference:
-          columnCounter: d2781796-c232-434f-93b6-dc7f3705abf5
-          stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
+          columnCounter: e014ab65-9c90-45a0-9791-d1d2ae100fa4
+          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
         config: {}
         dataType: TIMESTAMP
         description: ""
@@ -145,12 +133,10 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests:
-          hasNull: false
-          isDistinct: false
+        appliedColumnTests: {}
         columnReference:
-          columnCounter: 667ac09a-15ab-41c9-b7df-af3dd61ac15b
-          stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
+          columnCounter: d4480308-4447-4402-b536-257b55169d2a
+          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -164,12 +150,10 @@ operation:
       - acceptedValues:
           strictMatch: true
           values: []
-        appliedColumnTests:
-          hasNull: false
-          isDistinct: false
+        appliedColumnTests: {}
         columnReference:
-          columnCounter: 28221af7-86f8-48ae-8ff0-b0ec2acba094
-          stepCounter: 5f0582ab-5a98-4c9d-95cb-af0bdf4887fa
+          columnCounter: 52122309-a189-459d-9c5d-0da277e35519
+          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -181,26 +165,21 @@ operation:
           - columnReferences: []
             transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
     cteString: ""
-    enabledColumnTestIDs:
-      - hasNull
-      - isDistinct
+    enabledColumnTestIDs: []
     sourceMapping:
       - aliases:
           nation1: cdba39ad-e6cc-423d-9ba9-d69f96771719
         customSQL:
-          customSQL: |-
-            {{ stage('Override Create SQL') }}
-
-            DROP TABLE `cls-dev-bigquery`.`DE_TGT`.`fct_nation3`
+          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation1
         join:
           joinCondition: FROM {{ ref('SRC', 'nation1') }} `nation1`
-        name: fct_nation3
+        name: fct_nation_insert
         noLinkRefs: []
-  name: fct_nation3
-  overrideSQL: true
+  name: fct_nation_insert
+  overrideSQL: false
   schema: ""
   sqlType: "389"
   type: sql

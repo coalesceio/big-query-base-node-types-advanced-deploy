@@ -103,7 +103,7 @@ does not permit copying or modification for any other purpose.
             {% set nsNodeVariables.metadataChanges = true %}
         {% endif %}        
     
-        {# Alter table incase of any chnages in states and alter is allowed #}
+        {# Alter table incase of any changes in states and alter is allowed #}
         {% if currentState != undefined and currentState != desiredState and nsConfigVariables.createTable == false %}
 
             {# Rename / Move Object #}
@@ -124,6 +124,11 @@ does not permit copying or modification for any other purpose.
                     {{ stage('Alter Table - Add Primary Key Constraint') }}
                     ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                     ADD PRIMARY KEY ( {{ nsConfigVariables.primaryKey}} ) NOT ENFORCED
+                    {% set nsNodeVariables.metadataChanges = true %}
+                {% else %}
+                    {{ stage('Alter Table - Drop Primary Key Constraint') }}
+                    ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                    DROP PRIMARY KEY
                     {% set nsNodeVariables.metadataChanges = true %}
                 {% endif %}
             {% else %}
@@ -177,10 +182,15 @@ does not permit copying or modification for any other purpose.
 
             {# Change Default Rounding Mode #}
             {% if currentState.config.defRndMode != desiredState.config.defRndMode %}
-                {% set alterOptions = alterOptions
-                                        ~ (", " if alterOptions)
-                                        ~ "default_rounding_mode = " ~ nsConfigVariables.defRndMode %}
-
+                {% if nsConfigVariables.defRndMode != '' %}
+                    {% set alterOptions = alterOptions
+                                            ~ (", " if alterOptions)
+                                            ~ "default_rounding_mode = " ~ nsConfigVariables.defRndMode %}
+                {% else %}
+                    {% set alterOptions = alterOptions
+                                            ~ (", " if alterOptions)
+                                            ~ "default_rounding_mode =  NULL" %}
+                {% endif %}
             {% endif %}
 
             {# Alter Table Expiration #}
@@ -203,7 +213,7 @@ does not permit copying or modification for any other purpose.
             {% endif %}
 
             {% if alterOptions | trim | length > 0 %}
-                {{ stage('Alter Table - Option Attributes') }}
+                {{ stage('Alter Table - Change Options Attributes') }}
                 ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                 SET OPTIONS ( {{ alterOptions }} )
                 {% set nsNodeVariables.metadataChanges = true %}
@@ -335,7 +345,8 @@ does not permit copying or modification for any other purpose.
                             {% set nsMetaVariables.joinTest = desiredStateSources == currentStateSources %}
                             {% if nsMetaVariables.joinTest == false %}
                                 {{ stage('Metadata Updates - Join') }}
-                                /* "is": {{ desiredStateSources }} , "was": {{ currentStateSources }} */
+                                /* "desiredState"  : {{ desiredStateSources }},
+                                   "currentState"  : {{ currentStateSources }} */
                                 select 1=0
                             {% endif %}
 

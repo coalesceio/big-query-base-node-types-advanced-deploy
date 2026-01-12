@@ -1,11 +1,11 @@
 fileVersion: 1
-id: 081fa640-5c80-4a65-b4d7-51c3069f51e8
-name: fct_nation1
+id: 8582afb7-123d-4e73-8a76-edff2f308b7c
+name: fct_nation_merge
 operation:
   config:
     clusterKeyConfig:
       items:
-        - {}
+        - clustColumn: null
     clusterKeyToggle: false
     dayExprnExpression: ""
     defRndMode: ""
@@ -15,17 +15,19 @@ operation:
         - {}
     excludeMergeToggle: false
     exprnType: DAYS FROM NOW
-    groupByAll: false
+    groupByAll: true
     insertStrategy: UNION ALL
-    lastModifiedColumn: ""
-    lastModifiedCompToggle: false
+    lastModifiedColumn:
+      columnCounter: d9243aee-2df7-4ab2-81b5-71f0912cbb5a
+      stepCounter: 8582afb7-123d-4e73-8a76-edff2f308b7c
+    lastModifiedCompToggle: true
     partByColumn: ""
     partByColumnConfig: Time-Unit Column
     partByIngnTimeExpression: ""
     partByIntSqlExpression: ""
     partByTimeSqlExpression: ""
     partExpireDays: ""
-    partitionByToggle: false
+    partitionByToggle: true
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""
@@ -34,13 +36,11 @@ operation:
         - {}
     primaryToggle: false
     selectDistinct: false
-    tabExpirationToggle: false
+    tabExpirationToggle: true
     testsEnabled: false
     timeExprnExpression: ""
-    treatNullAsCurrentTimestamp: false
+    treatNullAsCurrentTimestamp: true
     truncateBefore: false
-    type2Dimension: false
-    updateStrategy: MERGE
   database: ""
   deployEnabled: true
   description: ""
@@ -52,11 +52,12 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 2f685ace-6e94-4e8f-be69-59f60ed4c868
-          stepCounter: 081fa640-5c80-4a65-b4d7-51c3069f51e8
+          columnCounter: ca2e2833-0781-4523-b621-d55f8245b7da
+          stepCounter: 8582afb7-123d-4e73-8a76-edff2f308b7c
         config: {}
         dataType: INT64
         description: ""
+        isBusinessKey: true
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
@@ -66,8 +67,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 6e2a476e-5583-4154-ae52-c09352a4f8f6
-          stepCounter: 081fa640-5c80-4a65-b4d7-51c3069f51e8
+          columnCounter: d3dde40e-3893-432c-99fe-2fd8856f1639
+          stepCounter: 8582afb7-123d-4e73-8a76-edff2f308b7c
         config: {}
         dataType: STRING
         description: ""
@@ -80,8 +81,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 66431b21-e117-48d3-8096-803a8658b3a2
-          stepCounter: 081fa640-5c80-4a65-b4d7-51c3069f51e8
+          columnCounter: e68fa450-1173-4d70-b0a2-d9c24ef6e371
+          stepCounter: 8582afb7-123d-4e73-8a76-edff2f308b7c
         config: {}
         dataType: INT64
         description: ""
@@ -94,8 +95,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 75df539d-5c6f-46f7-9d7d-c040f6082fcc
-          stepCounter: 081fa640-5c80-4a65-b4d7-51c3069f51e8
+          columnCounter: b01070ee-d2c4-4102-b121-880449c718b8
+          stepCounter: 8582afb7-123d-4e73-8a76-edff2f308b7c
         config: {}
         dataType: STRING
         description: ""
@@ -108,8 +109,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: d74cf06d-3262-4cbf-a0f3-16853e1c140c
-          stepCounter: 081fa640-5c80-4a65-b4d7-51c3069f51e8
+          columnCounter: d9243aee-2df7-4ab2-81b5-71f0912cbb5a
+          stepCounter: 8582afb7-123d-4e73-8a76-edff2f308b7c
         config: {}
         dataType: TIMESTAMP
         description: ""
@@ -125,8 +126,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 1a26005a-e1e4-4274-bde7-e3e64d022606
-          stepCounter: 081fa640-5c80-4a65-b4d7-51c3069f51e8
+          columnCounter: 124cb2a3-06b8-4179-bf19-b5caa65bc38f
+          stepCounter: 8582afb7-123d-4e73-8a76-edff2f308b7c
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -142,8 +143,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 254a9114-e9f8-445e-b6cf-3f0cb0d9a9d9
-          stepCounter: 081fa640-5c80-4a65-b4d7-51c3069f51e8
+          columnCounter: c6f88a97-1e5b-4188-8b2e-e5d472924970
+          stepCounter: 8582afb7-123d-4e73-8a76-edff2f308b7c
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -166,9 +167,9 @@ operation:
             nodeName: nation1
         join:
           joinCondition: FROM {{ ref('SRC', 'nation1') }} `nation1`
-        name: fct_nation1
+        name: fct_nation_merge
         noLinkRefs: []
-  name: fct_nation1
+  name: fct_nation_merge
   overrideSQL: false
   schema: ""
   sqlType: "389"

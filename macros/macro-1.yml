@@ -29,7 +29,7 @@ macroString: |-
                               | selectattr('name', 'equalto', currentState.node.location.name)
                               | map(attribute='schema')
                               | first %}
-      {% set nsNodeVariables.currentProjectDatasetDataset = currentProject + '.' + currentDataset %}
+      {% set nsNodeVariables.currentProjectDataset = currentProject + '.' + currentDataset %}
 
       {% set nsNodeVariables.curObjectNameFullPath = ref_no_link(currentState.node.location.name, currentState.node.name) %}
 
@@ -169,7 +169,7 @@ macroString: |-
   {% macro getDefaultRoundingMode() %}
 
     {# Create namespaces #}
-    {% set varDefRndMd = namespace(elements = "") %}
+    {% set varDefRndMd = "" %}
 
     {% if config.defRndMode == '' %}
       {% set varDefRnd = 'ROUND_HALF_AWAY_FROM_ZERO' %}
