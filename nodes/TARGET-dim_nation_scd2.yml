@@ -84,6 +84,7 @@ operation:
         config: {}
         dataType: INT64
         description: ""
+        isBusinessKey: true
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
