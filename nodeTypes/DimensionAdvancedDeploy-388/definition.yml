@@ -67,11 +67,11 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle %} true {% else %} false {% endif %}"
 
-      - type: textBox
-        displayName: "Time-Unit Expression (Ex: DATE_TRUNC(columnName, MONTH))"
-        attributeName: partByTimeSqlExpression
-        default: ""
+      - type: columnDropdownSelector
+        displayName: Partition By Column (dataType-DATE)
+        attributeName: partByColumn
         isRequired: false
+        default: ''
         enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: label
@@ -79,11 +79,11 @@ metadata:
         attributeName: labelOR
         enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
-      - type: columnDropdownSelector
-        displayName: Partition By Column (dataType-DATE)
-        attributeName: partByColumn
+      - type: textBox
+        displayName: "Time-Unit Expression (Ex: DATE_TRUNC(columnName, MONTH))"
+        attributeName: partByTimeSqlExpression
+        default: ""
         isRequired: false
-        default: ''
         enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partByColumnConfig == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: textBox
