@@ -1,0 +1,169 @@
+fileVersion: 1
+id: 1373096a-72ef-4805-9a5a-c7ae491a0844
+name: orders
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: SRC
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: c920bc85-e105-441e-ba8e-e31bb6074196
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: O_ORDERKEY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 2649f22d-024b-42cf-acf0-b21ec541646c
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: O_CUSTKEY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: ec261c1d-00bc-4f72-acc1-0c4af249f26f
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: O_ORDERSTATUS
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 698e242f-c666-4848-bea7-a0c7830b3f4e
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: FLOAT64
+        defaultValue: "NULL"
+        description: ""
+        name: O_TOTALPRICE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 5b201531-62d0-4f27-9150-b7c45b07c779
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: DATE
+        defaultValue: "NULL"
+        description: ""
+        name: O_ORDERDATE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: a80996d3-a84f-4065-a34f-a46dd7e1ca58
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: O_ORDERPRIORITY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 03ffd90c-29f8-4358-b961-d33aa92f8d34
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: O_CLERK
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 3e6aee75-424d-48bb-b915-f8bdc387c481
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: O_SHIPPRIORITY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 4a46bf68-5cb3-4ca3-ae9c-fd506432acfe
+          stepCounter: 1373096a-72ef-4805-9a5a-c7ae491a0844
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: O_COMMENT
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+  name: orders
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node
