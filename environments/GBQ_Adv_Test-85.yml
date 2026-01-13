@@ -6,6 +6,6 @@ mappingDefinitions:
     schema: tpch_sf001
   TARGET:
     database: cls-dev-bigquery
-    schema: DE_TGT
+    schema: DE_QA
 name: GBQ_Adv_Test
 type: Environment
