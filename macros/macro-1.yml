@@ -29,7 +29,7 @@ macroString: |-
                               | selectattr('name', 'equalto', currentState.node.location.name)
                               | map(attribute='schema')
                               | first %}
-      {% set nsNodeVariables.currentProjectDatasetDataset = currentProject + '.' + currentDataset %}
+      {% set nsNodeVariables.currentProjectDataset = currentProject + '.' + currentDataset %}
 
       {% set nsNodeVariables.curObjectNameFullPath = ref_no_link(currentState.node.location.name, currentState.node.name) %}
 
