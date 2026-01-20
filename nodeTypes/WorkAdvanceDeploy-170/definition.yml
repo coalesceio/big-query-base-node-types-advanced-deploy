@@ -39,6 +39,7 @@ metadata:
         -  type: columnDropdownSelector
            displayName: Primary Key Columns
            attributeName: primaryKeyColumn
+           default: ''
 
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' and config.primaryToggle %} true {% else %} false {% endif %}"
@@ -139,6 +140,7 @@ metadata:
 
         -  type: columnDropdownSelector
            displayName: Cluster By Columns
+           default: ''
            attributeName: clustColumn
            isRequired: false
       
@@ -224,6 +226,7 @@ metadata:
         type: toggleButton
         default: false
         enableIf: "{% if config.selectDistinct or (node.materializationType == 'view' and node.override.create.enabled) %} false {% else %} true {% endif %}"
+
       enableIf: "{% if not(node.materializationType == 'view' and node.override.create.enabled) %} true {% else %} false {% endif %}"
 
     - groupName: Other Options
