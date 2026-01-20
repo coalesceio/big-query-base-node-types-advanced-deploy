@@ -1,0 +1,118 @@
+fileVersion: 1
+id: bab375dd-0b81-407d-8bee-aaee8f699bf3
+name: sample_table1
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: TARGET
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: d1bfdbd6-225e-40e7-818a-d53c3c280d25
+          stepCounter: bab375dd-0b81-407d-8bee-aaee8f699bf3
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: id
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: bad03d5b-605b-4874-8b37-1692ff0aa80c
+          stepCounter: bab375dd-0b81-407d-8bee-aaee8f699bf3
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: name
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: b56f95da-ee03-4b74-ae85-459220b01905
+          stepCounter: bab375dd-0b81-407d-8bee-aaee8f699bf3
+        config: {}
+        dataType: NUMERIC
+        defaultValue: "NULL"
+        description: ""
+        name: region
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: d54f01db-bd04-4800-8b56-d9c6d55c0e5b
+          stepCounter: bab375dd-0b81-407d-8bee-aaee8f699bf3
+        config: {}
+        dataType: NUMERIC
+        defaultValue: "NULL"
+        description: ""
+        name: amount
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 5acf2b16-8555-4482-8cbc-71a63156f4b8
+          stepCounter: bab375dd-0b81-407d-8bee-aaee8f699bf3
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: last_modified
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: e65af547-8641-4eca-b07a-a1dd312e0f38
+          stepCounter: bab375dd-0b81-407d-8bee-aaee8f699bf3
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: status
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+  name: sample_table1
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node

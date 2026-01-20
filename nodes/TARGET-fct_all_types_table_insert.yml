@@ -246,8 +246,6 @@ operation:
     sourceMapping:
       - aliases:
           all_types_table: 49958516-b3d7-4f5b-bae0-81257d18da89
-        customSQL:
-          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: all_types_table

@@ -1,0 +1,170 @@
+fileVersion: 1
+id: 039b0dbf-676a-42e9-b8c5-37ff65af042a
+name: fct_dummy_table
+operation:
+  config:
+    clusterKeyConfig:
+      items:
+        - {}
+    clusterKeyToggle: false
+    dayExprnExpression: ""
+    defRndMode: ""
+    deleteStrategy: NO DELETE
+    excludeMergeConfig:
+      items:
+        - {}
+    excludeMergeToggle: false
+    exprnType: DAYS FROM NOW
+    groupByAll: false
+    insertStrategy: UNION DISTINCT
+    lastModifiedColumn: ""
+    lastModifiedCompToggle: false
+    partByColumn: ""
+    partByColumnConfig: Time-Unit Column
+    partByIngnTimeExpression: ""
+    partByIntSqlExpression: ""
+    partByTimeSqlExpression: ""
+    partExpireDays: ""
+    partitionByToggle: false
+    partitionFilterToggle: false
+    postSQL: ""
+    preSQL: ""
+    primaryKeyConfig:
+      items:
+        - {}
+    primaryToggle: false
+    selectDistinct: false
+    tabExpirationToggle: false
+    testsEnabled: false
+    timeExprnExpression: ""
+    treatNullAsCurrentTimestamp: false
+    truncateBefore: true
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: true
+  locationName: TARGET
+  materializationType: table
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: fc4b1bf3-e028-48d7-b241-a49065497cfa
+          stepCounter: 039b0dbf-676a-42e9-b8c5-37ff65af042a
+        config: {}
+        dataType: INT64
+        description: ""
+        name: id
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: abe56651-cb5b-4ccd-9b3c-b3bc83e868d2
+                stepCounter: ecefea7f-ce73-4fa7-ac50-b23dc61380f6
+            transform: ""
+          - columnReferences:
+              - columnCounter: 215b7b60-0391-4ddc-8480-4f5ca580f63d
+                stepCounter: 28326b22-d83a-471e-85d6-793206dfacb7
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 855cda8c-bd4e-49ec-bc36-a81497fc3415
+          stepCounter: 039b0dbf-676a-42e9-b8c5-37ff65af042a
+        config: {}
+        dataType: STRING
+        description: ""
+        name: name
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 8c33e646-112a-4106-b810-b4e638d90148
+                stepCounter: ecefea7f-ce73-4fa7-ac50-b23dc61380f6
+            transform: ""
+          - columnReferences:
+              - columnCounter: cae53dd7-8142-479b-b481-801580b1ac1a
+                stepCounter: 28326b22-d83a-471e-85d6-793206dfacb7
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 75c6f2fd-0c37-448a-bb98-872086397d9f
+          stepCounter: 039b0dbf-676a-42e9-b8c5-37ff65af042a
+        config: {}
+        dataType: INT64
+        description: ""
+        name: age
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 4f36a8d7-3c40-49d4-8d88-5c37cfc364ca
+                stepCounter: ecefea7f-ce73-4fa7-ac50-b23dc61380f6
+            transform: ""
+          - columnReferences:
+              - columnCounter: a72f18fb-416b-4f90-be0d-c88f877ebca2
+                stepCounter: 28326b22-d83a-471e-85d6-793206dfacb7
+            transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 8dac8779-e866-41eb-b25b-cc383f663750
+          stepCounter: 039b0dbf-676a-42e9-b8c5-37ff65af042a
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: ""
+        description: ""
+        isSystemCreateDate: true
+        name: system_create_date
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - columnReferences: []
+            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 63dc1593-47df-4756-9d63-256b710ba8e3
+          stepCounter: 039b0dbf-676a-42e9-b8c5-37ff65af042a
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: ""
+        description: ""
+        isSystemUpdateDate: true
+        name: system_update_date
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          - columnReferences: []
+            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases:
+          dummy_table: ecefea7f-ce73-4fa7-ac50-b23dc61380f6
+        dependencies:
+          - locationName: TARGET
+            nodeName: dummy_table
+        join:
+          joinCondition: FROM {{ ref('TARGET', 'dummy_table') }} `dummy_table`
+        name: fct_dummy_table
+        noLinkRefs: []
+      - aliases:
+          dummy_table1: 28326b22-d83a-471e-85d6-793206dfacb7
+        dependencies:
+          - locationName: TARGET
+            nodeName: dummy_table1
+        join:
+          joinCondition: FROM {{ ref('TARGET', 'dummy_table1') }} `dummy_table1`
+        name: NEW_SOURCE
+        noLinkRefs: []
+  name: fct_dummy_table
+  overrideSQL: false
+  schema: ""
+  sqlType: "389"
+  type: sql
+  version: 1
+type: Node

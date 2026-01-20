@@ -1,0 +1,118 @@
+fileVersion: 1
+id: 07c048ed-18d2-4f40-a7a1-203ac2b62a04
+name: sample_table
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: TARGET
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 62a01aca-f098-4176-b260-6930cd201384
+          stepCounter: 07c048ed-18d2-4f40-a7a1-203ac2b62a04
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: id
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: e5a71d9c-34b8-4df6-a8fd-58cff255daf7
+          stepCounter: 07c048ed-18d2-4f40-a7a1-203ac2b62a04
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: name
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 0acc645a-6969-4d96-814c-33dc5a1b455c
+          stepCounter: 07c048ed-18d2-4f40-a7a1-203ac2b62a04
+        config: {}
+        dataType: NUMERIC
+        defaultValue: "NULL"
+        description: ""
+        name: region
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 6b1d5e49-e8f1-4399-adb9-79001c5094de
+          stepCounter: 07c048ed-18d2-4f40-a7a1-203ac2b62a04
+        config: {}
+        dataType: NUMERIC
+        defaultValue: "NULL"
+        description: ""
+        name: amount
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 00e6de0c-b376-4ed0-9b60-fefb4fd61b2f
+          stepCounter: 07c048ed-18d2-4f40-a7a1-203ac2b62a04
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: last_modified
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 94d95565-a4f1-4152-bdbe-2c4c3e9a9c9b
+          stepCounter: 07c048ed-18d2-4f40-a7a1-203ac2b62a04
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: status
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+  name: sample_table
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node

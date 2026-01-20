@@ -1,0 +1,67 @@
+fileVersion: 1
+id: 28326b22-d83a-471e-85d6-793206dfacb7
+name: dummy_table1
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: TARGET
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 215b7b60-0391-4ddc-8480-4f5ca580f63d
+          stepCounter: 28326b22-d83a-471e-85d6-793206dfacb7
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: id
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: cae53dd7-8142-479b-b481-801580b1ac1a
+          stepCounter: 28326b22-d83a-471e-85d6-793206dfacb7
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: name
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: a72f18fb-416b-4f90-be0d-c88f877ebca2
+          stepCounter: 28326b22-d83a-471e-85d6-793206dfacb7
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: age
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+  name: dummy_table1
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node

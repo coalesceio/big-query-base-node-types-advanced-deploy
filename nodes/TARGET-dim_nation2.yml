@@ -1,0 +1,220 @@
+fileVersion: 1
+id: d2745445-7892-4610-8ce4-415e98e941e9
+name: dim_nation2
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: TARGET
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: b8b49540-b657-4948-b125-52f5da0ac618
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: STRING
+        defaultValue: GENERATE_UUID()
+        description: ""
+        name: dim_nation2_key
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: f68aa627-35da-491a-b41d-583c37aa3fcf
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: N_NATIONKEY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 672ddbb3-8e5a-414a-a7db-2ff84aa07725
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: N_NAME
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 8e7bd6c4-f8dc-4d31-a3d2-10da02d4638b
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: N_REGIONKEY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: cedc4855-5ba3-4876-8b7b-e57bca18f0fc
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: N_COMMENT
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 1f8ea480-fb1c-443c-a23d-ff8326c3edd8
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: last_modified
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 857ea9ba-439a-4924-a686-7ff5978b2d0a
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: INT64
+        defaultValue: "NULL"
+        description: ""
+        name: system_version
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 622c7af6-5c18-4fdc-9311-cfe6504ff562
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: STRING
+        defaultValue: "NULL"
+        description: ""
+        name: system_current_flag
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 181aca22-0f43-4bfd-810a-55d9b26f4197
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: system_start_date
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 08219779-078a-4139-b5b9-5c51c79d822b
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: system_end_date
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 9bcc3b0e-99ae-4943-823a-2e77272b9210
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: system_create_date
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 93e8752d-51cf-4513-98cc-e0d715b3e453
+          stepCounter: d2745445-7892-4610-8ce4-415e98e941e9
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: "NULL"
+        description: ""
+        name: system_update_date
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+  name: dim_nation2
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node

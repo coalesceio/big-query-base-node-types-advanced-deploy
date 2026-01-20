@@ -1,17 +1,17 @@
 fileVersion: 1
-id: 83183d7d-d8df-4c74-a09f-2a947063aae2
-name: dim_nation_scd2_lastmodified
+id: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
+name: dim_nation1
 operation:
   config:
     clusterKeyConfig:
       items:
-        - clustColumn: null
-    clusterKeyToggle: true
+        - {}
+    clusterKeyToggle: false
     customZeroKeyValuesConfig:
       items:
         - {}
     dayExprnExpression: ""
-    defRndMode: ROUND_HALF_AWAY_FROM_ZERO
+    defRndMode: ""
     deleteStrategy: NO DELETE
     excludeMergeConfig:
       items:
@@ -28,7 +28,7 @@ operation:
     insertZeroKeyTimestamp: "1900-01-01 00:00:00"
     insertZeroKeyToggle: false
     lastModifiedColumn: ""
-    lastModifiedCompToggle: true
+    lastModifiedCompToggle: false
     partByColumn: ""
     partByColumnConfig: Time-Unit Column
     partByIngnTimeExpression: ""
@@ -41,8 +41,8 @@ operation:
     preSQL: ""
     primaryKeyConfig:
       items:
-        - primaryKeyColumn: null
-    primaryToggle: true
+        - {}
+    primaryToggle: false
     selectDistinct: false
     tabExpirationToggle: false
     testsEnabled: false
@@ -65,8 +65,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 025217fa-17b4-4dd3-913a-1d717bdcb1f7
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 4c06a650-dece-4a6e-b715-46025b501d29
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: STRING
         defaultValue: ""
@@ -79,8 +79,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: cf552061-a3c8-444c-ab50-a69ba77faba0
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 999c803e-ede3-48b3-9b20-a421dd5ed234
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: INT64
         description: ""
@@ -94,8 +94,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 366e1097-e09a-46ee-8461-9a5882e5f670
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 9d2ee7aa-0b55-44a8-9c57-f475820cc85c
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: STRING
         description: ""
@@ -108,8 +108,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 14e99b49-70ea-4a2a-acf3-2afeef5ae96a
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: fa2263f2-999e-40b6-9f2c-fa96614fe203
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: INT64
         description: ""
@@ -122,8 +122,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: aac209ed-a2a8-4fba-ab3a-74d08514a1f6
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 8345ace9-690e-4a16-bc01-b6b02585fb1d
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: STRING
         description: ""
@@ -136,8 +136,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: dbfa4706-8cd7-4a1b-a4e7-72b2365b115d
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 7b37f7ed-01e1-4ac8-ab1e-2917aa807a2f
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: TIMESTAMP
         description: ""
@@ -153,8 +153,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: d744a996-5e0c-497a-b3f8-d496c444a534
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 16e889c7-6790-437c-b2eb-a144048d5fcd
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: INT64
         defaultValue: ""
@@ -170,8 +170,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: d1faabf9-2d01-42ef-96f6-82658b7dcc6b
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: b740d293-e9ea-4d64-921c-66d895a76bf5
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: STRING
         defaultValue: ""
@@ -187,8 +187,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: b03bc628-4e7d-4baf-ae45-7a4990eb14d2
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 7e679b12-a685-4964-a885-56f49cb51754
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -204,8 +204,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 020f1450-808f-484a-ac39-2883d89e4564
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 9dbb0ab6-0b05-48c4-ad51-d19e164614d7
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -221,8 +221,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: b394afcd-ec2f-4db4-8244-f44f1ac76637
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 86b7beac-4143-4dc5-8789-a9a508d87115
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -238,8 +238,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: a2cb12e0-0ef7-45a4-8a9e-79d45269df05
-          stepCounter: 83183d7d-d8df-4c74-a09f-2a947063aae2
+          columnCounter: 940ab0ac-30df-4d6f-8149-68d2fee41f88
+          stepCounter: 28f3d902-8c83-46e7-b9f2-b9fcc5033cf2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -260,9 +260,9 @@ operation:
             nodeName: nation1
         join:
           joinCondition: FROM {{ ref('SRC', 'nation1') }} `nation1`
-        name: dim_nation_scd2_lastmodified
+        name: dim_nation1
         noLinkRefs: []
-  name: dim_nation_scd2_lastmodified
+  name: dim_nation1
   overrideSQL: false
   schema: ""
   sqlType: "388"

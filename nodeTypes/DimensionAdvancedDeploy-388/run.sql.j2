@@ -9,7 +9,7 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Description    : This node creates dimension table, view and also override create sql for view with advanced deployment strategy == #}
 
 {# == Variable check to identify type of dimension == #}
-{% if config.lastModifiedCompToggle %}
+{% if config.lastModifiedCompToggle and updateStrategy == 'MERGE' %}
     {% set isSCDType2 = config.type2Dimension | default(false) %}
 {% else %}
     {% set isSCDType2 = columns | selectattr("isChangeTracking") | list | length > 0 %}
@@ -958,8 +958,7 @@ does not permit copying or modification for any other purpose.
                             {% endfor %}
 
                             'INSERT_INITAL_VERSION_ROWS' AS `DML_OPERATION`
-                            {{ get_clause(joinclause, 'from') }}
-
+                            {{  get_clause(joinclause, 'from')  }}
                             LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
                             {% for col in source.columns if col.isBusinessKey -%}
                                 {% if not loop.first %}
@@ -1203,7 +1202,6 @@ does not permit copying or modification for any other purpose.
                     ;
                 """;
 
-                BEGIN TRANSACTION;
                 EXECUTE IMMEDIATE """
                     -- Step 2: Update the changed records
                     UPDATE {{ ref_no_link(node.location.name, node.name) }} AS TGT
@@ -1383,6 +1381,7 @@ does not permit copying or modification for any other purpose.
                         {% if not loop.first %} AND {% endif %}
                         TGT.`{{ col.name }}` IS NULL
                     {%- endfor %};
+                COMMIT; 
         {% endif %}
     {% endif %}
 

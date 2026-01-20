@@ -1,19 +1,14 @@
 fileVersion: 1
-id: 22703526-612a-471f-b072-62ab0f0e8b44
-name: fct_nation_insert
+id: 1c614072-f7c1-4059-92b1-4b429fdc91c2
+name: fct_nation2
 operation:
   config:
     clusterKeyConfig:
       items:
-        - clustColumn:
-            columnCounter: f1c6b1d2-bd60-4bc8-9dd3-70e4482199b7
-            stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
-        - clustColumn:
-            columnCounter: 2d96e2b5-0fb1-4bb3-aca8-f8a7d3cbd85f
-            stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
-    clusterKeyToggle: true
-    dayExprnExpression: "60"
-    defRndMode: ROUND_HALF_EVEN
+        - {}
+    clusterKeyToggle: false
+    dayExprnExpression: ""
+    defRndMode: ""
     deleteStrategy: NO DELETE
     excludeMergeConfig:
       items:
@@ -24,29 +19,22 @@ operation:
     insertStrategy: UNION ALL
     lastModifiedColumn: ""
     lastModifiedCompToggle: false
-    partByColumn:
-      columnCounter: e014ab65-9c90-45a0-9791-d1d2ae100fa4
-      stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+    partByColumn: ""
     partByColumnConfig: Time-Unit Column
     partByIngnTimeExpression: ""
     partByIntSqlExpression: ""
-    partByTimeSqlExpression: DATE_TRUNC(last_modified, MONTH)
-    partExpireDays: "30"
-    partitionByToggle: true
+    partByTimeSqlExpression: ""
+    partExpireDays: ""
+    partitionByToggle: false
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""
     primaryKeyConfig:
       items:
-        - primaryKeyColumn:
-            columnCounter: f1c6b1d2-bd60-4bc8-9dd3-70e4482199b7
-            stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
-        - primaryKeyColumn:
-            columnCounter: 2de89a4d-169c-40a1-a5bd-a17306a9b244
-            stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
-    primaryToggle: true
-    selectDistinct: true
-    tabExpirationToggle: true
+        - {}
+    primaryToggle: false
+    selectDistinct: false
+    tabExpirationToggle: false
     testsEnabled: false
     timeExprnExpression: ""
     treatNullAsCurrentTimestamp: false
@@ -62,8 +50,8 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: f1c6b1d2-bd60-4bc8-9dd3-70e4482199b7
-          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+          columnCounter: a40ec6d8-71f4-4bc0-8d95-74b0ec1e8f39
+          stepCounter: 1c614072-f7c1-4059-92b1-4b429fdc91c2
         config: {}
         dataType: INT64
         description: ""
@@ -71,13 +59,13 @@ operation:
         nullable: true
         sourceColumnReferences:
           - columnReferences:
-              - columnCounter: 041263e8-3693-4054-9276-585a49d35092
-                stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
+              - columnCounter: d6ff6603-bc76-4610-bb88-cfc6ee9ed67e
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 2d96e2b5-0fb1-4bb3-aca8-f8a7d3cbd85f
-          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+          columnCounter: b59cef1a-0ea8-4f25-8d4d-050a52225ec8
+          stepCounter: 1c614072-f7c1-4059-92b1-4b429fdc91c2
         config: {}
         dataType: STRING
         description: ""
@@ -85,13 +73,13 @@ operation:
         nullable: true
         sourceColumnReferences:
           - columnReferences:
-              - columnCounter: 932f5024-7aa3-40c9-b84c-f08595a698de
-                stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
+              - columnCounter: 214c2fde-4e6f-4d6e-9d6b-1bf9a819a2da
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 2de89a4d-169c-40a1-a5bd-a17306a9b244
-          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+          columnCounter: 0104867c-036b-4b6e-9289-a2c316e4a38f
+          stepCounter: 1c614072-f7c1-4059-92b1-4b429fdc91c2
         config: {}
         dataType: INT64
         description: ""
@@ -99,13 +87,13 @@ operation:
         nullable: true
         sourceColumnReferences:
           - columnReferences:
-              - columnCounter: 4cc9417b-f40a-4ea7-be54-643cd8b2a85d
-                stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
+              - columnCounter: a8db8c68-e9a2-4b8a-81d0-0b717d3b5358
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 43092183-db7b-4763-8de0-f6c79966280b
-          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+          columnCounter: 5b916450-e42a-4774-9d8d-e74f860a9996
+          stepCounter: 1c614072-f7c1-4059-92b1-4b429fdc91c2
         config: {}
         dataType: STRING
         description: ""
@@ -113,13 +101,13 @@ operation:
         nullable: true
         sourceColumnReferences:
           - columnReferences:
-              - columnCounter: 3a84694b-6580-4671-a134-a7dbbddcaf04
-                stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
+              - columnCounter: 739bafda-bf0e-4c25-9714-5a1dafe8bbf5
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: e014ab65-9c90-45a0-9791-d1d2ae100fa4
-          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+          columnCounter: e4421297-e1b0-4e4b-b93c-c41e0d3614ee
+          stepCounter: 1c614072-f7c1-4059-92b1-4b429fdc91c2
         config: {}
         dataType: TIMESTAMP
         description: ""
@@ -127,16 +115,16 @@ operation:
         nullable: true
         sourceColumnReferences:
           - columnReferences:
-              - columnCounter: e8915b40-ec81-481f-8f79-6350ed74fe97
-                stepCounter: cdba39ad-e6cc-423d-9ba9-d69f96771719
+              - columnCounter: c74a7da9-7e77-4196-a4bc-2dc80d9848d0
+                stepCounter: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
             transform: ""
       - acceptedValues:
           strictMatch: true
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: d4480308-4447-4402-b536-257b55169d2a
-          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+          columnCounter: ca702423-210e-496d-a367-5186b7f67c88
+          stepCounter: 1c614072-f7c1-4059-92b1-4b429fdc91c2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -152,8 +140,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 52122309-a189-459d-9c5d-0da277e35519
-          stepCounter: 22703526-612a-471f-b072-62ab0f0e8b44
+          columnCounter: 2ee1e0b9-4208-49c2-836a-dbb340af0d33
+          stepCounter: 1c614072-f7c1-4059-92b1-4b429fdc91c2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -164,19 +152,32 @@ operation:
         sourceColumnReferences:
           - columnReferences: []
             transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 7db48018-36d1-4961-8017-6d44ae0b4856
+          stepCounter: 1c614072-f7c1-4059-92b1-4b429fdc91c2
+        config: {}
+        dataType: DATE
+        defaultValue: ""
+        description: ""
+        name: DATE_COL
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
     cteString: ""
     enabledColumnTestIDs: []
     sourceMapping:
       - aliases:
-          nation1: cdba39ad-e6cc-423d-9ba9-d69f96771719
+          nation2: 9bea25f8-ba4d-4a3e-ab28-15db46f63a1a
         dependencies:
           - locationName: SRC
-            nodeName: nation1
+            nodeName: nation2
         join:
-          joinCondition: FROM {{ ref('SRC', 'nation1') }} `nation1`
-        name: fct_nation_insert
+          joinCondition: FROM {{ ref('SRC', 'nation2') }} `nation2`
+        name: fct_nation2
         noLinkRefs: []
-  name: fct_nation_insert
+  name: fct_nation2
   overrideSQL: false
   schema: ""
   sqlType: "389"
