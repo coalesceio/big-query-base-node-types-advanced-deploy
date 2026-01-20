@@ -77,7 +77,7 @@ metadata:
       - type: label
         displayName: 【OR】
         attributeName: labelOR
-        enableIf: "{% if config.partitionByToggle and config.partitionBy == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle and config.partitionBy == 'Time-Unit Column' %} true {% else %} false {% endif %}"
 
       - type: textBox
         displayName: "Time-Unit Expression (💡Ex. DATE_TRUNC(columnName, MONTH))"

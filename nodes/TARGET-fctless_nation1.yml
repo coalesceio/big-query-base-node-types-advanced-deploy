@@ -10,7 +10,7 @@ operation:
             stepCounter: dda87b8c-5f16-46d0-b3d2-22ffaa34ead1
     clusterKeyToggle: true
     defRndMode: ""
-    exprnType: DAYS FROM NOW
+    exprnType: EXACT DATE/DATETIME
     groupByAll: false
     insertStrategy: UNION ALL
     partByColumn: ""
@@ -31,7 +31,7 @@ operation:
     primaryToggle: true
     selectDistinct: false
     tabExpirationToggle: true
-    tabExprnExpression: "60"
+    tabExprnExpression: "2026-12-12"
     testsEnabled: false
     truncateBefore: false
   database: ""
