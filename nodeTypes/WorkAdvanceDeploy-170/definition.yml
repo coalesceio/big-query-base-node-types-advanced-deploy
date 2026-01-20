@@ -68,7 +68,7 @@ metadata:
         enableIf: "{% if node.materializationType != 'view' and config.partitionByToggle %} true {% else %} false {% endif %}"
 
       - type: columnDropdownSelector
-        displayName: Partition By Column (dataType-DATE)
+        displayName: Partition By Column (ℹ️ DataType-DATE)
         attributeName: partByColumn
         isRequired: false
         default: ''
@@ -162,7 +162,7 @@ metadata:
         - "EXACT DATE/DATETIME"
         - "DAYS FROM NOW"
         isRequired: false
-        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle %} true {% else %} flase {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle %} true {% else %} false {% endif %}"
 
       - type: label
         displayName: 'Expiration Value* (💡Ex. 2024-12-31 | 2024-12-31 23:59:59)'

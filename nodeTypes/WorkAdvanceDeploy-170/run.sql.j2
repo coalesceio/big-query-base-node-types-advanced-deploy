@@ -25,43 +25,32 @@ does not permit copying or modification for any other purpose.
         TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
     {% endif %}
 
-{# == Determine Insert Strategy == #}
-{% if node.isMultisource %}
-    {% set insertStrategy = config.insertStrategy %}
-{% else %}
-    {% set insertStrategy = 'UNION DISTINCT' %}
-{% endif %}	
-	
-{# == Multi-Source option  == #}
-	
-		{% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] %}
-			{{ stage('Load Work Table Using Insert') }}
-			INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
-				(
-					{% for col in columns if not col.isSurrogateKey %}
-						`{{ col.name }}`
-						{%- if not loop.last -%},{% endif %}
-					{% endfor %}
-				)
-		{% endif %}
+    {{ stage('Load Work Table Using Insert') }}
+    INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+    (
+        {% for col in columns if not col.isSurrogateKey %}
+            `{{ col.name }}`
+            {%- if not loop.last -%},{% endif %}
+        {% endfor %}
+    )
 
-		{% for source in sources %}
- 			(
-                SELECT 
-            	{% if config.selectDistinct %} DISTINCT	{% endif %}
-                {% for col in source.columns if not col.isSurrogateKey%}
-                    {{ get_source_transform(col) }} AS `{{ col.name }}`
-                    {% if not loop.last %}, {% endif %}
-                {% endfor %}
+    {% for source in sources %}
+        (
+            SELECT 
+            {% if config.selectDistinct %} DISTINCT	{% endif %}
+            {% for col in source.columns if not col.isSurrogateKey%}
+                {{ get_source_transform(col) }} AS `{{ col.name }}`
+                {% if not loop.last %}, {% endif %}
+            {% endfor %}
 
-                {{ source.join }}
-        
-                {% if config.groupByAll %} GROUP BY ALL {% endif %}
-            )
-			{% if insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
-				{{insertStrategy}}
-			{% endif %}
-		{% endfor %}
+            {{ source.join }}
+    
+            {% if config.groupByAll %} GROUP BY ALL {% endif %}
+        )
+        {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
+            {{ config.insertStrategy }}
+        {% endif %}
+    {% endfor %}
 
     {# == Queries to be excuted post data insertion  == #}
     {% if config.postSQL %}			

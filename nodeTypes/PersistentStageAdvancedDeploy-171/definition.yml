@@ -62,7 +62,7 @@ metadata:
         enableIf: "{% if config.partitionByToggle %} true {% else %} false {% endif %}"
 
       - type: columnDropdownSelector
-        displayName: Partition By Column (dataType-DATE)
+        displayName: Partition By Column (ℹ️ DataType-DATE)
         attributeName: partByColumn
         isRequired: false
         default: ''
@@ -108,7 +108,7 @@ metadata:
         attributeName: partExpireDays
         default: ''
         isRequired: false
-        enableIf: "{% if config.partitionByToggle and ( config.partByColumnConfig == 'Time-Unit Column' or config.partitionBy == 'Ingestion Time' ) %} true {% else %} false {% endif %}"
+        enableIf: "{% if config.partitionByToggle and ( config.partitionBy == 'Time-Unit Column' or config.partitionBy == 'Ingestion Time' ) %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: clusterKeyToggle
@@ -175,7 +175,6 @@ metadata:
         isRequired: false
         enableIf: "{% if config.tabExpirationToggle %} true {% else %} false {% endif %}"
 
-
       - displayName: Default Rounding Mode[Optional]
         attributeName: defRndMode
         default: ""
@@ -212,17 +211,25 @@ metadata:
         enableIf: "{% if columns 
                             | selectattr('isBusinessKey')
                             | list
-                            | length > 0 %} true {% else %} false {% endif %}"
+                            | length > 0 
+                        and columns 
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0 %} true {% else %} false {% endif %}"
         
       - type: columnDropdownSelector
         attributeName: lastModifiedColumn
-        displayName: Comparison Source Column* (DataType - TIMESTAMP or NUMERIC)
+        displayName: Comparison Source Column* (ℹ️ DataType - TIMESTAMP or NUMERIC)
         default: ''
         enableIf: "{% if config.lastModifiedCompToggle 
-                    and (columns 
+                    and columns 
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                    and columns 
                             | selectattr('isBusinessKey')
                             | list
-                            | length > 0) %} true {% else %} false {% endif %}"
+                            | length > 0 %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: treatNullAsCurrentTimestamp
@@ -230,35 +237,59 @@ metadata:
         default: false
         enableIf: "{% if config.lastModifiedCompToggle
                     and ('TIMESTAMP' in config.lastModifiedColumn.dataType | upper)
-                    and (columns
+                    and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                    and columns 
                             | selectattr('isBusinessKey')
                             | list
-                            | length > 0) %}"
+                            | length > 0 %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: type2Dimension
         displayName: Enable SCD Type2
         default: false
-        enableIf: "{% if config.lastModifiedCompToggle %} true {% else %} false {% endif %}"
+        enableIf: "{% if config.lastModifiedCompToggle
+                        and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %} true {% else %} false {% endif %}"
 
       - type: changeTrackingColumns
         isRequired: false
-        enableIf: "{% if config.lastModifiedCompToggle == false %} true {% else %} false {% endif %}"
+        enableIf: "{% if config.lastModifiedCompToggle == false
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %} true {% else %} false {% endif %}"
 
       - type: label
-        displayName: Note - SCD Type2 if selected, Else SCD Type1
+        displayName: ℹ️ Note - SCD Type2 if selected, Else SCD Type1
         attributeName: labelCT
-        enableIf: "{% if config.lastModifiedCompToggle == false %} true {% else %} false {% endif %}"
+        enableIf: "{% if config.lastModifiedCompToggle == false
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %} true {% else %} false {% endif %}"
 
       - displayName: Exclude Columns from Merge (For SCD Type1)
         attributeName: excludeMergeToggle
         type: toggleButton
         default: false
-        enableIf: "{% config.lastModifiedCompToggle == false
+        enableIf: "{% if config.lastModifiedCompToggle == false
                         and columns
                             | selectattr('isChangeTracking')
                             | list
-                            | length == 0  %}
+                            | length == 0
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %}
                       true
                     {% else %} 
                       false
@@ -281,6 +312,10 @@ metadata:
                             | selectattr('isChangeTracking')
                             | list
                             | length == 0
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0
                            %}
                       true
                     {% else %} 
@@ -291,7 +326,6 @@ metadata:
         attributeName: truncateBefore
         type: toggleButton
         default: false
-
 
       - displayName: Distinct
         attributeName: selectDistinct
