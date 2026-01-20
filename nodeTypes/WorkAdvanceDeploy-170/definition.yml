@@ -58,7 +58,7 @@ metadata:
       - displayName: Partition By*
         attributeName: partitionBy
         type: dropdownSelector
-        default: "Time-Unit Column"
+        default: "Ingestion Time"
         options:
         - "Time-Unit Column"
         - "Integer Range"
@@ -249,12 +249,5 @@ metadata:
         enableIf: "{% if node.materializationType == 'view' %} false {% else %} true {% endif %}"
 
       isRequired: false
-
-    systemColumns:
-    - displayName: '{{NODE_NAME}}_key'
-      transform: ''
-      dataType: STRING
-      placement: beginning
-      attributeName: isSurrogateKey
 name: Work Advance Deploy
 type: NodeType

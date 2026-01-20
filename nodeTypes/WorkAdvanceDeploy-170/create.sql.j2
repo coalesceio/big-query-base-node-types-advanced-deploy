@@ -260,23 +260,26 @@ does not permit copying or modification for any other purpose.
                             {% if ns.attributeColCount > 1 %} , {% endif %}
                             ALTER COLUMN `{{ desiredColumnName }}`
                             SET DATA TYPE {{ desiredDatatype }}
-
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}
                         {% endif %}
 
                         {% if nullableTest == false %}
                             {% if ns.attributeColCount > 1 %} , {% endif %}
-                                ALTER COLUMN `{{ desiredColumnName }}`
-                                DROP NOT NULL
+                            ALTER COLUMN `{{ desiredColumnName }}`
+                            DROP NOT NULL
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}
                         {% endif %}
 
                         {% if descriptionTest == false %}
                             {% if ns.attributeColCount > 1 %} , {% endif %}
                             ALTER COLUMN `{{ desiredColumnName }}`
                             SET OPTIONS (description = '{{ desiredDescription | escape }}')
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}
                         {% endif %}
 
                         {% if defaultValueTest == false %}
                             {% if ns.attributeColCount > 1 %} , {% endif %}
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}
                             ALTER COLUMN `{{ desiredColumnName }}`
                             {% if desiredDefaultValue == '' %}
                                 DROP DEFAULT
@@ -410,9 +413,6 @@ does not permit copying or modification for any other purpose.
             (
                 {% for col in columns %}
                     `{{ col.name }}` {{ col.dataType }}
-                        {% if col.isSurrogateKey %}
-                            DEFAULT GENERATE_UUID()
-                        {% endif %}
                     {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }} {%endif%}
                     {% if not col.nullable %} NOT NULL {% endif%}
                     {%- if col.description | length > 0 %} OPTIONS(description="{{ col.description | escape }}") {% endif %}
