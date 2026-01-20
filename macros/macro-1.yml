@@ -64,17 +64,17 @@ macroString: |-
     {%- set varPartitionBy = "" -%}
 
     {% if config.partitionByToggle %}
-        {% if config.partByColumnConfig == 'Ingestion Time' %}
+        {% if config.partitionBy == 'Ingestion Time' %}
           {% if config.partByIngnTimeExpression != "" %}
             {%- set varPartitionBy = config.partByIngnTimeExpression -%}
           {% else %}
               {%- set varPartitionBy = "_PARTITIONDATE" -%}
           {% endif %}
 
-        {% elif config.partByColumnConfig == 'Integer Range' %}
+        {% elif config.partitionBy == 'Integer Range' %}
           {%- set varPartitionBy = config.partByIntSqlExpression|trim -%}
 
-        {% elif config.partByColumnConfig == 'Time-Unit Column' %}
+        {% elif config.partitionBy == 'Time-Unit Column' %}
           {% if config.partByTimeSqlExpression|trim|length > 0 %}
             {%- set varPartitionBy = config.partByTimeSqlExpression|trim -%}
           {% else %}
@@ -145,39 +145,18 @@ macroString: |-
     {% set varTabExprn = "" %}
 
     {% if config.tabExpirationToggle and config.exprnType != '' %}
-      {% if config.exprnType == 'EXACT DATE/DATETIME' and config.timeExprnExpression|trim|length > 0 %}
-        {% if config.timeExprnExpression|trim|length > 11 %}
-          {% set varTabExprn = 'TIMESTAMP "' + config.timeExprnExpression|trim + '"' %}
+      {% if config.exprnType == 'EXACT DATE/DATETIME' and config.tabExprnExpression|trim|length > 0 %}
+        {% if config.tabExprnExpression|trim|length > 11 %}
+          {% set varTabExprn = 'TIMESTAMP "' + config.tabExprnExpression|trim + '"' %}
         {% else %}
-          {% set varTabExprn = 'TIMESTAMP "' + config.timeExprnExpression|trim + ' 23:59:59"' %}
+          {% set varTabExprn = 'TIMESTAMP "' + config.tabExprnExpression|trim + ' 23:59:59"' %}
         {% endif %}
-      {% elif config.exprnType == 'DAYS FROM NOW'and config.dayExprnExpression|trim|length > 0 %}
-        {% set varTabExprn = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  config.dayExprnExpression|trim + ' DAY)' %}
+      {% elif config.exprnType == 'DAYS FROM NOW'and config.tabExprnExpression|trim|length > 0 %}
+        {% set varTabExprn = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  config.tabExprnExpression|trim + ' DAY)' %}
       {% endif %}
     {% endif %}
 
     {{ varTabExprn }}
-
-  {% endmacro %}
-
-  {# =======================================================================================
-    Purpose: Returns the default rounding mode. Uses the user-selected value if provided;
-    otherwise falls back to ROUND_HALF_AWAY_FROM_ZERO
-    Input Parameters : None
-    Returns          : String representing the Default Rounding Mode
-  ========================================================================================== #}
-  {% macro getDefaultRoundingMode() %}
-
-    {# Create namespaces #}
-    {% set varDefRndMd = namespace(elements = "") %}
-
-    {% if config.defRndMode == '' %}
-      {% set varDefRnd = 'ROUND_HALF_AWAY_FROM_ZERO' %}
-    {% else %}
-      {% set varDefRndMd = config.defRndMode %}
-    {% endif %}
-
-    {{ varDefRndMd }}
 
   {% endmacro %}
 

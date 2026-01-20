@@ -1,0 +1,146 @@
+fileVersion: 1
+id: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+name: wrk_nation1
+operation:
+  config:
+    clusterKeyConfig:
+      items:
+        - clustColumn:
+            columnCounter: be1ed608-e759-4a6c-91a6-01e3b67933ae
+            stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+        - clustColumn:
+            columnCounter: 51c26087-056b-4104-8e78-c3dd61edff49
+            stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+    clusterKeyToggle: true
+    dayExprnExpression: "70"
+    defRndMode: ""
+    exprnType: DAYS FROM NOW
+    groupByAll: false
+    insertStrategy: UNION ALL
+    partByColumn:
+      columnCounter: be1ed608-e759-4a6c-91a6-01e3b67933ae
+      stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+    partByColumnConfig: Ingestion Time
+    partByIngnTimeExpression: DATE_TRUNC(_PARTITIONTIME, DAY)
+    partByIntSqlExpression: RANGE_BUCKET(N_NATIONKEY, GENERATE_ARRAY(1, 100, 200))
+    partByOptions: Time-Unit Column
+    partByTimeSqlExpression: DATE_TRUNC(N_NATIONKEY, DAY)
+    partExpireDays: "78"
+    partitionBy: Ingestion Time
+    partitionByToggle: true
+    partitionFilterToggle: false
+    postSQL: ""
+    preSQL: ""
+    primaryKeyConfig:
+      items:
+        - primaryKeyColumn:
+            columnCounter: be1ed608-e759-4a6c-91a6-01e3b67933ae
+            stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+    primaryToggle: true
+    selectDistinct: true
+    tabExpirationToggle: true
+    tabExprnExpression: "30"
+    testsEnabled: false
+    timeExprnExpression: ""
+    truncateBefore: true
+  database: ""
+  deployEnabled: true
+  description: ""
+  isMultisource: false
+  locationName: TARGET
+  materializationType: table
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 78fa053f-225b-41a6-8dd7-903615b92944
+          stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+        config: {}
+        dataType: STRING
+        defaultValue: ""
+        description: ""
+        isSurrogateKey: true
+        name: wrk_nation1_key
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: be1ed608-e759-4a6c-91a6-01e3b67933ae
+          stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+        config: {}
+        dataType: INT64
+        description: ""
+        name: N_NATIONKEY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 82574ec7-854d-4499-9c1a-579f4a72c369
+                stepCounter: 1249f56c-f06d-4d1d-b235-42ad35b334b0
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 51c26087-056b-4104-8e78-c3dd61edff49
+          stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+        config: {}
+        dataType: STRING
+        description: ""
+        name: N_NAME
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 324b2416-bf3e-481c-92a4-ef3f414448d2
+                stepCounter: 1249f56c-f06d-4d1d-b235-42ad35b334b0
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 5d3a025a-6308-4092-b46d-347781269c07
+          stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+        config: {}
+        dataType: INT64
+        description: ""
+        name: N_REGIONKEY
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: ad8f50de-ab07-49bb-a7ec-5684ac3ef5ce
+                stepCounter: 1249f56c-f06d-4d1d-b235-42ad35b334b0
+            transform: ""
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: 112b3ec4-7688-4c3e-960b-0d3cc5f5f5f6
+          stepCounter: 5c0811b5-14bf-4bb3-b7ab-bca876cd47e8
+        config: {}
+        dataType: STRING
+        description: ""
+        name: N_COMMENT
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences:
+              - columnCounter: 44f41ac9-fb40-4262-9b53-f0fd065cb737
+                stepCounter: 1249f56c-f06d-4d1d-b235-42ad35b334b0
+            transform: ""
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping:
+      - aliases:
+          nation: 1249f56c-f06d-4d1d-b235-42ad35b334b0
+        dependencies:
+          - locationName: SRC
+            nodeName: nation
+        join:
+          joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
+        name: wrk_nation1
+        noLinkRefs: []
+  name: wrk_nation1
+  overrideSQL: false
+  schema: ""
+  sqlType: "170"
+  type: sql
+  version: 1
+type: Node

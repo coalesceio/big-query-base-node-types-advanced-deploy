@@ -9,12 +9,7 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Description    : This node creates work table, view and also override create sql for view with advanced deployment strategy == #}
 
 {# == To run data quality tests before data insertion == #}
-{% for test in node.tests if config.testsEnabled %}
-    {% if test.runOrder == 'Before' %}
-        {{ test_stage(test.name, test.continueOnFailure) }}
-        {{ test.templateString }}
-    {% endif %}
-{% endfor %}
+{{ runTests('Before') }}
 
 {% if node.materializationType == 'table' %}
 
@@ -26,7 +21,7 @@ does not permit copying or modification for any other purpose.
 
     {# == Truncate data before data insertion  == #}
     {% if config.truncateBefore %}
-        {{ stage('Truncate Work Table - ' + node.name) }}
+        {{ stage('Truncate Work Table') }}
         TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
     {% endif %}
 
@@ -40,7 +35,7 @@ does not permit copying or modification for any other purpose.
 {# == Multi-Source option  == #}
 	
 		{% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] %}
-			{{ stage( 'Insert Records' ) }}
+			{{ stage('Load Work Table Using Insert') }}
 			INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
 				(
 					{% for col in columns if not col.isSurrogateKey %}
@@ -51,27 +46,21 @@ does not permit copying or modification for any other purpose.
 		{% endif %}
 
 		{% for source in sources %}
-	
- 			(SELECT
-			{% if config.selectDistinct %}
-			DISTINCT
-			{% endif %}
-			{% for col in source.columns if not col.isSurrogateKey%}
-				{{ get_source_transform(col) }} AS `{{ col.name }}`
-				{% if not loop.last %}, {% endif %}
-			{% endfor %}
+ 			(
+                SELECT 
+            	{% if config.selectDistinct %} DISTINCT	{% endif %}
+                {% for col in source.columns if not col.isSurrogateKey%}
+                    {{ get_source_transform(col) }} AS `{{ col.name }}`
+                    {% if not loop.last %}, {% endif %}
+                {% endfor %}
 
-	
-			{{ source.join }}
-	
-                 {% if config.groupByAll %}
-                 GROUP BY ALL
-                 {% endif %}
-                 {{ sortorder_by_colv() }})
+                {{ source.join }}
+        
+                {% if config.groupByAll %} GROUP BY ALL {% endif %}
+            )
 			{% if insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
 				{{insertStrategy}}
-			{% endif %}							 
-	
+			{% endif %}
 		{% endfor %}
 
     {# == Queries to be excuted post data insertion  == #}
@@ -89,18 +78,4 @@ does not permit copying or modification for any other purpose.
 {% endif %}
 
 {# == To run data quality tests after data insertion == #}
-{% if config.testsEnabled %}
-	{% for test in node.tests %}
-		{% if test.runOrder == 'After' %}
-			{{ test_stage(test.name, test.continueOnFailure) }}
-			{{ test.templateString }}
-        {% endif %}
-	{% endfor %}
-
-	{% for column in columns %}
-		{% for test in column.tests %}
-			{{ test_stage(column.name + ": " + test.name) }}
-			{{ test.templateString }}
-		{% endfor %}
-	{% endfor %}
-{% endif %}
+{{ runTests('After') }}
