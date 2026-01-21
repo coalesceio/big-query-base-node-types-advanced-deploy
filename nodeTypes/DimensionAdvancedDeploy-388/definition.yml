@@ -269,7 +269,7 @@ metadata:
         attributeName: labelCT
         enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle == false %} true {% else %} false {% endif %}"
 
-      - displayName: Exclude Columns from Merge (For SCD Type1)
+      - displayName: Exclude Columns from Merge (ℹ️ For SCD Type1)
         attributeName: excludeMergeToggle
         type: toggleButton
         default: false
