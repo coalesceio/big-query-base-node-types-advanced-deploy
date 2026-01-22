@@ -27,7 +27,8 @@ operation:
     partByIntSqlExpression: ""
     partByTimeSqlExpression: ""
     partExpireDays: ""
-    partitionByToggle: true
+    partitionBy: Ingestion Time
+    partitionByToggle: false
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""
@@ -37,6 +38,7 @@ operation:
     primaryToggle: false
     selectDistinct: false
     tabExpirationToggle: true
+    tabExprnExpression: "50"
     testsEnabled: false
     timeExprnExpression: ""
     treatNullAsCurrentTimestamp: true

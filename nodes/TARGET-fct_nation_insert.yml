@@ -32,6 +32,7 @@ operation:
     partByIntSqlExpression: ""
     partByTimeSqlExpression: DATE_TRUNC(last_modified, MONTH)
     partExpireDays: "30"
+    partitionBy: Time-Unit Column
     partitionByToggle: true
     partitionFilterToggle: false
     postSQL: ""
@@ -47,6 +48,7 @@ operation:
     primaryToggle: true
     selectDistinct: true
     tabExpirationToggle: true
+    tabExprnExpression: "60"
     testsEnabled: false
     timeExprnExpression: ""
     treatNullAsCurrentTimestamp: false
