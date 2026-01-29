@@ -31,8 +31,10 @@ operation:
     preSQL: ""
     primaryKeyConfig:
       items:
-        - {}
-    primaryToggle: false
+        - primaryKeyColumn:
+            columnCounter: c760e096-61a7-47f7-92ee-25fc9b6448b5
+            stepCounter: 1e6c1e47-deca-4018-80b2-d32f7ea7cc5e
+    primaryToggle: true
     selectDistinct: true
     tabExpirationToggle: false
     tabExprnExpression: ""

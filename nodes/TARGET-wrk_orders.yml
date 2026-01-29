@@ -28,7 +28,10 @@ operation:
         - primaryKeyColumn:
             columnCounter: a56a6e3a-8b6e-495f-b95d-e86448671b74
             stepCounter: 6ab480fc-b14a-4376-965c-be99050e5404
-    primaryToggle: true
+        - primaryKeyColumn:
+            columnCounter: 5a8b3c05-4927-44dc-8416-17348e09f4d6
+            stepCounter: 6ab480fc-b14a-4376-965c-be99050e5404
+    primaryToggle: false
     selectDistinct: false
     tabExpirationToggle: false
     tabExprnExpression: ""
