@@ -1,6 +1,6 @@
 fileVersion: 1
 id: 759b4071-d084-45c6-abdd-34ed96189d71
-name: fct_nation
+name: fct_nation_renamed
 operation:
   config:
     clusterKeyConfig:
@@ -149,9 +149,9 @@ operation:
             nodeName: nation
         join:
           joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
-        name: fct_nation
+        name: fct_nation_renamed
         noLinkRefs: []
-  name: fct_nation
+  name: fct_nation_renamed
   overrideSQL: false
   schema: ""
   sqlType: "389"
