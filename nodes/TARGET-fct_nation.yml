@@ -40,7 +40,7 @@ operation:
     truncateBefore: false
   database: ""
   deployEnabled: true
-  description: This is old table description
+  description: This is new table description
   isMultisource: false
   locationName: TARGET
   materializationType: table
