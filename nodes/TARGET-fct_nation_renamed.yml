@@ -53,7 +53,7 @@ operation:
           stepCounter: 759b4071-d084-45c6-abdd-34ed96189d71
         config: {}
         dataType: INT64
-        description: This is new column description
+        description: ""
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
