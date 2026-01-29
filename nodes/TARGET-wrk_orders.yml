@@ -17,7 +17,7 @@ operation:
     partByIngnTimeExpression: ""
     partByIntSqlExpression: ""
     partByTimeSqlExpression: DATE_TRUNC(O_ORDERDATE, MONTH)
-    partExpireDays: "40"
+    partExpireDays: "30"
     partitionBy: Time-Unit Column
     partitionByToggle: true
     partitionFilterToggle: false
