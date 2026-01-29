@@ -1,38 +1,22 @@
 fileVersion: 1
-id: c3cc2ac0-dcd6-4cd7-9ab9-0e84d55f07b1
-name: fct_nation_main
+id: 95e07bca-9922-4a30-a2c3-de3621929096
+name: fct_nation
 operation:
   config:
-    clusterKeyConfig:
-      items:
-        - {}
-    clusterKeyToggle: false
-    defRndMode: ""
-    exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    partByColumn: ""
-    partByIngnTimeExpression: ""
-    partByIntSqlExpression: ""
-    partByTimeSqlExpression: ""
-    partExpireDays: "30"
-    partitionBy: Ingestion Time
-    partitionByToggle: true
-    partitionFilterToggle: false
-    postSQL: ""
-    preSQL: ""
-    primaryKeyConfig:
+    orderby: false
+    orderbycolumn:
       items:
         - {}
-    primaryToggle: false
+    postSQL: ""
+    preSQL: ""
     selectDistinct: false
-    tabExpirationToggle: false
-    tabExprnExpression: ""
     testsEnabled: false
     truncateBefore: false
   database: ""
   deployEnabled: true
-  description: This is a table description changed
+  description: This is old table description
   isMultisource: false
   locationName: TARGET
   materializationType: table
@@ -41,11 +25,11 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: fc36d980-22db-4293-8d30-bc500616d928
-          stepCounter: c3cc2ac0-dcd6-4cd7-9ab9-0e84d55f07b1
+          columnCounter: 02fc81cf-89d8-474c-b6cb-849d4a121277
+          stepCounter: 95e07bca-9922-4a30-a2c3-de3621929096
         config: {}
         dataType: INT64
-        description: This is a column description
+        description: This is old column description
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
@@ -55,8 +39,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 2bdd1322-f0e7-4f6b-9c46-88ef48c30dcf
-          stepCounter: c3cc2ac0-dcd6-4cd7-9ab9-0e84d55f07b1
+          columnCounter: 262c7e8d-3f20-454f-ae20-a4c82d4a5fce
+          stepCounter: 95e07bca-9922-4a30-a2c3-de3621929096
         config: {}
         dataType: STRING
         description: ""
@@ -69,8 +53,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 39329fb3-fbc3-48c6-84ac-9bb840d0d970
-          stepCounter: c3cc2ac0-dcd6-4cd7-9ab9-0e84d55f07b1
+          columnCounter: 88d83f42-53c8-42ac-a48a-f3419464c6a7
+          stepCounter: 95e07bca-9922-4a30-a2c3-de3621929096
         config: {}
         dataType: INT64
         description: ""
@@ -83,8 +67,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: e05ae34b-4485-4a18-92ce-ac4d5460c5b8
-          stepCounter: c3cc2ac0-dcd6-4cd7-9ab9-0e84d55f07b1
+          columnCounter: 1bcf4574-372b-4024-97be-aa5978c51546
+          stepCounter: 95e07bca-9922-4a30-a2c3-de3621929096
         config: {}
         dataType: STRING
         description: ""
@@ -100,8 +84,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 8c97c1b5-5e1a-4408-91f3-023e4f2f5eb0
-          stepCounter: c3cc2ac0-dcd6-4cd7-9ab9-0e84d55f07b1
+          columnCounter: 13481d7f-a7cd-41c3-90a3-844a85fac745
+          stepCounter: 95e07bca-9922-4a30-a2c3-de3621929096
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -117,8 +101,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 8e6de337-ceb3-4688-926f-c950fce4ca66
-          stepCounter: c3cc2ac0-dcd6-4cd7-9ab9-0e84d55f07b1
+          columnCounter: 9cce18bc-78a3-4864-a6fe-4d1fb6245f54
+          stepCounter: 95e07bca-9922-4a30-a2c3-de3621929096
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -134,17 +118,19 @@ operation:
     sourceMapping:
       - aliases:
           nation: 41ba6f71-cf99-4820-82e9-ecc2368c29f9
+        customSQL:
+          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation
         join:
           joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
-        name: fct_nation_main
+        name: fct_nation
         noLinkRefs: []
-  name: fct_nation_main
+  name: fct_nation
   overrideSQL: false
   schema: ""
-  sqlType: "177"
+  sqlType: Fact
   type: sql
   version: 1
 type: Node
