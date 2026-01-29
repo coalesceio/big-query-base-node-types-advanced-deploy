@@ -83,6 +83,7 @@ operation:
         config: {}
         dataType: INT64
         description: ""
+        isBusinessKey: true
         name: O_ORDERKEY
         nullable: true
         sourceColumnReferences:

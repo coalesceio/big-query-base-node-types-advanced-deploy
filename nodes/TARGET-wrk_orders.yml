@@ -25,7 +25,9 @@ operation:
     preSQL: ""
     primaryKeyConfig:
       items:
-        - primaryKeyColumn: null
+        - primaryKeyColumn:
+            columnCounter: a56a6e3a-8b6e-495f-b95d-e86448671b74
+            stepCounter: 6ab480fc-b14a-4376-965c-be99050e5404
     primaryToggle: true
     selectDistinct: false
     tabExpirationToggle: false

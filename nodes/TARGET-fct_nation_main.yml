@@ -16,7 +16,7 @@ operation:
     partByIntSqlExpression: ""
     partByTimeSqlExpression: ""
     partExpireDays: "30"
-    partitionBy: Time-Unit Column
+    partitionBy: Ingestion Time
     partitionByToggle: true
     partitionFilterToggle: false
     postSQL: ""
@@ -32,7 +32,7 @@ operation:
     truncateBefore: false
   database: ""
   deployEnabled: true
-  description: ""
+  description: This is a table description
   isMultisource: false
   locationName: TARGET
   materializationType: table
@@ -45,7 +45,7 @@ operation:
           stepCounter: c3cc2ac0-dcd6-4cd7-9ab9-0e84d55f07b1
         config: {}
         dataType: INT64
-        description: ""
+        description: This is a column description
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
