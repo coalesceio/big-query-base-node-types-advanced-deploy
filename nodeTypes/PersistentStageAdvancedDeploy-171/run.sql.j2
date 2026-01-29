@@ -1,0 +1,568 @@
+{#
+        Copyright (c) 2025 Coalesce. All rights reserved.
+    This script and its associated documentation are confidential and proprietary to Coalesce.
+    Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
+    Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
+    does not permit copying or modification for any other purpose.  
+    #}
+    {# == Node Type Name           : Persistent Advanced Deploy == #}
+    {# == Node Type Description    : This node creates persistent stage table  with advanced deployment strategy == #}
+
+{# == Variable to hold business key == #}
+{% set has_business_key = columns | selectattr("isBusinessKey") | list | length > 0 %}
+
+{# == Variable check to identify type of dimension == #}
+{% if has_business_key %}
+    {% if config.lastModifiedCompToggle %}
+        {% set isSCDType2 = config.type2Dimension | default(false) %}
+    {% else %}
+        {% set isSCDType2 = columns | selectattr("isChangeTracking") | list | length > 0 %}
+    {% endif %}
+
+    {# == Variable to hold last modified value (date or version) == #}
+    {% set lastModifiedColumn = config.lastModifiedColumn.name | default('') if config.lastModifiedCompToggle %}
+
+    {# == Variable to hold Now replacement == #}
+    {% set useCurrentTimeStamp = config.treatNullAsCurrentTimestamp | default(false) if (config.lastModifiedCompToggle and 'TIMESTAMP' in config.lastModifiedColumn.dataType | upper) else false %}
+
+{% endif %}
+
+{# == To run data quality tests before data insertion == #}
+{{ runTests('Before') }}
+
+{# == Queries to be excuted before data insertion  == #}
+{% if config.preSQL %}			
+    {{ stage('Pre-SQL') }}
+    {{ config.preSQL }}
+{% endif %}
+
+{# == Truncate data before data insertion  == #}
+{% if config.truncateBefore %}
+    {{ stage('Truncate Persistent Table') }}
+    TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
+{% endif %}
+
+{% if has_business_key and isSCDType2 %}
+
+    {# SCD-Type2 Persistent Stage == #}
+    {{ stage('Load Persistent Stage Table Using Merge(SCD Type2)') }}
+    MERGE INTO {{ ref_no_link(node.location.name, node.name) }} `TGT`
+    USING
+        (
+        {% for source in sources %}
+            (
+                {% set joinclause = source.join %}
+                /* New Rows That Don't Exist */
+                (
+                    SELECT
+                    {% if config.selectDistinct %}
+                        DISTINCT
+                    {% endif %}
+                    {% for col in source.columns if not col.isSurrogateKey %}
+                        {% if col.isSystemVersion %}
+                            1
+                        {% elif col.isSystemCurrentFlag %}
+                            'Y'
+                        {% elif col.name == lastModifiedColumn and useCurrentTimeStamp %}
+                            COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP())
+                        {% else %}
+                            {{ get_source_transform(col) }}
+                        {% endif %}
+                        AS `{{ col.name }}`,
+                    {% endfor %}
+                    'INSERT_INITAL_VERSION_ROWS' AS `DML_OPERATION`
+                    {{  get_clause(joinclause, 'from')  }}
+
+                    LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `PSTG`
+                    ON
+
+                    {% for col in source.columns if col.isBusinessKey -%}
+                        {% if not loop.first %}
+                            AND
+                        {% endif %}
+                        {{ get_source_transform(col) }} = `PSTG`.`{{ col.name }}`
+                    {% endfor %}
+                    WHERE
+                    {% for col in source.columns if col.isBusinessKey -%}
+                        {% if not loop.first %}
+                            AND
+                        {% endif %}
+                        `PSTG`.`{{ col.name }}` IS NULL
+                    {% endfor %}
+                    {{ get_clause(joinclause) }}
+
+                    {% if config.groupByAll %} GROUP BY ALL {% endif %}
+                )
+                UNION ALL
+                {% if config.lastModifiedCompToggle %}
+                    /* Insert new records with incremented version */
+                {% else %}
+                    /* New Row Needing To Be Inserted Due To Type-2 Column Changes */
+                {% endif %}
+                (
+                    SELECT
+                    {% if config.selectDistinct %}
+                        DISTINCT
+                    {% endif %}
+                    {% for col in source.columns if not col.isSurrogateKey %}
+                        {% if col.isSystemVersion %}
+                            `PSTG`.`{{ col.name }}` + 1
+                        {% elif col.isSystemCurrentFlag %}
+                            'Y'
+                        {% elif col.name == lastModifiedColumn and useCurrentTimeStamp %}
+                            COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP())
+                        {% else %}
+                            {{ get_source_transform(col) }}
+                        {% endif %}
+                        AS `{{ col.name }}`,
+                    {% endfor %}
+                    'INSERT_NEW_VERSION_ROWS' AS `DML_OPERATION`
+                    {{  get_clause(joinclause, 'from')  }}
+
+                    INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `PSTG`
+                    ON
+
+                    {% for col in source.columns if col.isBusinessKey -%}
+                        {% if not loop.first %} AND {% endif %}
+                        {{ get_source_transform(col) }} = `PSTG`.`{{ col.name }}`
+                    {% endfor %}
+                    WHERE `PSTG`.`{{ get_value_by_column_attribute("isSystemCurrentFlag") }}` = 'Y'
+
+                    {% if config.lastModifiedCompToggle %} 
+                        {% for col in source.columns if col.name == lastModifiedColumn -%}
+                            AND
+                            {% if useCurrentTimeStamp %}
+                                COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) > `PSTG`.`{{ lastModifiedColumn }}`
+                            {% else %}
+                                {{ get_source_transform(col) }} > `PSTG`.`{{ lastModifiedColumn }}`
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for col in source.columns if col.isChangeTracking %}
+                            {% if loop.first %}
+                                AND (
+                            {% else %}
+                                OR
+                            {% endif %}
+                            {% if col.dataType == 'GEOGRAPHY' %}
+                            (
+                                ST_DISTANCE(
+                                    CASE
+                                        WHEN SRC.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                        ELSE SRC.`{{ col.name }}`
+                                    END,
+                                    CASE
+                                        WHEN TGT.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                        ELSE TGT.`{{ col.name }}`
+                                    END
+                                ) > 0
+                            )
+                            {% else %}
+                                {{ get_source_transform(col) }} IS DISTINCT FROM `PSTG`.`{{ col.name }}`
+                            {% endif %}
+                            {% if loop.last %} ) {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {{  get_clause(joinclause)  }}
+                    {% if config.groupByAll %} GROUP BY ALL {% endif %}
+                )
+
+                UNION ALL
+                {% if config.lastModifiedCompToggle %}
+                    /* Rows to Expire from CDC Timestamp Differences */
+                {% else %}
+                    /* Rows Needing To Be Expired Due To Type-2 Column Changes */
+                {% endif %}
+                /* In this case, only two columns are merged (version and end date) */
+                
+                ( 
+                    SELECT
+                    {% if config.selectDistinct %}
+                    DISTINCT
+                    {% endif %}
+                    {%- for col in source.columns if not col.isSurrogateKey %}
+                        {% if col.isSystemEndDate %}
+                            TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 MILLISECOND)
+                        {% elif col.isSystemCurrentFlag %}
+                            'N'
+                        {% else %}
+                            `PSTG`.`{{ col.name }}`
+                        {% endif %}
+                        AS `{{ col.name }}`,
+                    {% endfor -%}
+                    'UPDATE_EXPIRED_VERSION_ROWS' AS `DML_OPERATION`
+                    {{  get_clause(joinclause,'from')  }}
+
+                    INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `PSTG`
+                    ON
+
+                    {% for col in source.columns if col.isBusinessKey -%}
+                        {% if not loop.first %}
+                            AND
+                        {% endif %}
+                        {{ get_source_transform(col) }} = `PSTG`.`{{ col.name }}`
+                    {% endfor %}
+
+                    WHERE `PSTG`.`{{ get_value_by_column_attribute("isSystemCurrentFlag") }}` = 'Y'
+
+                    {% if config.lastModifiedCompToggle %} 
+                        {% for col in source.columns if col.name == lastModifiedColumn -%}
+                            AND
+                            {% if useCurrentTimeStamp %}
+                                COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) > `PSTG`.`{{ lastModifiedColumn }}`
+                            {% else %}
+                                {{ get_source_transform(col) }} > `PSTG`.`{{ lastModifiedColumn }}`
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% for col in source.columns if (col.isChangeTracking == true) %}
+                            {% if loop.first %}
+                                AND (
+                            {% else %}
+                                OR
+                            {% endif %}
+                            {% if col.dataType == 'GEOGRAPHY' %}
+                            (
+                                ST_DISTANCE(
+                                    CASE
+                                        WHEN SRC.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                        ELSE SRC.`{{ col.name }}`
+                                    END,
+                                    CASE
+                                        WHEN TGT.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                        ELSE TGT.`{{ col.name }}`
+                                    END
+                                ) > 0
+                            )
+                            {% else %}
+                                {{ get_source_transform(col) }} IS DISTINCT FROM `PSTG`.`{{ col.name }}`
+                            {% endif %}
+                            {% if loop.last %} ) {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {{  get_clause(joinclause)  }}
+                    {% if config.groupByAll %} GROUP BY ALL {% endif %}
+                )
+
+                {% if not config.lastModifiedCompToggle %}
+
+                    {# The if-block below avoids unnecessary updates when no type 2 column changes are present #}
+                    {% if source.columns 
+                        | rejectattr('isSurrogateKey')
+                        | rejectattr('isBusinessKey')
+                        | rejectattr('isChangeTracking')
+                        | rejectattr('isSystemVersion')
+                        | rejectattr('isSystemCurrentFlag')
+                        | rejectattr('isSystemStartDate')
+                        | rejectattr('isSystemEndDate')
+                        | rejectattr('isSystemCreateDate')
+                        | rejectattr('isSystemUpdateDate') 
+                        | list | length == 0 
+                    %}
+                        {# Skip Section #}
+                    {% else %}
+                        UNION ALL
+                        /* Rows Needing To Be Updated Due To Changes To Non-Type-2 columns
+                        This case merges only when there are changes in non-type-2 column updates, but no changes in type-2 columns*/
+                        (
+                            SELECT
+                            {% if config.selectDistinct %}
+                            DISTINCT
+                            {% endif %}
+                            {%- for col in source.columns if not col.isSurrogateKey %}
+                                {% if col.isSystemVersion or col.isSystemCreateDate or col.isSystemStartDate or col.isSystemEndDate %}
+                                    `PSTG`.`{{ col.name }}`
+                                {% elif col.isSystemCurrentFlag %}
+                                    'Y'
+                                {% else %}
+                                    {{ get_source_transform(col) }}
+                                {% endif %}
+                                AS `{{ col.name }}`,
+                            {% endfor -%}
+                                'UPDATE_NON_TYPE2_ROWS' AS `DML_OPERATION`
+                            {{  get_clause(joinclause, 'from')  }}
+                            INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `PSTG` ON
+                            {% for col in source.columns if col.isBusinessKey -%}
+                                {% if not loop.first %}
+                                    AND
+                                {% endif %}
+                                {% if col.dataType == 'GEOGRAPHY' %}
+                                    (
+                                    ST_DISTANCE(
+                                        CASE
+                                            WHEN SRC.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                            ELSE SRC.`{{ col.name }}`
+                                        END,
+                                        CASE
+                                            WHEN TGT.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                            ELSE TGT.`{{ col.name }}`
+                                        END
+                                    ) > 0
+                                )
+                                {% else %}
+                                    {{ get_source_transform(col) }} = `PSTG`.`{{ col.name }}`
+                                {% endif %}
+                            {% endfor %}
+                            WHERE `PSTG`.`{{ get_value_by_column_attribute("isSystemCurrentFlag") }}` = 'Y'
+                        AND
+                        (
+                            {% for col in source.columns if (col.isChangeTracking) -%}
+                                {% if not loop.first %}
+                                    AND
+                                {% endif %}
+                                {{ get_source_transform(col) }} = `PSTG`.`{{ col.name }}`
+                            {% endfor %}
+                        )
+                            
+                        {% for col in source.columns if not 
+                            (   
+                                col.isBusinessKey or 
+                                col.isChangeTracking or 
+                                col.isSurrogateKey or 
+                                col.isSystemVersion or
+                                col.isSystemCurrentFlag or
+                                col.isSystemStartDate or
+                                col.isSystemEndDate or
+                                col.isSystemUpdateDate or
+                                col.isSystemCreateDate
+                            ) -%}
+                        {% if loop.first %}
+                            AND (
+                        {% endif %}
+                        {% if not loop.first %}
+                            OR
+                        {% endif %}
+                        {% if col.dataType == 'GEOGRAPHY' %}
+                        (
+                            ST_DISTANCE(
+                                CASE
+                                    WHEN SRC.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                    ELSE SRC.`{{ col.name }}`
+                                    END,
+                                    CASE
+                                    WHEN TGT.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                                    ELSE TGT.`{{ col.name }}`
+                                END
+                                ) > 0
+                            )
+                        {% else %}
+                            {{ get_source_transform(col) }} IS DISTINCT FROM `PSTG`.`{{ col.name }}`
+                        {% endif %}
+                            {% if loop.last %} ) {% endif %}
+                            {% endfor %}
+                            {{  get_clause(joinclause)  }}
+
+                            {% if config.groupByAll %} GROUP BY ALL {% endif %}
+                        )
+                    {% endif %}
+                {% endif %}
+            )
+                        {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
+                            {{config.insertStrategy}}
+                        {% endif %}         
+                    {% endfor %}
+                ) AS `SRC`
+                ON
+                {% for col in columns if col.isBusinessKey -%}
+                    {% if not loop.first %}
+                        AND
+                    {% endif %}
+                    `TGT`.`{{ col.name }}` = `SRC`.`{{ col.name }}`
+                {% endfor %}
+                AND `TGT`.`{{ get_value_by_column_attribute("isSystemVersion") }}` = `SRC`.`{{ get_value_by_column_attribute("isSystemVersion") }}`
+
+                WHEN MATCHED THEN UPDATE SET
+                {%- for col in columns if not (col.isBusinessKey or col.isSurrogateKey or col.isSystemCreateDate) %}
+                    `TGT`.`{{ col.name }}` = `SRC`.`{{ col.name }}`
+                    {% if not loop.last %}, {% endif %}
+                {% endfor -%}
+
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    {%- for col in columns if not col.isSurrogateKey %}
+                        `{{ col.name }}`
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                )
+                VALUES
+                (
+                    {%- for col in columns if not col.isSurrogateKey %}
+                        `SRC`.`{{ col.name }}`
+                        {% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                )
+
+{# == Merge Load for SCD Type1 == #}
+{% elif has_business_key and not isSCDType2 %}
+
+    {# Create a list of column names to exclude from the merge update, if the feature is enabled #}
+    {% if config.excludeMergeToggle and config.lastModifiedCompToggle == false %}
+         {%- set excludeColList = config.excludeMergeConfig.get('items', []) | map(attribute='excludeColumn.name') | list %}
+        {%- set includeColList = columns | rejectattr('name', 'in', excludeColList) | list %}
+    {% else %}
+        {%- set includeColList = columns | list %}
+    {% endif %}
+
+    {# SCD-Type1 Persistent == #}
+    {{ stage('Load Persistent Table Using Merge(SCD Type1)') }}
+    MERGE INTO {{ ref_no_link(node.location.name, node.name) }} `TGT`
+    USING
+    (
+        {% for source in sources %}
+            (
+                SELECT
+                {% if config.selectDistinct %}
+                    DISTINCT
+                {% endif %}
+                {% for col in source.columns if not col.isSurrogateKey %}
+                    {% if col.isSystemVersion %}
+                        1
+                    {% elif col.isSystemCurrentFlag %}
+                        'Y'
+                    {% elif col.name == lastModifiedColumn %}
+                        MAX (`PSTG`.`{{lastModifiedColumn}}`) AS MAX_TARGET_VALUE,
+                        {% if useCurrentTimeStamp %}
+                            COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) as COMPARISON_VALUE,
+                            COALESCE({{ get_source_transform(col) }},CURRENT_TIMESTAMP())
+                        {% else %}
+                            {{ get_source_transform(col) }} AS COMPARISON_VALUE,
+                            {{ get_source_transform(col) }}
+                        {% endif %}
+                    {% else %}
+                            {{ get_source_transform(col) }}
+                    {% endif %}
+                            AS `{{ col.name }}`
+                    {%- if not loop.last %}, {% endif %}
+                {% endfor %}
+                {% if config.lastModifiedCompToggle %}
+                    {{  get_clause(source.join, 'from')  }}
+                    LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `PSTG` ON
+                    {% for col in source.columns if col.isBusinessKey -%}
+                        {% if not loop.first %}
+                            AND
+                        {% endif %}
+                            {{ get_source_transform(col) }} = `PSTG`.`{{ col.name }}`
+                    {% endfor %}
+                        {% set clause = get_clause(source.join) %}
+                        {% if clause %}
+                            {{ ("WHERE " ~ clause.strip()[3:].strip()) if clause.strip().upper().startswith('AND') else clause }}
+                        {% endif %}
+                {% else %}
+                    {{ source.join }}
+                {% endif %}
+
+                {% if config.groupByAll or config.lastModifiedCompToggle %} GROUP BY ALL {% endif %}
+            )
+            {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
+                {{config.insertStrategy}}
+            {% endif %}
+        {% endfor %}
+    ) AS `SRC`
+    ON
+    {% for col in columns if col.isBusinessKey -%}
+        {% if not loop.first %}
+            AND
+    {% endif %}
+        `SRC`.`{{ col.name }}` = `TGT`.`{{ col.name }}`
+    {% endfor %}
+
+    WHEN MATCHED
+    {% if config.lastModifiedCompToggle %}
+        AND (`SRC`.COMPARISON_VALUE > `SRC`.MAX_TARGET_VALUE 
+        OR `SRC`.MAX_TARGET_VALUE IS NULL)
+    {% else %}
+        {% for col in includeColList if not (   col.isBusinessKey or col.isSurrogateKey or col.isSystemVersion or col.isSystemCurrentFlag or col.isSystemStartDate or col.isSystemEndDate or col.isSystemUpdateDate or col.isSystemCreateDate) %}
+            {% if loop.first %}
+                AND (
+            {% else %}
+                OR
+            {% endif %}
+            {% if col.dataType == 'GEOGRAPHY' %}
+                (
+                    ST_DISTANCE(
+                        CASE
+                            WHEN SRC.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                            ELSE SRC.`{{ col.name }}`
+                        END,
+                        CASE
+                            WHEN TGT.`{{ col.name }}` IS NULL THEN ST_GEOGPOINT(0, 0)
+                            ELSE TGT.`{{ col.name }}`
+                        END
+                    ) > 0
+                )
+            {% else %}
+                `SRC`.`{{ col.name }}` IS DISTINCT FROM `TGT`.`{{ col.name }}`
+            {% endif %}
+            {% if loop.last %}
+                )
+            {% endif %}
+        {% endfor %}
+    {% endif %}   
+        
+    THEN UPDATE SET
+    {%- for col in includeColList if not (  col.isBusinessKey or 
+                                            col.isSurrogateKey or
+                                            col.isSystemVersion or col.isSystemCurrentFlag or
+                                            col.isSystemStartDate or col.isSystemCreateDate
+                                        ) %}
+                    `TGT`.`{{ col.name }}` = `SRC`.`{{ col.name }}`
+                    {% if not loop.last %}, {% endif %}
+    {% endfor %}
+
+    WHEN NOT MATCHED THEN
+    INSERT
+    (
+        {%- for col in columns if not col.isSurrogateKey %}
+            `{{ col.name }}`
+            {% if not loop.last %}, {% endif %}
+        {% endfor -%}
+    )
+    VALUES
+    (
+        {%- for col in columns if not col.isSurrogateKey %}
+            `SRC`.`{{ col.name }}`
+            {% if not loop.last %}, {% endif %}
+        {% endfor -%}
+    )
+{% else %}
+
+    {# == Basic Insert if no keys specified == #}
+    {{ stage('Load Persistent Table Using Insert') }}
+    INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+    (
+        {% for col in columns if not col.isSurrogateKey %}
+            `{{ col.name }}`
+            {%- if not loop.last -%},{% endif %}
+        {% endfor %}
+    )
+    {% for source in sources %}
+        (
+            SELECT
+            {% if config.selectDistinct %} DISTINCT {% endif %}
+            {% for col in source.columns if not col.isSurrogateKey %}
+                {% if col.isSystemVersion %} 1
+                {% elif col.isSystemCurrentFlag %} 'Y'
+                {% else %} {{ get_source_transform(col) }}
+                {% endif %}
+                AS `{{ col.name }}`
+                {%- if not loop.last -%}, {% endif %}
+            {% endfor %}
+            {{ source.join }}
+            {% if config.groupByAll %} GROUP BY ALL {% endif %}
+        ) 
+                {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
+                    {{config.insertStrategy}}
+                {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# == Queries to be excuted post data insertion  == #}
+{% if config.postSQL %}			
+    {{ stage('Post-SQL') }}
+    {{ config.postSQL }}
+{% endif %}
+
+{# == To run data quality tests after data insertion == #}
+{{ runTests('After') }}

@@ -1,0 +1,407 @@
+fileVersion: 1
+id: "171"
+isDisabled: false
+metadata:
+  defaultStorageLocation: null
+  error: null
+  nodeMetadataSpec: |-
+    capitalized: Persistent Stage Advanced Deploy
+    short: pstg
+    tagColor: '#29B2DB'
+    plural: Persistent Stages
+
+    deployStrategy: advanced
+
+    config:
+    - groupName: Create Options
+      items:
+      - type: materializationSelector
+        isRequired: true
+        default: table
+        options:
+        - table
+
+      - type: toggleButton
+        displayName: Primary Key
+        default: false
+        attributeName: primaryToggle
+
+      - type: tabular   
+        displayName: Primary Key Columns* (ℹ️ Not Enforced)
+        attributeName: primaryKeyConfig
+        columns:
+
+        -  type: columnDropdownSelector
+           displayName: Primary Key Columns
+           attributeName: primaryKeyColumn
+           default: ''
+
+        isRequired: false
+        enableIf: "{% if config.primaryToggle %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: partitionByToggle
+        displayName: Enable Partitioning
+        default: false
+        isRequired: false
+
+      - type: label
+        displayName: ⚠️ Warning - On Redeployment, PARTITION Changes will Drop and Recreate the Table
+        attributeName: labelPartWarning
+        enableIf: "{% if config.partitionByToggle %} true {% else %} false {% endif %}"
+
+      - displayName: Partition By*
+        attributeName: partitionBy
+        type: dropdownSelector
+        default: "Ingestion Time"
+        options:
+        - "Time-Unit Column"
+        - "Integer Range"
+        - "Ingestion Time"
+        isRequired: false
+        enableIf: "{% if config.partitionByToggle %} true {% else %} false {% endif %}"
+
+      - type: columnDropdownSelector
+        displayName: Partition By Column (ℹ️ DataType-DATE)
+        attributeName: partByColumn
+        isRequired: false
+        default: ''
+        enableIf: "{% if config.partitionByToggle and config.partitionBy == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: 【OR】
+        attributeName: labelOR
+        enableIf: "{% if config.partitionByToggle and config.partitionBy == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: "Time-Unit Expression (💡Ex. DATE_TRUNC(columnName, MONTH))"
+        attributeName: partByTimeSqlExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if config.partitionByToggle and config.partitionBy == 'Time-Unit Column' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: "Integer Range Expression* (💡Ex. RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200)))"
+        attributeName: partByIntSqlExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if config.partitionByToggle and config.partitionBy == 'Integer Range' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: Ingestion-time Expression[Optional] (💡Ex. DATE_TRUNC(_PARTITIONTIME, MONTH))
+        attributeName: partByIngnTimeExpression
+        default: ''
+        isRequired: false
+        enableIf: "{% if config.partitionByToggle and config.partitionBy == 'Ingestion Time' %} true {% else %} false {% endif %}"
+
+      #----- Not supported For Now ------#
+      - type: toggleButton
+        attributeName: partitionFilterToggle
+        displayName: Require Partition Filter
+        default: false
+        isRequired: false
+        enableIf: "false"
+      # ----------------------------------#
+
+      - type: textBox
+        displayName: Partition Expiration Days[Optional] (💡Ex. 30)
+        attributeName: partExpireDays
+        default: ''
+        isRequired: false
+        enableIf: "{% if config.partitionByToggle and ( config.partitionBy == 'Time-Unit Column' or config.partitionBy == 'Ingestion Time' ) %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: clusterKeyToggle
+        displayName: Enable Clustering
+        default: false
+        isRequired: false
+
+
+      - type: label
+        displayName: ⚠️ Warning - On Redeployment, CLUSTER Changes will Drop and Recreate the Table
+        attributeName: labelClustWarning
+        enableIf: "{% if config.clusterKeyToggle %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: ⚠️ Warning - Cluster Columns exceeding the limit of 4
+        attributeName: labelCKWarning
+        enableIf: "{% if config.clusterKeyToggle and config.clusterKeyConfig.get('items') | length > 4 %} true {% else %} false {% endif %}"
+
+      - type: tabular
+        displayName: Cluster By* (ℹ️ Only first 4 rows are processed)
+        attributeName: clusterKeyConfig
+        columns:
+
+        -  type: columnDropdownSelector
+           displayName: Cluster By Columns
+           default: ''
+           attributeName: clustColumn
+           isRequired: false
+      
+        isRequired: false
+        enableIf: "{% if config.clusterKeyToggle %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: tabExpirationToggle
+        displayName: Table Expiration
+        default: false
+        isRequired: false
+
+
+      - displayName: Expiration Type*
+        attributeName: exprnType
+        default: "DAYS FROM NOW"
+        type: dropdownSelector
+        options:
+        - "EXACT DATE/DATETIME"
+        - "DAYS FROM NOW"
+        isRequired: false
+        enableIf: "{% if config.tabExpirationToggle %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: 'Expiration Value* (💡Ex. 2024-12-31 | 2024-12-31 23:59:59)'
+        attributeName: labelTimeExprn
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle and config.exprnType == 'EXACT DATE/DATETIME' %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: 'Expiration Value* (💡Ex. 30)'
+        attributeName: labelDayExprn
+        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle and config.exprnType == 'DAYS FROM NOW' %} true {% else %} false {% endif %}"
+
+      - type: textBox
+        displayName: ''
+        attributeName: tabExprnExpression
+        default: ""
+        isRequired: false
+        enableIf: "{% if config.tabExpirationToggle %} true {% else %} false {% endif %}"
+
+      - displayName: Default Rounding Mode[Optional]
+        attributeName: defRndMode
+        default: ""
+        type: dropdownSelector
+        options:
+        - ""
+        - "ROUND_HALF_AWAY_FROM_ZERO"
+        - "ROUND_HALF_EVEN"
+        isRequired: false
+        
+    - groupName: Load Options
+
+      items:
+
+      - type: multisourceToggle
+
+      - displayName: Multi Source Strategy*
+        attributeName: insertStrategy
+        type: dropdownSelector
+        default: UNION ALL
+        options:
+        - "UNION DISTINCT"
+        - "UNION ALL"
+        isRequired: false
+        enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
+
+      - type: businessKeyColumns
+        isRequired: false
+
+      - type: toggleButton
+        attributeName: lastModifiedCompToggle
+        displayName: Last Modified Comparison
+        default: false
+        enableIf: "{% if columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 
+                        and columns 
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0 %} true {% else %} false {% endif %}"
+        
+      - type: columnDropdownSelector
+        attributeName: lastModifiedColumn
+        displayName: Comparison Source Column* (ℹ️ DataType - TIMESTAMP or NUMERIC)
+        default: ''
+        enableIf: "{% if config.lastModifiedCompToggle 
+                    and columns 
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                    and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: treatNullAsCurrentTimestamp
+        displayName: Treat NULL as Current Timestamp
+        default: false
+        enableIf: "{% if config.lastModifiedCompToggle
+                    and ('TIMESTAMP' in config.lastModifiedColumn.dataType | upper)
+                    and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                    and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %} true {% else %} false {% endif %}"
+
+      - type: toggleButton
+        attributeName: type2Dimension
+        displayName: Enable SCD Type2
+        default: false
+        enableIf: "{% if config.lastModifiedCompToggle
+                        and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %} true {% else %} false {% endif %}"
+
+      - type: changeTrackingColumns
+        isRequired: false
+        enableIf: "{% if config.lastModifiedCompToggle == false
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %} true {% else %} false {% endif %}"
+
+      - type: label
+        displayName: ℹ️ Note - SCD Type2 if selected, Else SCD Type1
+        attributeName: labelCT
+        enableIf: "{% if config.lastModifiedCompToggle == false
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %} true {% else %} false {% endif %}"
+
+      - displayName: Exclude Columns from Merge (For SCD Type1)
+        attributeName: excludeMergeToggle
+        type: toggleButton
+        default: false
+        enableIf: "{% if config.lastModifiedCompToggle == false
+                        and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0 %}
+                      true
+                    {% else %} 
+                      false
+                    {% endif %}"
+
+      - type: tabular
+        displayName: 'Exclude Merge List'
+        attributeName: excludeMergeConfig
+        columns:
+
+          -  type: columnDropdownSelector
+             displayName: Exclude Column Name
+             attributeName: excludeColumn
+             default: ''
+           
+        isRequired: false
+        enableIf: "{% if config.excludeMergeToggle
+                        and config.lastModifiedCompToggle == false
+                        and columns
+                            | selectattr('isChangeTracking')
+                            | list
+                            | length == 0
+                        and columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0
+                           %}
+                      true
+                    {% else %} 
+                      false
+                    {% endif %}"
+
+      - displayName: Truncate Before
+        attributeName: truncateBefore
+        type: toggleButton
+        default: false
+
+      - displayName: Distinct
+        attributeName: selectDistinct
+        type: toggleButton
+        enableIf: "{% if config.groupByAll %} false {% else %} true {% endif %}"
+        default: false
+        
+      - displayName: Group By All
+        attributeName: groupByAll
+        type: toggleButton
+        default: false
+        enableIf: "{% if config.selectDistinct %} false {% else %} true {% endif %}"
+
+    - groupName: Other Options
+      items:
+
+      - displayName: Enable Tests
+        attributeName: testsEnabled
+        type: toggleButton
+        default: false
+
+      - displayName: Pre-SQL
+        attributeName: preSQL
+        type: textBox
+        syntax: sql
+        isRequired: false
+
+      - displayName: Post-SQL
+        attributeName: postSQL
+        type: textBox
+        syntax: sql
+        isRequired: false
+
+      isRequired: false
+
+    systemColumns:
+    - displayName: '{{NODE_NAME}}_key'
+      transform: ''
+      dataType: STRING
+      placement: beginning
+      attributeName: isSurrogateKey
+
+    - displayName: system_version
+      transform: ''
+      dataType: INT64
+      placement: end
+      attributeName: isSystemVersion
+
+    - displayName: system_current_flag
+      transform: ''
+      dataType: STRING
+      placement: end
+      attributeName: isSystemCurrentFlag
+
+    - displayName: system_start_date
+      transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+      dataType: TIMESTAMP
+      placement: end
+      attributeName: isSystemStartDate
+
+    - displayName: system_end_date
+      transform: CAST('2999-12-31 00:00:00' AS TIMESTAMP)
+      dataType: TIMESTAMP
+      placement: end
+      attributeName: isSystemEndDate
+
+    - displayName: system_create_date
+      transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+      dataType: TIMESTAMP
+      placement: end
+      attributeName: isSystemCreateDate
+
+    - displayName: system_update_date
+      transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+      dataType: TIMESTAMP
+      placement: end
+      attributeName: isSystemUpdateDate
+name: Persistent Stage Advanced Deploy
+type: NodeType

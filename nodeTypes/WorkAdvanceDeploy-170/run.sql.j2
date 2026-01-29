@@ -1,0 +1,70 @@
+{#
+    Copyright (c) 2025 Coalesce. All rights reserved.
+This script and its associated documentation are confidential and proprietary to Coalesce.
+Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
+Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
+does not permit copying or modification for any other purpose.  
+#}
+{# == Node Type Name           : Work Advanced Deploy == #}
+{# == Node Type Description    : This node creates work table, view and also override create sql for view with advanced deployment strategy == #}
+
+{# == To run data quality tests before data insertion == #}
+{{ runTests('Before') }}
+
+{% if node.materializationType == 'table' %}
+
+    {# == Queries to be excuted before data insertion  == #}
+    {% if config.preSQL %}			
+        {{ stage('Pre-SQL') }}
+        {{ config.preSQL }}
+    {% endif %}
+
+    {# == Truncate data before data insertion  == #}
+    {% if config.truncateBefore %}
+        {{ stage('Truncate Work Table') }}
+        TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
+    {% endif %}
+
+    {{ stage('Load Work Table Using Insert') }}
+    INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
+    (
+        {% for col in columns if not col.isSurrogateKey %}
+            `{{ col.name }}`
+            {%- if not loop.last -%},{% endif %}
+        {% endfor %}
+    )
+
+    {% for source in sources %}
+        (
+            SELECT 
+            {% if config.selectDistinct %} DISTINCT	{% endif %}
+            {% for col in source.columns if not col.isSurrogateKey%}
+                {{ get_source_transform(col) }} AS `{{ col.name }}`
+                {% if not loop.last %}, {% endif %}
+            {% endfor %}
+
+            {{ source.join }}
+    
+            {% if config.groupByAll %} GROUP BY ALL {% endif %}
+        )
+        {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
+            {{ config.insertStrategy }}
+        {% endif %}
+    {% endfor %}
+
+    {# == Queries to be excuted post data insertion  == #}
+    {% if config.postSQL %}			
+        {{ stage('Post-SQL') }}
+        {{ config.postSQL }}
+    {% endif %}
+
+{% else %}
+
+    {{ stage('Load Skipped for View') }}
+    -- The node {{node.name}} is materialized as View. Therefore, a Load operation is not supported.
+    SELECT 1 FROM UNNEST([1]) AS INFO_MESSAGE WHERE FALSE
+
+{% endif %}
+
+{# == To run data quality tests after data insertion == #}
+{{ runTests('After') }}

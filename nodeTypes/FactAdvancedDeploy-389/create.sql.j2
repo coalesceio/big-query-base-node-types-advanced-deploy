@@ -1,0 +1,445 @@
+{#
+    Copyright (c) 2025 Coalesce. All rights reserved.
+This script and its associated documentation are confidential and proprietary to Coalesce.
+Unauthorized reproduction, distribution, or disclosure of this material is strictly prohibited.
+Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
+does not permit copying or modification for any other purpose.  
+#}
+{# == Node Type Name           : Fact Advanced Deploy == #}
+{# == Node Type Description    : This node creates fact table, view and also override create sql for view with advanced deployment strategy == #}
+
+{% set nsNodeVariables = namespace(currentProjectDataset = "",
+                                    desiredProjectDataset = "",
+                                    desObjectNameFullPath = "",
+                                    curObjectNameFullPath = "",
+                                    metadataChanges = false) %}
+{{ initializeNodeVariables(nsNodeVariables) }}
+
+{% if desiredState %}
+
+    {# Override CreateSQL for view #}
+    {% if desiredState.node.materializationType == 'view' %}
+
+        {% if currentState != undefined
+                and (currentState.node.materializationType != desiredState.node.materializationType
+                or nsNodeVariables.currentProjectDataset != nsNodeVariables.desiredProjectDataset) %}
+            {# Drop current table before creating #}
+            {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
+            DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
+        {% endif %}
+            
+        {% if desiredState.node.override.create.enabled and desiredState.node.override.create.script | trim != "" %}
+
+            {# Run the overriding script #}
+            {{ desiredState.node.override.create.script }}
+
+        {% else %}
+
+            {# Create new view #}
+            {% if currentState == undefined or currentState != desiredState %}
+                {{ stage('Create Fact View', true, "sql", "create") }}
+
+                CREATE OR REPLACE VIEW {{ nsNodeVariables.desObjectNameFullPath }}
+                (
+                    {% for col in desiredState.columns %}
+                        `{{ col.name }}`
+			            {%- if col.description | length > 0 %} OPTIONS(description='{{ col.description | escape }}') {% endif %}
+                        {%- if not loop.last -%},{% endif %}
+                    {% endfor %}
+                )
+	            {%- if desiredState.node.description | length > 0 %} OPTIONS(description='{{ desiredState.node.description | escape }}') {% endif %}
+                AS
+                {% for source in desiredState.sources %}
+
+                    SELECT 
+                    {% if desiredState.config.selectDistinct %} DISTINCT {% endif %}
+
+                    {% for col in source.columns %}
+                        {% if col.isSurrogateKey or col.isSystemUpdateDate or col.isSystemCreateDate %}
+                            NULL
+                        {% else %}
+                            {{ get_source_transform(col) }}
+                        {% endif %}
+                        AS `{{ col.name }}`
+                        {%- if not loop.last -%}, {% endif %}
+                    {% endfor %}
+
+                    {{ source.join }}
+
+                    {% if desiredState.config.groupByAll %}  GROUP BY ALL  {% endif %}
+                 
+                    {% if desiredState.config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
+                        {{ desiredState.config.insertStrategy }}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+
+    {% elif desiredState.node.materializationType == 'table' %}
+
+        {% set nsConfigVariables = namespace(options = "", partitionBy = "", clusterBy = "", primaryKey = "", tabEprnClause = "", createTable = false) %}
+
+        {# Initialise the variables necessary for create/alter of table #}
+        {%- set nsConfigVariables.partitionBy = getPartitionBy() | trim -%}
+        {%- set nsConfigVariables.clusterBy = getClusterBy() | trim -%}
+        {%- set nsConfigVariables.primaryKey = getPrimaryKey() | trim -%}
+        {%- set nsConfigVariables.tabEprnClause = getTabExpirationClause() | trim -%}
+
+        {# Check the conditions for creating new table #}
+        {% if currentState != undefined
+                and (currentState.node.materializationType != desiredState.node.materializationType
+                or nsNodeVariables.currentProjectDataset != nsNodeVariables.desiredProjectDataset
+                or desiredState.config.partitionByToggle != currentState.config.partitionByToggle
+                or desiredState.config.partitionBy != currentState.config.partitionBy
+                or desiredState.config.partByIngnTimeExpression | trim != currentState.config.partByIngnTimeExpression | trim
+                or desiredState.config.partByColumn.name != currentState.config.partByColumn.name
+                or desiredState.config.partByTimeSqlExpression | trim != currentState.config.partByTimeSqlExpression | trim
+                or desiredState.config.partByIntSqlExpression | trim != currentState.config.partByIntSqlExpression | trim
+                or desiredState.config.clusterKeyToggle != currentState.config.clusterKeyToggle
+                or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', [])) %}
+            {% set nsConfigVariables.createTable = true %}
+            {% set nsNodeVariables.metadataChanges = true %}
+        {% endif %}
+
+        {# Alter table incase of any changes in states and alter is allowed #}
+        {% if currentState != undefined and currentState != desiredState and nsConfigVariables.createTable == false %}
+
+            {# Rename / Move Object #}
+            {% if currentState.node.name != desiredState.node.name %}
+
+                {{ stage('Alter Table - Rename') }}
+                ALTER TABLE  {{nsNodeVariables.currentProjectDataset}}.{{currentState.node.name}}
+                RENAME TO  {{ desiredState.node.name }}
+                {% set nsNodeVariables.metadataChanges = true %}
+        
+            {% endif %}
+
+            {# Alter Primary Key #}
+            {% if (currentState.config.primaryToggle == desiredState.config.primaryToggle == true
+                    and currentState.config.get('primaryKeyConfig', []) != desiredState.config.get('primaryKeyConfig', []))
+                    or (desiredState.config.primaryToggle and currentState.config.primaryToggle != desiredState.config.primaryToggle) %}
+
+                {# Changing Primary Key: Constraint will be dropped and recreated. #}
+                {% if nsConfigVariables.primaryKey | length == 0 or currentState.config.primaryToggle %}
+                    {{ stage('Alter Table - Drop Primary Key Constraint') }}
+                    ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                    DROP PRIMARY KEY
+                    {% set nsNodeVariables.metadataChanges = true %}
+                {% endif %}
+
+                {% if nsConfigVariables.primaryKey | length > 0 %}
+                    {{ stage('Alter Table - Add Primary Key Constraint') }}
+                    ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                    ADD PRIMARY KEY ( {{ nsConfigVariables.primaryKey}} ) NOT ENFORCED
+                    {% set nsNodeVariables.metadataChanges = true %}
+                {% endif %}
+            {% else %}
+                {% if currentState.config.primaryToggle and desiredState.config.primaryToggle == false %}
+                    {{ stage('Alter Table - Drop Primary Key Constraint') }}
+                    ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                    DROP PRIMARY KEY
+                    {% set nsNodeVariables.metadataChanges = true %}
+                {% endif %}
+            {% endif %}
+
+            {% set alterOptions = "" %}
+            {% if desiredState.config.partitionByToggle %}
+                {# Alter Partition Filter - not used as of now #}
+                {% if desiredState.config.partitionFilterToggle %}
+                    {% if desiredState.config.partitionFilterToggle != currentState.config.partitionFilterToggle %}
+                        {% set alterOptions = 'require_partition_filter = TRUE' %}
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                {% if currentState.config.partitionFilterToggle %}
+                    {% set alterOptions = 'require_partition_filter = FALSE' %}
+                {% endif %}
+            {% endif %}
+
+            {# Alter Partition Expiration #}
+            {% if desiredState.config.partitionByToggle and desiredState.config.partitionBy != 'Integer Range' %}
+                {% if desiredState.config.partExpireDays | trim | length > 0 %}
+                    {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
+                        {% set alterOptions = alterOptions
+                                                ~ (", " if alterOptions)
+                                                ~ 'partition_expiration_days = ' +  desiredState.config.partExpireDays | trim %}
+                    {% endif %}
+                {% else %}
+                    {% if currentState.config.partExpireDays | trim | length > 0 %}
+                        {% set alterOptions = alterOptions
+                                                ~ (", " if alterOptions)
+                                                ~ 'partition_expiration_days = NULL' %}
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+
+            {# Change Table Description #}
+            {% if currentState.node.description != desiredState.node.description %}
+                {% set alterOptions = alterOptions
+                                        ~ (", " if alterOptions)
+                                        ~ "description = '" + (desiredState.node.description | escape) + "'" %}
+            {% endif %}
+
+            {# Change Default Rounding Mode #}
+            {% if currentState.config.defRndMode != desiredState.config.defRndMode %}
+                {% set alterOptions = alterOptions
+                                        ~ (", " if alterOptions)
+                                        ~ "default_rounding_mode = "
+                                        ~ ("NULL" if desiredState.config.defRndMode == '' else desiredState.config.defRndMode) %}
+            {% endif %}
+
+            {# Alter Table Expiration #}
+            {% if (currentState.config.tabExpirationToggle == desiredState.config.tabExpirationToggle == true
+                    and (currentState.config.exprnType != desiredState.config.exprnType
+                    or desiredState.config.tabExprnExpression | trim != currentState.config.tabExprnExpression | trim))
+                    or (desiredState.config.tabExpirationToggle and currentState.config.tabExpirationToggle != desiredState.config.tabExpirationToggle) %}
+
+                {% set alterOptions = alterOptions
+                                        ~ (", " if alterOptions)
+                                        ~ 'expiration_timestamp = ' + nsConfigVariables.tabEprnClause %}
+            {% else %}
+                {% if currentState.config.tabExpirationToggle and desiredState.config.tabExpirationToggle == false %}
+                    {% set alterOptions = alterOptions
+                                            ~ (", " if alterOptions)
+                                            ~ 'expiration_timestamp = NULL' %}
+                {% endif %}
+            {% endif %}
+
+            {% if alterOptions | trim | length > 0 %}
+                {{ stage('Alter Table - Change Options Attributes') }}
+                ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                SET OPTIONS ( {{ alterOptions }} )
+                {% set nsNodeVariables.metadataChanges = true %}
+            {% endif %}
+
+            {# Rename/Attributes Change/Drop Columns #}
+            {% set ns = namespace(dropColCount=0, renameColCount=0, attributeColCount=0) %}
+            {% for curCol in currentState.columns %}
+
+                {% if curCol.id in desiredState.columns | map(attribute="id") %}
+                    
+                    {% set desiredColumnName = desiredState.columns | selectattr('id', 'equalto', curCol.id) | map(attribute='name') | first %}
+                    {% set desiredDatatype = desiredState.columns | selectattr('id', "equalto", curCol.id) | map(attribute='dataType') | first %}
+                    {% set desiredNullable = desiredState.columns | selectattr('id', "equalto", curCol.id) | map(attribute='nullable') | first %}
+                    {% set desiredDefaultValue = desiredState.columns | selectattr('id', "equalto", curCol.id) | map(attribute='defaultValue') | first %}
+                    {% set desiredDescription = desiredState.columns | selectattr('id', "equalto", curCol.id) | map(attribute='description') | first %}
+
+                    {# Rename Column #}
+                    {% if curCol.name != desiredColumnName %}
+                        {% set ns.renameColCount = ns.renameColCount + 1 %}
+                        {% set nsNodeVariables.metadataChanges = true %}
+                        {% if ns.renameColCount == 1 %}
+                            {{ stage('Alter Table - Rename Column/s') }}
+                            ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                        {% else %}
+                            , 
+                        {% endif %}
+                        RENAME COLUMN {{ curCol.name }} TO {{ desiredColumnName }}
+                    {% endif %}
+
+                    {# Column Attribute Changes #}
+                    {% set datatypeTest = curCol.dataType == desiredDatatype %}
+                    {% set nullableTest = curCol.nullable == desiredNullable %}
+                    {% set defaultValueTest = curCol.defaultValue == desiredDefaultValue %}
+                    {% set descriptionTest = curCol.description == desiredDescription %}
+
+                    {% if datatypeTest == false 
+                        or (nullableTest == false and desiredNullable)
+                        or defaultValueTest == false
+                        or descriptionTest == false %}
+
+                        {% set ns.attributeColCount = ns.attributeColCount + 1 %}
+                        {% set nsNodeVariables.metadataChanges = true %}
+
+                        {% if ns.attributeColCount == 1 %}
+                            {{ stage('Alter Table - Change Column Attributes') }}
+                            ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                        {% endif %}
+
+                        {% if datatypeTest == false %}
+                            {% if ns.attributeColCount > 1 %} , {% endif %}
+                            ALTER COLUMN `{{ desiredColumnName }}`
+                            SET DATA TYPE {{ desiredDatatype }}
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}                            
+                        {% endif %}
+
+                        {% if nullableTest == false %}
+                            {% if ns.attributeColCount > 1 %} , {% endif %}
+                            ALTER COLUMN `{{ desiredColumnName }}`
+                            DROP NOT NULL
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}
+                        {% endif %}
+
+                        {% if descriptionTest == false %}
+                            {% if ns.attributeColCount > 1 %} , {% endif %}
+                            ALTER COLUMN `{{ desiredColumnName }}`
+                            SET OPTIONS (description = '{{ desiredDescription | escape }}')
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}  
+                        {% endif %}
+
+                        {% if defaultValueTest == false %}
+                            {% if ns.attributeColCount > 1 %} , {% endif %}
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}  
+                            ALTER COLUMN `{{ desiredColumnName }}`
+                            {% if desiredDefaultValue == '' %}
+                                DROP DEFAULT
+                            {% else %}
+                                SET DEFAULT {{ desiredDefaultValue }}
+                            {% endif %}
+                        {% endif %}
+        
+                    {% endif %}
+                {% endif %}
+
+                {# Drop Column #}
+                {% if curCol.id not in desiredState.columns | map(attribute="id") %}
+                    {% set ns.dropColCount = ns.dropColCount + 1 %}
+                    {% set nsNodeVariables.metadataChanges = true %}
+                    {% if ns.dropColCount == 1 %}
+                        {{ stage('Alter Table - Drop Column/s') }}
+                        ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                    {% else %}
+                        , 
+                    {% endif %}
+                    DROP COLUMN {{ curCol.name }}
+                {% endif %}
+            {% endfor %}
+
+            {# Add Columns #}
+            {% set ns = namespace(addCount=0) %}
+            {% for addDesCol in desiredState.columns %}
+                {% if addDesCol.id not in currentState.columns | map(attribute="id") %}
+
+                    {% set ns.addCount = ns.addCount + 1 %}
+                    {% set nsNodeVariables.metadataChanges = true %}
+                    {% if ns.addCount == 1 %}
+                        {{ stage('Alter Table - Add Columns') }}
+                        ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+                    {% else %}
+                        ,
+                    {% endif %}
+                    ADD COLUMN `{{ addDesCol.name }}` {{ addDesCol.dataType }}
+                        {%- if addDesCol.defaultValue | length > 0 %} DEFAULT {{ addDesCol.defaultValue }} {% endif %}
+                        {% if not addDesCol.nullable %} NOT NULL {% endif %}
+                        {%- if addDesCol.description | length > 0 %} OPTIONS(description='{{ addDesCol.description | escape }}') {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {# Other Metadata Changes #}
+            {% if nsNodeVariables.metadataChanges == false %}
+                {% set nsMetaVariables = namespace(joinTest = true) %}
+                {% set nsMetaVariables.joinTest = currentState.sources | count == desiredState.sources | count %}
+                {% if nsMetaVariables.joinTest %}
+                    {% for src in desiredState.sources %}
+                        {% set matchingSource = currentState.sources | selectattr('name', 'equalto', src.name) | first %}
+                        {% if matchingSource %}
+
+                            {# Join comparison #}
+                            {% set desiredStateSources = src.join | replace("{{", '"{{"') | replace("}}", '"}}"') | replace('/*', '/ *') | replace('*/', '* /') %}
+                            {% set currentStateSources = matchingSource.join | replace("{{", '"{{"') | replace("}}", '"}}"') | replace('/*', '/ *') | replace('*/', '* /') %}
+
+                            {% set nsMetaVariables.joinTest = desiredStateSources == currentStateSources %}
+                            {% if nsMetaVariables.joinTest == false %}
+                                {{ stage('Metadata Updates - Join') }}
+                                /* "desiredState"  : {{ desiredStateSources }},
+                                   "currentState"  : {{ currentStateSources }} */
+                                select 1=0
+                            {% endif %}
+
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {# Source count mismatch — compare source names instead #}
+                    {% set desiredStateSources = desiredState.sources | map(attribute='name') | list | sort %}
+                    {% set currentStateSources = currentState.sources | map(attribute='name') | list | sort %}
+
+                    {% set nsMetaVariables.joinTest = desiredStateSources == currentStateSources %}
+
+                    {% if nsMetaVariables.joinTest == false %}
+                        {{ stage('Metadata Updates - Join') }}
+                        /* "is": {{ desiredStateSources }} , "was": {{ currentStateSources }} */
+                        select 1=0
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+
+        {# Create table incase of new deployment or unsupported alter changes in existing table #}
+        {% elif currentState == undefined or nsConfigVariables.createTable %}
+
+            {# Build table options - description #}
+            {% if desiredState.node.description | length > 0 %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "description = '" + desiredState.node.description | escape + "'" %}
+            {% endif %}
+
+           {# Build table options - expiration_timestamp #}
+            {% if desiredState.config.tabExpirationToggle %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "expiration_timestamp=" + nsConfigVariables.tabEprnClause %}
+            {% endif %}
+
+            {# Build table options - require_partition_filter #}
+            {% if desiredState.config.partitionByToggle and desiredState.config.partitionFilterToggle %}
+               {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "require_partition_filter=true" %}
+            {% endif %}
+
+            {# Build table options - partition_expiration_days #}
+            {% if desiredState.config.partitionByToggle and desiredState.config.partitionBy != 'Integer Range' and desiredState.config.partExpireDays | trim | length > 0 %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ "partition_expiration_days=" + desiredState.config.partExpireDays | trim %}
+            {% endif %}
+
+            {# Build table options - Default Rounding Mode #}
+            {% if desiredState.config.defRndMode != '' %}
+                {% set nsConfigVariables.options = nsConfigVariables.options
+                                                    ~ (", " if nsConfigVariables.options)
+                                                    ~ 'default_rounding_mode = ' + desiredState.config.defRndMode %}
+            {% endif %}
+
+            {# Drop current table before creating #}
+            {% if nsConfigVariables.createTable %}
+                {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
+                DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
+            {% endif %}
+
+            {# Create table with all the config/mapping options #}
+            {{ stage('Create Fact Table', true, "sql", "create")}}
+            CREATE OR REPLACE TABLE {{ nsNodeVariables.desObjectNameFullPath }}
+            (
+                {% for col in columns %}
+                    `{{ col.name }}` {{ col.dataType }}
+                    {%- if col.defaultValue | length > 0 %} DEFAULT {{ col.defaultValue }} {%endif%}
+                    {% if not col.nullable %} NOT NULL {% endif%}
+                    {%- if col.description | length > 0 %} OPTIONS(description='{{ col.description | escape }}') {% endif %}
+                    {%- if not loop.last -%}, {% endif %}
+                {% endfor %}
+
+                {% if desiredState.config.primaryToggle %} 
+                    , PRIMARY KEY ( {{ nsConfigVariables.primaryKey}} ) NOT ENFORCED
+                {% endif %}
+            )
+                {% if desiredState.config.partitionByToggle %}
+                    PARTITION BY {{ nsConfigVariables.partitionBy }}
+                {% endif %}
+                {% if desiredState.config.clusterKeyToggle %}
+                    CLUSTER BY  {{ nsConfigVariables.clusterBy }} 
+                {% endif %}
+                {% if nsConfigVariables.options | trim != "" %}
+                    OPTIONS ( {{ nsConfigVariables.options }} )
+                {% endif %}
+            
+        {% endif %}
+    {% endif %}
+
+{% elif currentState != undefined and desiredState == undefined %}
+
+    {# Drop the table/view in undeployment #}
+    {{ stage('Drop Current ' + currentState.node.materializationType ) }}
+    DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
+
+{% endif %}

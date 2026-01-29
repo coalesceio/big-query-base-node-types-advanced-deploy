@@ -1,0 +1,267 @@
+fileVersion: 1
+id: "1"
+macroString: |-
+  {#=========================================================
+    Initialize variables for node types that use the 
+    advanced deployment strategy
+  =========================================================== #}
+  {% if desiredState %}
+      {% set columns = desiredState.columns %}
+      {% set storageLocations = desiredState.storageLocations %}
+      {% set config = desiredState.config %}
+      {% set sources = desiredState.sources %}
+      {% set node = desiredState.node %}
+      {% set parameters = desiredState.parameters %}
+  {% endif %}
+
+  {#=========================================================
+    Initialize variables for node types that use the 
+    advanced deployment strategy
+  ===========================================================#}
+  {% macro initializeNodeVariables(nsNodeVariables) %}
+
+    {% if currentState is defined %}
+      {% set currentProject = currentState.storageLocations 
+                                | selectattr('name', 'equalto', currentState.node.location.name)
+                                | map(attribute='database')
+                                | first %}
+      {% set currentDataset = currentState.storageLocations
+                              | selectattr('name', 'equalto', currentState.node.location.name)
+                              | map(attribute='schema')
+                              | first %}
+      {% set nsNodeVariables.currentProjectDataset = currentProject + '.' + currentDataset %}
+
+      {% set nsNodeVariables.curObjectNameFullPath = ref_no_link(currentState.node.location.name, currentState.node.name) %}
+
+    {% endif %}
+
+    {% if desiredState is defined %}
+      {% set desiredProject = desiredState.storageLocations
+                                | selectattr('name', 'equalto', desiredState.node.location.name)
+                                | map(attribute='database')
+                                | first %}
+      {% set desiredDataset = desiredState.storageLocations
+                                | selectattr('name', 'equalto', desiredState.node.location.name)
+                                | map(attribute='schema')
+                                | first %}
+      {% set nsNodeVariables.desiredProjectDataset = desiredProject + '.' + desiredDataset %}
+
+      {% set nsNodeVariables.desObjectNameFullPath = ref_no_link(desiredState.node.location.name, desiredState.node.name) %}
+
+    {% endif %}
+
+  {% endmacro %}
+
+  {# =======================================================================================
+    Purpose: Generates the correct PARTITION BY expression based on the user’s configuration.
+    Supports ingestion time, integer range, and time-unit column partitioning, 
+    and falls back to defaults when no custom expression is provided.
+    Input Parameters : None
+    Returns          : String representing the PARTITION BY clause
+  ========================================================================================= #}
+  {% macro getPartitionBy() %}
+
+    {%- set varPartitionBy = "" -%}
+
+    {% if config.partitionByToggle %}
+        {% if config.partitionBy == 'Ingestion Time' %}
+          {% if config.partByIngnTimeExpression != "" %}
+            {%- set varPartitionBy = config.partByIngnTimeExpression -%}
+          {% else %}
+              {%- set varPartitionBy = "_PARTITIONDATE" -%}
+          {% endif %}
+
+        {% elif config.partitionBy == 'Integer Range' %}
+          {%- set varPartitionBy = config.partByIntSqlExpression|trim -%}
+
+        {% elif config.partitionBy == 'Time-Unit Column' %}
+          {% if config.partByTimeSqlExpression|trim|length > 0 %}
+            {%- set varPartitionBy = config.partByTimeSqlExpression|trim -%}
+          {% else %}
+            {%- set varPartitionBy = config.partByColumn.name -%}
+          {% endif %}
+        {% endif %}
+    {% endif %}
+
+    {{ varPartitionBy }}
+
+  {% endmacro %}
+
+  {# ===================================================================================
+    Purpose: Builds the CLUSTER BY clause from the selected clustering columns.
+    Uses up to four columns from the config and returns them as a comma-separated list.
+    Input Parameters : None
+    Returns          : String representing the CLUSTER BY clause
+  ====================================================================================== #}
+  {% macro getClusterBy() %}
+
+    {# Create namespaces #}
+    {% set varClusterBy = "" %}
+
+    {% if config.clusterKeyToggle and config.clusterKeyConfig is defined %}
+          {%- set varClusterBy = config.clusterKeyConfig.get('items', [])[:4]
+                                          | selectattr('clustColumn', 'defined')
+                                          | map(attribute='clustColumn')
+                                          | selectattr('name', 'defined')
+                                          | map(attribute='name')
+                                          | list | join(', ') -%}
+    {% endif %}
+
+    {{- varClusterBy -}}
+  {% endmacro %}
+
+  {# ==================================================================================
+    Purpose: Returns the list of selected primary key columns as a comma-separated 
+    string, using values from the primary key configuration safely
+    Input Parameters : None
+    Returns          : String representing the PRIMARY KEY clause
+  ===================================================================================== #}
+  {% macro getPrimaryKey() %}
+
+    {# Create namespaces #}
+    {% set varPrimaryKey = "" %}
+
+    {% if config.primaryToggle %}
+        {# Extract column names safely #}
+        {% set varPrimaryKey = config.primaryKeyConfig.get('items', [])
+                                        | map(attribute='primaryKeyColumn')
+                                        | map(attribute='name')
+                                        | list | join(', ') %}
+    {% endif %}
+
+    {{ varPrimaryKey }}
+  {% endmacro %}
+
+  {# ========================================================================
+    Purpose: Builds the table expiration expression based on the selected type. 
+    Supports exact date or datetime values and day-based offsets, 
+    converting inputs into a valid TIMESTAMP
+    Input Parameters : None
+    Returns          : String representing the Table Expiration clause
+  ========================================================================= #}
+  {% macro getTabExpirationClause() %}
+
+    {# Create namespaces #}
+    {% set varTabExprn = "" %}
+
+    {% if config.tabExpirationToggle and config.exprnType != '' %}
+      {% if config.exprnType == 'EXACT DATE/DATETIME' and config.tabExprnExpression|trim|length > 0 %}
+        {% if config.tabExprnExpression|trim|length > 11 %}
+          {% set varTabExprn = 'TIMESTAMP "' + config.tabExprnExpression|trim + '"' %}
+        {% else %}
+          {% set varTabExprn = 'TIMESTAMP "' + config.tabExprnExpression|trim + ' 23:59:59"' %}
+        {% endif %}
+      {% elif config.exprnType == 'DAYS FROM NOW'and config.tabExprnExpression|trim|length > 0 %}
+        {% set varTabExprn = 'TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL ' +  config.tabExprnExpression|trim + ' DAY)' %}
+      {% endif %}
+    {% endif %}
+
+    {{ varTabExprn }}
+
+  {% endmacro %}
+
+  {# =======================================================================================
+    Purpose: Returns the default rounding mode. Uses the user-selected value if provided;
+    otherwise falls back to ROUND_HALF_AWAY_FROM_ZERO
+    Input Parameters : None
+    Returns          : String representing the Default Rounding Mode
+  ========================================================================================== #}
+  {% macro getDefaultRoundingMode() %}
+
+    {# Create namespaces #}
+    {% set varDefRndMd = namespace(elements = "") %}
+
+    {% if config.defRndMode == '' %}
+      {% set varDefRnd = 'ROUND_HALF_AWAY_FROM_ZERO' %}
+    {% else %}
+      {% set varDefRndMd = config.defRndMode %}
+    {% endif %}
+
+    {{ varDefRndMd }}
+
+  {% endmacro %}
+
+  {###########################################################################################
+  Purpose:
+  Determines the correct BigQuery DROP object syntax based on the materialization type.
+
+  Input:
+  - materialization (string): The BigQuery object type to be dropped
+    (e.g., table, view, materialized view, external table, snapshot, clone).
+
+  Returns:
+  - string: The appropriate DROP object keyword with IF EXISTS
+    (e.g., 'TABLE IF EXISTS', 'VIEW IF EXISTS', 'MATERIALIZED VIEW IF EXISTS').
+  #############################################################################################}
+  {% macro dropMaterialization(materialization) %}
+
+      {% if materialization in ['table', 'clone'] %}
+          TABLE IF EXISTS
+
+      {% elif materialization == 'snapshot' %}
+          SNAPSHOT TABLE IF EXISTS
+
+      {% elif materialization in ['view', 'authorized view'] %}
+          VIEW IF EXISTS
+
+      {% elif materialization == 'materialized view' %}
+          MATERIALIZED VIEW IF EXISTS
+
+      {% elif materialization == 'external table' %}
+          EXTERNAL TABLE IF EXISTS
+
+      {% elif materialization == 'temporary table' %}
+          TABLE IF EXISTS   {# temp tables usually don’t need DROP, but kept for symmetry #}
+
+      {% else %}
+          TABLE IF EXISTS   {# safe default for BigQuery #}
+
+      {% endif %}
+
+  {% endmacro %}
+
+  {# ========================================================================
+    Purpose          : Executes data quality tests associated with the node
+                       and its columns, based on the configured run order.
+                       Supports running tests either before or after data
+                       insertion, and respects the test continuation
+                       behavior on failure.
+    Input Parameters : runOrder (String)
+                       - Determines when the tests should be executed.
+                         Expected values: 'Before' or 'After'
+    Returns          : Rendered SQL statements for executing the applicable
+                       node-level and column-level data quality tests.
+                       No output is generated if tests are disabled.
+  ========================================================================= #}
+  {% macro runTests(runOrder) %}
+
+      {% if config.testsEnabled %}
+          {# == To run data quality tests before data insertion == #}
+          {% for test in node.tests %}
+              {% if runOrder == 'Before' %}
+                  {% if test.runOrder == 'Before' %}
+                      {{ test_stage(test.name, test.continueOnFailure) }}
+                      {{ test.templateString }}
+                  {% endif %}
+              {% endif %}
+
+              {% if runOrder == 'After' %}
+                  {% if test.runOrder == 'After' %}
+                      {{ test_stage(test.name, test.continueOnFailure) }}
+                      {{ test.templateString }}
+                  {% endif %}
+              {% endif %}
+          {% endfor %}
+
+          {% if runOrder == 'After' %}
+              {% for column in columns %}
+                  {% for test in column.tests %}
+                      {{ test_stage(column.name + ": " + test.name) }}
+                      {{ test.templateString }}
+                  {% endfor %}
+              {% endfor %}
+          {% endif %}
+      {% endif %}
+  {% endmacro %}
+name: macro
+type: Macro
