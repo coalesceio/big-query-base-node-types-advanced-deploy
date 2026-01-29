@@ -7,7 +7,7 @@ operation:
       items:
         - {}
     clusterKeyToggle: false
-    defRndMode: ""
+    defRndMode: ROUND_HALF_AWAY_FROM_ZERO
     excludeMergeConfig:
       items:
         - excludeColumn: null
