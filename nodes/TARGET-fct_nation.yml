@@ -40,7 +40,7 @@ operation:
     truncateBefore: false
   database: ""
   deployEnabled: true
-  description: This is new table description
+  description: This is latest table description
   isMultisource: false
   locationName: TARGET
   materializationType: table
@@ -53,7 +53,7 @@ operation:
           stepCounter: 759b4071-d084-45c6-abdd-34ed96189d71
         config: {}
         dataType: INT64
-        description: This is old column description
+        description: This is new column description
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
