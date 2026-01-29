@@ -130,7 +130,7 @@ operation:
   name: fct_nation
   overrideSQL: false
   schema: ""
-  sqlType: Fact
+  sqlType: "389"
   type: sql
   version: 1
 type: Node
