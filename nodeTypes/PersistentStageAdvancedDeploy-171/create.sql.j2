@@ -9,10 +9,10 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Description    : This node creates Persistent stage table swith advanced deploy strategy == #}
 
 {% set nsNodeVariables = namespace(currentProjectDataset = "",
-                        desiredProjectDataset = "",
-                        desObjectNameFullPath = "",
-                        curObjectNameFullPath = "",
-                        metadataChanges = false) %}
+                                    desiredProjectDataset = "",
+                                    desObjectNameFullPath = "",
+                                    curObjectNameFullPath = "",
+                                    metadataChanges = false) %}
 {{ initializeNodeVariables(nsNodeVariables) }}
 
 {% if desiredState %}
@@ -72,7 +72,7 @@ does not permit copying or modification for any other purpose.
                     {{ stage('Alter Table - Add Primary Key Constraint') }}
                     ALTER TABLE {{ nsNodeVariables.desObjectNameFullPath }}
                     ADD PRIMARY KEY ( {{ nsConfigVariables.primaryKey}} ) NOT ENFORCED
-                    {% set nsNodeVariables.metadataChanges = true %}    
+                    {% set nsNodeVariables.metadataChanges = true %}
                 {% endif %}
             {% else %}
                 {% if currentState.config.primaryToggle and desiredState.config.primaryToggle == false %}
@@ -89,8 +89,8 @@ does not permit copying or modification for any other purpose.
                 {% if desiredState.config.partitionFilterToggle %}
                     {% if desiredState.config.partitionFilterToggle != currentState.config.partitionFilterToggle %}
                         {% set alterOptions = 'require_partition_filter = TRUE' %}
-                        {% endif %}
                     {% endif %}
+                {% endif %}
             {% else %}
                 {% if currentState.config.partitionFilterToggle %}
                     {% set alterOptions = 'require_partition_filter = FALSE' %}
@@ -99,14 +99,14 @@ does not permit copying or modification for any other purpose.
 
             {# Alter Partition Expiration #}
             {% if desiredState.config.partitionByToggle and desiredState.config.partitionBy != 'Integer Range' %}
-                    {% if desiredState.config.partExpireDays | trim | length > 0 %}
-                        {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
-                            {% set alterOptions = alterOptions
-                                                    ~ (", " if alterOptions)
-                                                    ~ 'partition_expiration_days = ' +  desiredState.config.partExpireDays | trim %}
-                        {% endif %}
-                    {% else %}
-                        {% if currentState.config.partExpireDays | trim | length > 0 %}
+                {% if desiredState.config.partExpireDays | trim | length > 0 %}
+                    {% if desiredState.config.partExpireDays | trim  != currentState.config.partExpireDays | trim %}
+                        {% set alterOptions = alterOptions
+                                                ~ (", " if alterOptions)
+                                                ~ 'partition_expiration_days = ' +  desiredState.config.partExpireDays | trim %}
+                    {% endif %}
+                {% else %}
+                    {% if currentState.config.partExpireDays | trim | length > 0 %}
                         {% set alterOptions = alterOptions
                                                 ~ (", " if alterOptions)
                                                 ~ 'partition_expiration_days = NULL' %}
@@ -206,8 +206,8 @@ does not permit copying or modification for any other purpose.
 
                         {% if nullableTest == false %}
                             {% if ns.attributeColCount > 1 %} , {% endif %}
-                                ALTER COLUMN `{{ desiredColumnName }}`
-                                DROP NOT NULL
+                            ALTER COLUMN `{{ desiredColumnName }}`
+                            DROP NOT NULL
                             {% set ns.attributeColCount = ns.attributeColCount + 1 %}
                         {% endif %}
 
@@ -259,16 +259,13 @@ does not permit copying or modification for any other purpose.
                     {% else %}
                         ,
                     {% endif %}
-                        ADD COLUMN `{{ addDesCol.name }}` {{ addDesCol.dataType }}
+                    ADD COLUMN `{{ addDesCol.name }}` {{ addDesCol.dataType }}
                         {%- if addDesCol.defaultValue | length > 0 %} DEFAULT {{ addDesCol.defaultValue }} {% endif %}
                         {% if not addDesCol.nullable %} NOT NULL {% endif %}
-                        {%- if addDesCol.description | length > 0 %}
-                            OPTIONS (description='{{ addDesCol.description | escape }}')
-                        {%- endif %}
+                        {%- if addDesCol.description | length > 0 %} OPTIONS(description='{{ addDesCol.description | escape }}') {% endif %}
 
                 {% endif %}
             {% endfor %}
-
 
             {# Other Metadata Changes #}
             {% if nsNodeVariables.metadataChanges == false %}
@@ -302,7 +299,7 @@ does not permit copying or modification for any other purpose.
 
                     {% if nsMetaVariables.joinTest == false %}
                         {{ stage('Metadata Updates - Join') }}
-                        /* "is": {{ desiredStateSources }} , "was": {{ currentStateSources }} */
+                        /* "desiredState": {{ desiredStateSources }} , "currentState": {{ currentStateSources }} */
                         select 1=0
                     {% endif %}
                 {% endif %}
@@ -345,9 +342,9 @@ does not permit copying or modification for any other purpose.
                                                     ~ (", " if nsConfigVariables.options)
                                                     ~ 'default_rounding_mode = ' + desiredState.config.defRndMode %}
             {% endif %}
-		
-                {# Drop current table before creating #}
-                {% if nsConfigVariables.createTable %}
+
+            {# Drop current table before creating #}
+            {% if nsConfigVariables.createTable %}
                 {{ stage('Drop Current ' + currentState.node.materializationType + ' - ' + currentState.node.name, true, "sql", "drop") }}
                 DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
             {% endif %}

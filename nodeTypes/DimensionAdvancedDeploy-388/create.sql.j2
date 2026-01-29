@@ -99,8 +99,8 @@ does not permit copying or modification for any other purpose.
                 or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', [])) %}
             {% set nsConfigVariables.createTable = true %}
             {% set nsNodeVariables.metadataChanges = true %}
-        {% endif %}        
-    
+        {% endif %}
+
         {# Alter table incase of any changes in states and alter is allowed #}
         {% if currentState != undefined and currentState != desiredState and nsConfigVariables.createTable == false %}
 
@@ -111,7 +111,7 @@ does not permit copying or modification for any other purpose.
                 ALTER TABLE  {{nsNodeVariables.currentProjectDataset}}.{{currentState.node.name}}
                 RENAME TO  {{ desiredState.node.name }}
                 {% set nsNodeVariables.metadataChanges = true %}
-        
+
             {% endif %}
 
             {# Alter Primary Key #}
@@ -260,7 +260,7 @@ does not permit copying or modification for any other purpose.
                             {% if ns.attributeColCount > 1 %} , {% endif %}
                             ALTER COLUMN `{{ desiredColumnName }}`
                             SET DATA TYPE {{ desiredDatatype }}
-                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}                            
+                            {% set ns.attributeColCount = ns.attributeColCount + 1 %}
                         {% endif %}
 
                         {% if nullableTest == false %}
@@ -322,6 +322,7 @@ does not permit copying or modification for any other purpose.
                         {%- if addDesCol.defaultValue | length > 0 %} DEFAULT {{ addDesCol.defaultValue }} {% endif %}
                         {% if not addDesCol.nullable %} NOT NULL {% endif %}
                         {%- if addDesCol.description | length > 0 %} OPTIONS(description='{{ addDesCol.description | escape }}') {% endif %}
+
                 {% endif %}
             {% endfor %}
 
@@ -342,7 +343,7 @@ does not permit copying or modification for any other purpose.
                             {% if nsMetaVariables.joinTest == false %}
                                 {{ stage('Metadata Updates - Join') }}
                                 /* "desiredState"  : {{ desiredStateSources }},
-                                   "currentState"  : {{ currentStateSources }} */
+                                "currentState"  : {{ currentStateSources }} */
                                 select 1=0
                             {% endif %}
 
@@ -357,7 +358,7 @@ does not permit copying or modification for any other purpose.
 
                     {% if nsMetaVariables.joinTest == false %}
                         {{ stage('Metadata Updates - Join') }}
-                        /* "is": {{ desiredStateSources }} , "was": {{ currentStateSources }} */
+                        /* "desiredState": {{ desiredStateSources }} , "currentState": {{ currentStateSources }} */
                         select 1=0
                     {% endif %}
                 {% endif %}
@@ -373,7 +374,7 @@ does not permit copying or modification for any other purpose.
                                                     ~ "description = '" + desiredState.node.description | escape + "'" %}
             {% endif %}
 
-           {# Build table options - expiration_timestamp #}
+            {# Build table options - expiration_timestamp #}
             {% if desiredState.config.tabExpirationToggle %}
                 {% set nsConfigVariables.options = nsConfigVariables.options
                                                     ~ (", " if nsConfigVariables.options)
@@ -382,7 +383,7 @@ does not permit copying or modification for any other purpose.
 
             {# Build table options - require_partition_filter #}
             {% if desiredState.config.partitionByToggle and desiredState.config.partitionFilterToggle %}
-               {% set nsConfigVariables.options = nsConfigVariables.options
+                {% set nsConfigVariables.options = nsConfigVariables.options
                                                     ~ (", " if nsConfigVariables.options)
                                                     ~ "require_partition_filter=true" %}
             {% endif %}
@@ -422,7 +423,7 @@ does not permit copying or modification for any other purpose.
                     {%- if not loop.last -%}, {% endif %}
                 {% endfor %}
 
-                {% if desiredState.config.primaryToggle %} 
+                {% if desiredState.config.primaryToggle %}
                     , PRIMARY KEY ( {{ nsConfigVariables.primaryKey}} ) NOT ENFORCED
                 {% endif %}
             )

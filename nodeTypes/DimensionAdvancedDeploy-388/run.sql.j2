@@ -8,6 +8,12 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Name           : Dimension Advanced Deploy == #}
 {# == Node Type Description    : This node creates dimension table, view and also override create sql for view with advanced deployment strategy == #}
 
+{%- if config.updateStrategy == 'INSERT/UPDATE' -%}
+    {%- set updateStrategy = 'INSERT/UPDATE' -%}
+{%- else -%}
+    {%- set updateStrategy = 'MERGE' -%}
+{%- endif -%}
+
 {# == Variable check to identify type of dimension == #}
 {% if config.lastModifiedCompToggle and updateStrategy == 'MERGE' %}
     {% set isSCDType2 = config.type2Dimension | default(false) %}
@@ -37,12 +43,6 @@ does not permit copying or modification for any other purpose.
         {{ stage('Truncate Dimension Table') }}
         TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
     {% endif %}
-
-    {%- if config.updateStrategy == 'INSERT/UPDATE' -%}
-		{%- set updateStrategy = 'INSERT/UPDATE' -%}
-	{%- else -%}
-		{%- set updateStrategy = 'MERGE' -%}
-	{%- endif -%}
 
     {% if config.insertZeroKeyToggle %}
         {% if config.insertZeroKeyAdvancedToggle == true %}
