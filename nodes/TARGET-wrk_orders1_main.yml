@@ -5,7 +5,7 @@ operation:
   config:
     clusterKeyConfig:
       items:
-        - {}
+        - clustColumn: null
     clusterKeyToggle: false
     defRndMode: ""
     exprnType: DAYS FROM NOW
@@ -16,14 +16,14 @@ operation:
     partByIntSqlExpression: ""
     partByTimeSqlExpression: ""
     partExpireDays: ""
-    partitionBy: Ingestion Time
+    partitionBy: Time-Unit Column
     partitionByToggle: false
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""
     primaryKeyConfig:
       items:
-        - {}
+        - primaryKeyColumn: null
     primaryToggle: false
     selectDistinct: false
     tabExpirationToggle: false
