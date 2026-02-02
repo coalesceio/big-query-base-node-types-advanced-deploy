@@ -1,0 +1,11 @@
+fileVersion: 1
+id: "691"
+mappingDefinitions:
+  SRC:
+    database: cls-dev-bigquery
+    schema: DE_SRC
+  TARGET:
+    database: cls-dev-bigquery
+    schema: DE_BASE
+name: GBQ_Test_Advanced_DE_BASE
+type: Environment
