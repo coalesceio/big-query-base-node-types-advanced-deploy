@@ -1,4 +1,4 @@
-## BigQuery - Base & Advanced Node Types – Brief Summary
+## BigQuery - Base Node Types Advanced Deploy – Brief Summary
 
 - **Fact nodes**  
   Represent measurable business events such as sales, transactions, or usage. These are the core tables used for reporting, KPIs, and trend analysis.
@@ -17,6 +17,32 @@
 
 **Summary:**  
 Together, these node types ensure data is accurate, reusable, scalable, and aligned with business reporting and decision-making needs.
+
+| Category | Feature                         | Dim | Fact | Factless | Work | PStage |
+|----------|----------------------------------|-----|------|----------|------|--------|
+| Create   | Create As                        | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Create   | Primary Key                      | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Create   | Enable Partitioning              | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Create   | Enable Clustering                | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Create   | Table Expiration                 | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Create   | Default Rounding Mode (Optional) | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Create   | Labels                           | ⬜  | ⬜   | ⬜       | ⬜   | ⬜     |
+| Load     | MultiSource                      | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Load     | Update Strategy                  | ✅  | ⬜   | ⬜       | ⬜   | ⬜     |
+| Load     | Unmatched Record Strategy        | ✅  | ✅   | ⬜       | ⬜   | ⬜     |
+| Load     | Business Key                     | ✅  | ✅   | ⬜       | ⬜   | ✅     |
+| Load     | Last Modified Comparison         | ✅  | ✅   | ⬜       | ⬜   | ✅     |
+| Load     | Change Tracking                  | ✅  | ⬜   | ⬜       | ⬜   | ✅     |
+| Load     | Exclude Columns from Merge       | ✅  | ✅   | ⬜       | ⬜   | ✅     |
+| Load     | Truncate Before                  | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Load     | Distinct                         | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Load     | Group By All                     | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Load     | Insert Zero Key Record           | ✅  | ⬜   | ⬜       | ⬜   | ⬜     |
+| Others   | Enable Tests                     | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Others   | Pre-SQL                          | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Others   | Post-SQL                         | ✅  | ✅   | ✅       | ✅   | ✅     |
+
+---
 
 ## Base Node Types Advanced Deploy
 
