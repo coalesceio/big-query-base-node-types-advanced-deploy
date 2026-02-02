@@ -58,6 +58,343 @@ The Coalesce Base Node Types Package includes:
 
 ---
 
+## Work Advance Deploy
+The Coalesce Work Node is a versatile node that allows you to develop and deploy a Work table/view in Google BigQuery.
+
+A Work node serves as an intermediary object and is commonly employed to store raw data before undergoing the crucial phases of transformation and loading into the main tables of the data warehouse.
+
+This pivotal step ensures that the raw data is processed and structured effectively.
+
+### Work Advance Deploy Node Configuration
+* Node Properties
+* Create Options
+* Load Options
+* Other Options
+
+<img width="476" height="288" alt="image" src="https://github.com/user-attachments/assets/c073d336-35e1-49ca-9700-7041745ffc94" />
+
+#### Work Advanced Deploy Node Properties
+
+| **Setting** | **Description** |
+|----------|-------------|
+| **Storage Location** | Storage Location where the Dimension will be created |
+| **Node Type** | Name of template used to create node objects |
+| **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
+
+#### Work Advanced Deploy Options
+
+You can create the node as:
+
+* [Table](#work-advanced-deploy-create-as-table)
+* [View](#work-advanced-deploy-create-as-view)
+
+#### Work Advanced Deploy Create as Table
+
+##### Work Advanced Deploy Create Options
+
+<img width="466" height="545" alt="image" src="https://github.com/user-attachments/assets/7cdf546b-743d-4b9d-b5a2-ca32343098c8" />
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**. <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
+| **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
+| **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
+| **Integer Range Expression** | **Text Box**: Provide a SQL expression for integer range partitioning. <br/>*Example*: `RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))` |
+| **Ingestion-time Expression** | **Text Box**: (Optional) Provide a custom expression for ingestion-time partitioning. <br/>*Example*: `DATE_TRUNC(_PARTITIONTIME, MONTH)` |
+| **Partition Expiration Days** | **Text Box**: (Optional) Specify the number of days after which a partition should expire and be deleted. <br/>*Example*: `30` |
+| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table. |
+| **Cluster By** | **Tabular Input**: Select up to **4 columns** to cluster the table data. The order of columns determines the sort hierarchy. |
+| **Table Expiration** | **Toggle**: True/False <br/> Enables or disables the automatic expiration of the table. |
+| **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
+| **Expiration Value** | **Text Box**: Enter the value based on the selected Expiration Type. <br/>- For **EXACT DATE/DATETIME**, use format: `YYYY-MM-DD` or `YYYY-MM-DD HH:MM:SS` (e.g., `2024-12-31`). <br/>- For **DAYS FROM NOW**, enter an integer (e.g., `30`). |
+| **Default Rounding Mode** | **Dropdown**: (Optional) Specify the rounding behavior for numeric calculations. <br/>- `ROUND_HALF_AWAY_FROM_ZERO` <br/>- `ROUND_HALF_EVEN` |
+
+##### Work Advanced Deploy Load Options
+
+<img width="431" height="339" alt="image" src="https://github.com/user-attachments/assets/765abfb1-fad3-45aa-9aed-2e30fcf3c81d" />
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Multi Source** | Toggle: True/False<br/>Implementation of SQL UNIONs<br/>**True**: Combine multiple sources using `UNION ALL` or `UNION DISTINCT`. |
+| **Truncate Before** | Toggle: True/False<br/>**True**: Table is truncated before every load.<br/>**False**: Incremental load based on update strategy. |
+| **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
+| **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
+
+##### Work Advanced Deploy Other Options
+
+<img width="457" height="434" alt="image" src="https://github.com/user-attachments/assets/95792ce3-8a4e-4657-a41d-9c3aafdbb7ab" />
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
+| **Pre-SQL / Post-SQL**| SQL to execute before or after the dimension load operation. |
+
+<img width="585" height="550" alt="image" src="https://github.com/user-attachments/assets/35f3290e-52f1-4669-b758-778a1bb65dfe" />
+
+> [!WARNING]
+> **Destructive Change:** Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
+
+> [!WARNING]
+> **Destructive Change:** Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
+
+##### Work Advanced Deploy Create as View
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Override SQL** | Toggle: True/False <br/> Allows providing a custom SQL definition for the view. |
+| **Multi Source** | Toggle: True/False<br/>**True**: Combines multiple sources using `UNION ALL` or `UNION DISTINCT`. |
+| **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
+| **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
+| **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
+
+#### Work Advanced Deploy System Column
+
+This column is automatically added to manage dimension logic:
+
+| **Column** | **Description** |
+|----------|-------------|
+| **{{NODE_NAME}}_key** | The generated Surrogate Key for the work record. |
+
+### Work Advanced Deploy Joins
+
+Join conditions and other clauses can be specified in the join space next to mapping of columns in the UI.
+
+> 📘 **Specify Group by Clauses**
+>
+> Best Practice is to specify group by clauses in this space if you are not opting for the group by all provided in OPTIONS config.
+
+### Work Advanced Deploy Deployment
+
+#### Work Advanced Deploy Initial Deployment
+
+When deployed for the first time into an environment the Work node of materialization type table or view will execute the following stage:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **Create Work Table** | This will execute a CREATE OR REPLACE statement and create a table in the target environment |
+| **Create Work View** | This will execute a CREATE OR REPLACE statement and create a view in the target environment |
+
+#### Work Advanced Deploy Redeployment
+
+Once a Work table is initially deployed, subsequent configuration changes will result in either an in-place **`ALTER`** or a full **`DROP and RECREATE`** of the table, depending on the nature of the update (e.g., destructive changes like partitioning or clustering will trigger a recreation).
+
+#### Altering the Work Tables
+
+The following types of column or table modifications will result in an **`ALTER`** statement to update the table structure in the target environment, whether these changes are made individually or in combination:
+
+*   **Primary Key Updates:** Adding/Updating/Modifying non-enforced primary key constraints.
+*   **Table Metadata:** Rename or updating descriptions.
+*   **Column Structure Changes:** 
+    *   Adding new columns.
+    *   Dropping existing columns.
+    *   Renaming columns.
+*   **Column Attribute Modifications:** Changing descriptions, data types or adjusting nullability constraints (e.g., `NULL` to `NOT NULL`).
+*   **Configuration & Option Changes:**
+    *   Updating **Table Expiration** or **Partition Expiration** settings.
+    *   Adjusting the **Default Rounding Mode**.
+
+The following stages are executed:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **ALTER TABLE** | Alter table statement is executed to perform the alter operation |
+
+#### Recreating the Work Views
+
+The subsequent deployment of Work node of materialization type view with changes in view definition, adding table description or renaming view results in recreating the dimension view.
+
+#### Drop and Recreate Work View/Table
+
+| **Change** | **Stages Executed** |
+|------------|-------------------|
+| **Any materialization to Table** |  1. Drop `materialization`<br/>2. Create Dimension table |
+| **Any materialization to View** |  1. Drop `materialization`<br/>2. Create Dimension view |
+
+### Work Advanced Deploy Undeployment
+
+If a Work Node of materialization type table is deleted from a Workspace, that Workspace is committed to Git and that commit deployed to a higher level environment then the Dimension Table in the target environment will be dropped.
+
+The stage executed:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **Drop table/view** | Removes the table or view from the environment |
+
+-----
+
+## Persistent Stage Advance Deploy
+
+The Coalesce Persistent Stage Nodes element, serving as an intermediary object, is frequently utilized to maintain data persistence across multiple execution cycles.
+
+It plays a crucial role in tracking the historical changes of columns linked to business keys.
+
+This functionality is particularly beneficial when the objective is to retain raw data for prolonged durations.
+
+
+### Persistent Stage Advanced Deploy Node Configuration
+
+The Dimension node type has four configuration groups:
+
+* Node Properties
+* Create Options
+* Load Dimension Options
+* Other Options
+
+<img width="416" height="298" alt="image" src="https://github.com/user-attachments/assets/a61eab12-e8dd-46ef-befc-b5ccbe38d639" />
+
+#### Persistent Stage Advanced Deploy Node Properties
+
+| **Setting** | **Description** |
+|----------|-------------|
+| **Storage Location** | Storage Location where the Dimension will be created |
+| **Node Type** | Name of template used to create node objects |
+| **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
+
+#### Persistent Stage Advanced Deploy Options
+
+You can create the node as:
+
+* [Table](#dimension-advanced-deploy-create-as-table)
+
+#### Persistent Stage Advanced Deploy Create as Table
+
+##### Persistent Stage Advance Deploy Create Options
+<img width="362" height="526" alt="image" src="https://github.com/user-attachments/assets/e52eb6a4-9c77-4157-b8c1-643f82a8d8bf" />
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**. <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
+| **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
+| **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
+| **Integer Range Expression** | **Text Box**: Provide a SQL expression for integer range partitioning. <br/>*Example*: `RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))` |
+| **Ingestion-time Expression** | **Text Box**: (Optional) Provide a custom expression for ingestion-time partitioning. <br/>*Example*: `DATE_TRUNC(_PARTITIONTIME, MONTH)` |
+| **Partition Expiration Days** | **Text Box**: (Optional) Specify the number of days after which a partition should expire and be deleted. <br/>*Example*: `30` |
+| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table. |
+| **Cluster By** | **Tabular Input**: Select up to **4 columns** to cluster the table data. The order of columns determines the sort hierarchy. |
+| **Table Expiration** | **Toggle**: True/False <br/> Enables or disables the automatic expiration of the table. |
+| **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
+| **Expiration Value** | **Text Box**: Enter the value based on the selected Expiration Type. <br/>- For **EXACT DATE/DATETIME**, use format: `YYYY-MM-DD` or `YYYY-MM-DD HH:MM:SS` (e.g., `2024-12-31`). <br/>- For **DAYS FROM NOW**, enter an integer (e.g., `30`). |
+| **Default Rounding Mode** | **Dropdown**: (Optional) Specify the rounding behavior for numeric calculations. <br/>- `ROUND_HALF_AWAY_FROM_ZERO` <br/>- `ROUND_HALF_EVEN` |
+
+##### Persistent Stage Advance Deploy Load Options
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Multi Source** | Toggle: True/False<br/>Implementation of SQL UNIONs<br/>**True**: Combine multiple sources using `UNION ALL` or `UNION DISTINCT`. |
+| **Business key** | Required column for SCD Dimensions.<br/>**Note:** Geometry and Geography data type columns are not supported as business key columns. |
+| **Last Modified Comparison**<br/> | **Toggle**: True/False <br/>- **True**: Enables high-performance Change Data Capture (CDC) by comparing a specific source timestamp or numeric column to identify records that have changed since the last load. <br/>- **False**: Performs standard CDC by comparing data values across all designated Change Tracking columns to detect modifications. |
+| **Treat NULL as Current Timestamp**(For TIMESTAMP Columns) | **Toggle**: True/False <br/>- **True**: Source records with a `NULL` value in the comparison column are assigned the current system timestamp. This ensures that records with missing modification metadata are treated as "new" and are updated in the target table. <br/>- **False**: `NULL` values are handled per standard SQL comparison rules, which may result in these records being ignored during incremental loads. |
+| **Enable SCD Type 2** | Toggle: True/False <br/> **True**: Maintains historical versions of records using system start/end dates and version flags. |
+| **Change Tracking Columns**<br/>(Visible when Last Modified Comparison is OFF) | **Checkbox List**: Provides a list of available target columns to define historical tracking behavior. <br/>- **SCD Type 2 (History):** Any column selected in this list will trigger the creation of a new record version when a change is detected. <br/>- **SCD Type 1 (Overwrite):** Columns that are **not** selected will follow SCD Type 1 logic, meaning changes to these columns will overwrite the existing current record without creating a new version. <br/>- **Default Logic:** If **no columns** are selected, the entire table is treated as **SCD Type 1**. |
+| **Exclude Columns from Merge** | **Toggle**: True/False <br/> Enables the ability to exclude specific columns from the `UPDATE` clause of the **`MERGE INTO`** statement. This is primarily used in **SCD Type 1** scenarios to ensure that certain columns remain unchanged after the initial record creation. <br/> *Note: This option is only available when no Change Tracking columns are selected and Last Modified Comparison is disabled.* |
+| **Exclude Merge List** | **Tabular Input**: A list of columns to be omitted from the update logic. <br/>- **Exclude Column Name**: Select the specific column(s) that should be ignored during the update phase of the merge. These columns will be populated during the initial **INSERT** but never modified during a **MERGE UPDATE**. |
+| **Truncate Before** | Toggle: True/False<br/>**True**: Table is truncated before every load.<br/>**False**: Incremental load based on update strategy. |
+| **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
+| **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
+
+##### Persistent Stage Advance Deploy Other Options
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
+| **Pre-SQL / Post-SQL**| SQL to execute before or after the dimension load operation. |
+
+<img width="585" height="550" alt="image" src="https://github.com/user-attachments/assets/35f3290e-52f1-4669-b758-778a1bb65dfe" />
+
+> [!WARNING]
+> **Destructive Change:** Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
+
+> [!WARNING]
+> **Destructive Change:** Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
+
+
+#### Persistent Stage Advanced Deploy System Columns
+
+These columns are automatically added to manage dimension logic:
+
+| **Column** | **Description** |
+|----------|-------------|
+| **{{NODE_NAME}}_key** | The generated Surrogate Key for the dimension record. |
+| **system_version** | Incremental version number for SCD Type 2 tracking. |
+| **system_current_flag** | Indicates the active record ('Y'/'N'). |
+| **system_start_date** | The timestamp when the record version became active. |
+| **system_end_date** | The timestamp when the record version was superseded (Default: 2999-12-31). |
+| **system_create_date** | Audit timestamp for when the row was first inserted. |
+| **system_update_date** | Audit timestamp for the last modification. |
+
+## BigQuery SCD Implementation Preferences
+
+* **Strategy Selection:** Use the **MERGE** statement for creating Slowly Changing Dimensions (SCD Type 1 or 2).
+* **Performance:** While traditional **INSERT/UPDATE** DML can be used for smaller batches, **MERGE** is recommended for superior execution performance on large datasets.
+* **Optimization:** For tables exceeding **10 million rows**, ensure the table is **partitioned** and **clustered** to minimize the bytes scanned during the MERGE operation.
+
+### Persistent Stage Advanced Deploy Joins
+
+Join conditions and other clauses can be specified in the join space next to mapping of columns in the UI.
+
+> 📘 **Specify Group by Clauses**
+>
+> Best Practice is to specify group by clauses in this space if you are not opting for the group by all provided in OPTIONS config.
+
+### Persistent Stage Advanced Deploy Deployment
+
+When deployed for the first time into an environment the Dimension node of materialization type table or view will execute the following stage:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **Create Persistent Table** | This will execute a CREATE OR REPLACE statement and create a table in the target environment |
+
+
+#### Persistent Stage Advanced Deploy Redeployment
+
+Once a Persistent Stage table is initially deployed, subsequent configuration changes will result in either an in-place **`ALTER`** or a full **`DROP and RECREATE`** of the table, depending on the nature of the update (e.g., destructive changes like partitioning or clustering will trigger a recreation).
+
+#### Altering the Persistent Stage Tables
+
+The following types of column or table modifications will result in an **`ALTER`** statement to update the table structure in the target environment, whether these changes are made individually or in combination:
+
+*   **Primary Key Updates:** Adding/Updating/Modifying non-enforced primary key constraints.
+*   **Table Metadata:** Rename or updating descriptions.
+*   **Column Structure Changes:** 
+    *   Adding new columns.
+    *   Dropping existing columns.
+    *   Renaming columns.
+*   **Column Attribute Modifications:** Changing descriptions, data types or adjusting nullability constraints (e.g., `NULL` to `NOT NULL`).
+*   **Configuration & Option Changes:**
+    *   Updating **Table Expiration** or **Partition Expiration** settings.
+    *   Adjusting the **Default Rounding Mode**.
+
+The following stages are executed:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **ALTER TABLE** | Alter table statement is executed to perform the alter operation |
+
+
+#### Drop and Recreate Persistent Stage Table
+
+| **Change** | **Stages Executed** |
+|------------|-------------------|
+| **Any materialization to Table** |  1. Drop `materialization`<br/>2. Create Persistent table |
+
+
+### Persistent Stage Advanced Deploy Undeployment
+
+If a Persistent Stage Node of materialization type table is deleted from a Workspace, that Workspace is committed to Git and that commit deployed to a higher level environment then the Persistent Table in the target environment will be dropped.
+
+The stage executed:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **Drop table** | Removes the table from the environment |
+
+-----
+
+
 ## Dimension Advanced Deploy
 
 The Coalesce Dimension Advanced Deploy node is designed to manage the lifecycle of dimension tables, supporting both Slowly Changing Dimensions (SCD) Type 1 and Type 2. It provides advanced controls for partitioning, clustering, and automated "Zero Key" (Unknown member) record injection.
@@ -402,3 +739,161 @@ The stage executed:
 | **Stage** | **Description** |
 |-----------|----------------|
 | **Drop table/view** | Removes the table or view from the environment |
+
+
+-----
+
+## Factless Fact Advance Deploy
+
+The Coalesce Fact UDN is a versatile node that allows you to develop and deploy a Fact table in Google BigQuery.
+
+A factless fact table is used to record events or situations that have no measures, and it has the same level of detail as the dimensions.
+
+### Factless Fact Advanced Deploy Node Configuration
+
+The Factless Fact node type has four configuration groups:
+
+* Node Properties
+* Create Options
+* Load Options
+* Other Options
+
+<img width="393" height="286" alt="image" src="https://github.com/user-attachments/assets/9eb7142c-b49c-4563-8103-920b6b83e318" />
+
+#### Factless Fact Advanced Deploy Node Properties
+
+| **Setting** | **Description** |
+|----------|-------------|
+| **Storage Location** | Storage Location where the Fact will be created |
+| **Node Type** | Name of template used to create node objects |
+| **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
+
+#### Factless Fact Advanced Deploy Options
+
+You can create the node as:
+
+* [Table](#fact-advanced-deploy-create-as-table)
+
+#### Factless Fact Advanced Deploy Create as Table
+
+##### Factless Fact Advanced Deploy Create Options
+
+<img width="378" height="537" alt="image" src="https://github.com/user-attachments/assets/1877ebf9-0b52-4a7e-a475-5efa97e039b6" />
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**. <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
+| **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
+| **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
+| **Integer Range Expression** | **Text Box**: Provide a SQL expression for integer range partitioning. <br/>*Example*: `RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))` |
+| **Ingestion-time Expression** | **Text Box**: (Optional) Provide a custom expression for ingestion-time partitioning. <br/>*Example*: `DATE_TRUNC(_PARTITIONTIME, MONTH)` |
+| **Partition Expiration Days** | **Text Box**: (Optional) Specify the number of days after which a partition should expire and be deleted. <br/>*Example*: `30` |
+| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table. |
+| **Cluster By** | **Tabular Input**: Select up to **4 columns** to cluster the table data. The order of columns determines the sort hierarchy. |
+| **Table Expiration** | **Toggle**: True/False <br/> Enables or disables the automatic expiration of the table. |
+| **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
+| **Expiration Value** | **Text Box**: Enter the value based on the selected Expiration Type. <br/>- For **EXACT DATE/DATETIME**, use format: `YYYY-MM-DD` or `YYYY-MM-DD HH:MM:SS` (e.g., `2024-12-31`). <br/>- For **DAYS FROM NOW**, enter an integer (e.g., `30`). |
+| **Default Rounding Mode** | **Dropdown**: (Optional) Specify the rounding behavior for numeric calculations. <br/>- `ROUND_HALF_AWAY_FROM_ZERO` <br/>- `ROUND_HALF_EVEN` |
+
+##### Factless Fact Advanced Deploy Load Options
+
+<img width="379" height="329" alt="image" src="https://github.com/user-attachments/assets/8d962b14-4d8a-4dc3-ada7-e5b79e453cbf" />
+
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Multi Source** | Toggle: True/False<br/>Implementation of SQL UNIONs<br/>**True**: Combine multiple sources using `UNION ALL` or `UNION DISTINCT`. |
+| **Truncate Before** | Toggle: True/False<br/>**True**: Table is truncated before every load.<br/>**False**: Incremental load based on update strategy. |
+| **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
+| **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
+
+##### Factless Fact Advanced Deploy Other Options
+<img width="374" height="433" alt="image" src="https://github.com/user-attachments/assets/990bb1cc-cc7f-47a5-a29c-fde087396c85" />
+
+| **Setting** | **Description** |
+|---------|-------------|
+| **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
+| **Pre-SQL / Post-SQL**| SQL to execute before or after the Fact load operation. |
+
+<img width="585" height="550" alt="image" src="https://github.com/user-attachments/assets/35f3290e-52f1-4669-b758-778a1bb65dfe" />
+
+> [!WARNING]
+> **Destructive Change:** Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
+
+> [!WARNING]
+> **Destructive Change:** Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
+
+#### Factless Fact Advanced Deploy System Columns
+
+These columns are automatically added to manage fact logic:
+
+| **Column** | **Description** |
+|----------|-------------|
+| **system_create_date** | Audit timestamp for when the row was first inserted. |
+| **system_update_date** | Audit timestamp for the last modification. |
+
+## BigQuery SCD Implementation Preferences
+
+* **Optimization:** For tables exceeding **10 million rows**, ensure the table is **partitioned** and **clustered** to minimize the bytes scanned during the MERGE operation.
+
+### Factless Fact Advanced Deploy Joins
+
+Join conditions and other clauses can be specified in the join space next to mapping of columns in the UI.
+
+> 📘 **Specify Group by Clauses**
+>
+> Best Practice is to specify group by clauses in this space if you are not opting for the group by all provided in OPTIONS config.
+
+### Factless Fact Advanced Deploy Deployment
+
+#### Factless Fact Advanced Deploy Initial Deployment
+
+When deployed for the first time into an environment the Fact node of materialization type table or view will execute the following stage:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **Create Fact Table** | This will execute a CREATE OR REPLACE statement and create a table in the target environment |
+
+
+#### Factless Fact Advanced Deploy Redeployment
+
+Once a Factless Fact table is initially deployed, subsequent configuration changes will result in either an in-place **`ALTER`** or a full **`DROP and RECREATE`** of the table, depending on the nature of the update (e.g., destructive changes like partitioning or clustering will trigger a recreation).
+
+#### Altering the Factless Fact Tables
+
+The following types of column or table modifications will result in an **`ALTER`** statement to update the table structure in the target environment, whether these changes are made individually or in combination:
+
+*   **Primary Key Updates:** Adding/Updating/Modifying non-enforced primary key constraints.
+*   **Table Metadata:** Rename or updating descriptions.
+*   **Column Structure Changes:** 
+    *   Adding new columns.
+    *   Dropping existing columns.
+    *   Renaming columns.
+*   **Column Attribute Modifications:** Changing descriptions, data types or adjusting nullability constraints (e.g., `NULL` to `NOT NULL`).
+*   **Configuration & Option Changes:**
+    *   Updating **Table Expiration** or **Partition Expiration** settings.
+    *   Adjusting the **Default Rounding Mode**.
+
+The following stages are executed:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **ALTER TABLE** | Alter table statement is executed to perform the alter operation |
+
+#### Drop and Recreate Factless Fact Table
+
+| **Change** | **Stages Executed** |
+|------------|-------------------|
+| **Any materialization to Table** |  1. Drop `materialization`<br/>2. Create Fact table |
+
+### Factless Fact Advanced Deploy Undeployment
+
+If a Fact Node of materialization type table is deleted from a Workspace, that Workspace is committed to Git and that commit deployed to a higher level environment then the Fact Table in the target environment will be dropped.
+
+The stage executed:
+
+| **Stage** | **Description** |
+|-----------|----------------|
+| **Drop table** | Removes the table from the environment |
