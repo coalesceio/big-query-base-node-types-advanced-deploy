@@ -20,7 +20,8 @@ Together, these node types ensure data is accurate, reusable, scalable, and alig
 
 | Category | Feature                         | Dim | Fact | Factless | Work | PStage |
 |----------|----------------------------------|-----|------|----------|------|--------|
-| Create   | Create As                        | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Create   | Create As Table                  | ✅  | ✅   | ✅       | ✅   | ✅     |
+| Create   | Create As View                   | ✅  | ✅   | ⬜       | ✅   | ⬜     |
 | Create   | Primary Key                      | ✅  | ✅   | ✅       | ✅   | ✅     |
 | Create   | Enable Partitioning              | ✅  | ✅   | ✅       | ✅   | ✅     |
 | Create   | Enable Clustering                | ✅  | ✅   | ✅       | ✅   | ✅     |
