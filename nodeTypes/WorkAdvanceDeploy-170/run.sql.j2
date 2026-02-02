@@ -11,60 +11,60 @@ does not permit copying or modification for any other purpose.
 {# == To run data quality tests before data insertion == #}
 {{ runTests('Before') }}
 
-{% if node.materializationType == 'table' %}
+{%- if node.materializationType == 'table' %}
 
     {# == Queries to be excuted before data insertion  == #}
-    {% if config.preSQL %}			
+    {%- if config.preSQL %}			
         {{ stage('Pre-SQL') }}
         {{ config.preSQL }}
-    {% endif %}
+    {%- endif %}
 
     {# == Truncate data before data insertion  == #}
-    {% if config.truncateBefore %}
+    {%- if config.truncateBefore %}
         {{ stage('Truncate Work Table') }}
         TRUNCATE TABLE {{ ref_no_link(node.location.name, node.name) }}
-    {% endif %}
+    {%- endif %}
 
     {{ stage('Load Work Table Using Insert') }}
     INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
     (
-        {% for col in columns if not col.isSurrogateKey %}
+        {%- for col in columns if not col.isSurrogateKey %}
             `{{ col.name }}`
-            {%- if not loop.last -%},{% endif %}
-        {% endfor %}
+            {%- if not loop.last -%},{%- endif %}
+        {%- endfor %}
     )
 
-    {% for source in sources %}
+    {%- for source in sources %}
         (
             SELECT 
-            {% if config.selectDistinct %} DISTINCT	{% endif %}
-            {% for col in source.columns if not col.isSurrogateKey%}
+            {%- if config.selectDistinct %} DISTINCT	{%- endif %}
+            {%- for col in source.columns if not col.isSurrogateKey%}
                 {{ get_source_transform(col) }} AS `{{ col.name }}`
-                {% if not loop.last %}, {% endif %}
-            {% endfor %}
+                {%- if not loop.last %}, {%- endif %}
+            {%- endfor %}
 
             {{ source.join }}
     
-            {% if config.groupByAll %} GROUP BY ALL {% endif %}
+            {%- if config.groupByAll %} GROUP BY ALL {%- endif %}
         )
-        {% if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
+        {%- if config.insertStrategy in ['UNION DISTINCT', 'UNION ALL'] and not loop.last %}
             {{ config.insertStrategy }}
-        {% endif %}
-    {% endfor %}
+        {%- endif %}
+    {%- endfor %}
 
     {# == Queries to be excuted post data insertion  == #}
-    {% if config.postSQL %}			
+    {%- if config.postSQL %}			
         {{ stage('Post-SQL') }}
         {{ config.postSQL }}
-    {% endif %}
+    {%- endif %}
 
-{% else %}
+{%- else %}
 
     {{ stage('Load Skipped for View') }}
     -- The node {{node.name}} is materialized as View. Therefore, a Load operation is not supported.
     SELECT 1 FROM UNNEST([1]) AS INFO_MESSAGE WHERE FALSE
 
-{% endif %}
+{%- endif %}
 
 {# == To run data quality tests after data insertion == #}
 {{ runTests('After') }}

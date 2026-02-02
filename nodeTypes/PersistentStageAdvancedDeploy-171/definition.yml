@@ -116,7 +116,6 @@ metadata:
         default: false
         isRequired: false
 
-
       - type: label
         displayName: ⚠️ Warning - On Redeployment, CLUSTER Changes will Drop and Recreate the Table
         attributeName: labelClustWarning
@@ -147,7 +146,6 @@ metadata:
         default: false
         isRequired: false
 
-
       - displayName: Expiration Type*
         attributeName: exprnType
         default: "DAYS FROM NOW"
@@ -161,12 +159,12 @@ metadata:
       - type: label
         displayName: 'Expiration Value* (💡Ex. 2024-12-31 | 2024-12-31 23:59:59)'
         attributeName: labelTimeExprn
-        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle and config.exprnType == 'EXACT DATE/DATETIME' %} true {% else %} false {% endif %}"
+        enableIf: "{% if config.tabExpirationToggle and config.exprnType == 'EXACT DATE/DATETIME' %} true {% else %} false {% endif %}"
 
       - type: label
         displayName: 'Expiration Value* (💡Ex. 30)'
         attributeName: labelDayExprn
-        enableIf: "{% if node.materializationType != 'view' and config.tabExpirationToggle and config.exprnType == 'DAYS FROM NOW' %} true {% else %} false {% endif %}"
+        enableIf: "{% if config.tabExpirationToggle and config.exprnType == 'DAYS FROM NOW' %} true {% else %} false {% endif %}"
 
       - type: textBox
         displayName: ''
@@ -185,7 +183,7 @@ metadata:
         - "ROUND_HALF_EVEN"
         isRequired: false
         
-    - groupName: Load Options
+    - groupName: Load Persistent Stage Options
 
       items:
 
@@ -201,6 +199,11 @@ metadata:
         isRequired: false
         enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
 
+      - type: label
+        displayName: ℹ️ Business Key → MERGE, No Business Key → INSERT
+        attributeName: labelBK
+        enableIf: "true"
+
       - type: businessKeyColumns
         isRequired: false
 
@@ -211,21 +214,13 @@ metadata:
         enableIf: "{% if columns 
                             | selectattr('isBusinessKey')
                             | list
-                            | length > 0 
-                        and columns 
-                            | selectattr('isChangeTracking')
-                            | list
-                            | length == 0 %} true {% else %} false {% endif %}"
+                            | length > 0 %} true {% else %} false {% endif %}"
         
       - type: columnDropdownSelector
         attributeName: lastModifiedColumn
         displayName: Comparison Source Column* (ℹ️ DataType - TIMESTAMP or NUMERIC)
         default: ''
         enableIf: "{% if config.lastModifiedCompToggle 
-                    and columns 
-                            | selectattr('isChangeTracking')
-                            | list
-                            | length == 0
                     and columns 
                             | selectattr('isBusinessKey')
                             | list
@@ -237,10 +232,6 @@ metadata:
         default: false
         enableIf: "{% if config.lastModifiedCompToggle
                     and ('TIMESTAMP' in config.lastModifiedColumn.dataType | upper)
-                    and columns
-                            | selectattr('isChangeTracking')
-                            | list
-                            | length == 0
                     and columns 
                             | selectattr('isBusinessKey')
                             | list
@@ -251,10 +242,6 @@ metadata:
         displayName: Enable SCD Type2
         default: false
         enableIf: "{% if config.lastModifiedCompToggle
-                        and columns
-                            | selectattr('isChangeTracking')
-                            | list
-                            | length == 0
                         and columns 
                             | selectattr('isBusinessKey')
                             | list
@@ -277,7 +264,7 @@ metadata:
                             | list
                             | length > 0 %} true {% else %} false {% endif %}"
 
-      - displayName: Exclude Columns from Merge (For SCD Type1)
+      - displayName: Exclude Columns from Merge (ℹ️ For SCD Type1)
         attributeName: excludeMergeToggle
         type: toggleButton
         default: false
