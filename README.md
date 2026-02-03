@@ -98,7 +98,7 @@ You can create the node as:
 | **Setting** | **Description** |
 |---------|-------------|
 | **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
@@ -258,7 +258,7 @@ You can create the node as:
 | **Setting** | **Description** |
 |---------|-------------|
 | **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
@@ -426,7 +426,7 @@ You can create the node as:
 | **Setting** | **Description** |
 |---------|-------------|
 | **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
@@ -619,7 +619,7 @@ You can create the node as:
 | **Setting** | **Description** |
 |---------|-------------|
 | **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
@@ -794,7 +794,7 @@ You can create the node as:
 | **Setting** | **Description** |
 |---------|-------------|
 | **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
