@@ -39,6 +39,7 @@ Together, these node types ensure data is accurate, reusable, scalable, and alig
 | Load     | Distinct                         | ✅  | ✅   | ✅       | ✅   | ✅     |
 | Load     | Group By All                     | ✅  | ✅   | ✅       | ✅   | ✅     |
 | Load     | Insert Zero Key Record           | ✅  | ⬜   | ⬜       | ⬜   | ⬜     |
+| Load     | Methods                          | MERGE<br/>INSERT/UPDATE | MERGE<br/>INSERT | MERGE |INSERT | MERGE<br/>INSERT |
 | Others   | Enable Tests                     | ✅  | ✅   | ✅       | ✅   | ✅     |
 | Others   | Pre-SQL                          | ✅  | ✅   | ✅       | ✅   | ✅     |
 | Others   | Post-SQL                         | ✅  | ✅   | ✅       | ✅   | ✅     |
@@ -68,7 +69,7 @@ This pivotal step ensures that the raw data is processed and structured effectiv
 ### Work Advance Deploy Node Configuration
 * Node Properties
 * Create Options
-* Load Options
+* Load Work Options
 * Other Options
 
 <img width="476" height="288" alt="image" src="https://github.com/user-attachments/assets/c073d336-35e1-49ca-9700-7041745ffc94" />
@@ -77,7 +78,7 @@ This pivotal step ensures that the raw data is processed and structured effectiv
 
 | **Setting** | **Description** |
 |----------|-------------|
-| **Storage Location** | Storage Location where the Dimension will be created |
+| **Storage Location** | Storage Location where the work will be created |
 | **Node Type** | Name of template used to create node objects |
 | **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
 
@@ -129,7 +130,7 @@ You can create the node as:
 | **Setting** | **Description** |
 |---------|-------------|
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
-| **Pre-SQL / Post-SQL**| SQL to execute before or after the dimension load operation. |
+| **Pre-SQL / Post-SQL**| SQL to execute before or after the work load operation. |
 
 <img width="585" height="550" alt="image" src="https://github.com/user-attachments/assets/35f3290e-52f1-4669-b758-778a1bb65dfe" />
 
@@ -148,14 +149,6 @@ You can create the node as:
 | **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
 | **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
-
-#### Work Advanced Deploy System Column
-
-This column is automatically added to manage dimension logic:
-
-| **Column** | **Description** |
-|----------|-------------|
-| **{{NODE_NAME}}_key** | The generated Surrogate Key for the work record. |
 
 ### Work Advanced Deploy Joins
 
@@ -203,18 +196,18 @@ The following stages are executed:
 
 #### Recreating the Work Views
 
-The subsequent deployment of Work node of materialization type view with changes in view definition, adding table description or renaming view results in recreating the dimension view.
+The subsequent deployment of Work node of materialization type view with changes in view definition, adding table description or renaming view results in recreating the work view.
 
 #### Drop and Recreate Work View/Table
 
 | **Change** | **Stages Executed** |
 |------------|-------------------|
-| **Any materialization to Table** |  1. Drop `materialization`<br/>2. Create Dimension table |
-| **Any materialization to View** |  1. Drop `materialization`<br/>2. Create Dimension view |
+| **Any materialization to Table** |  1. Drop `materialization`<br/>2. Create Work table |
+| **Any materialization to View** |  1. Drop `materialization`<br/>2. Create Work view |
 
 ### Work Advanced Deploy Undeployment
 
-If a Work Node of materialization type table is deleted from a Workspace, that Workspace is committed to Git and that commit deployed to a higher level environment then the Dimension Table in the target environment will be dropped.
+If a Work Node of materialization type table is deleted from a Workspace, that Workspace is committed to Git and that commit deployed to a higher level environment then the Work Table in the target environment will be dropped.
 
 The stage executed:
 
@@ -232,14 +225,13 @@ It plays a crucial role in tracking the historical changes of columns linked to 
 
 This functionality is particularly beneficial when the objective is to retain raw data for prolonged durations.
 
-
 ### Persistent Stage Advanced Deploy Node Configuration
 
-The Dimension node type has four configuration groups:
+The Persistent Stage node type has four configuration groups:
 
 * Node Properties
 * Create Options
-* Load Dimension Options
+* Load Persistent Stage Options
 * Other Options
 
 <img width="416" height="298" alt="image" src="https://github.com/user-attachments/assets/a61eab12-e8dd-46ef-befc-b5ccbe38d639" />
@@ -248,7 +240,7 @@ The Dimension node type has four configuration groups:
 
 | **Setting** | **Description** |
 |----------|-------------|
-| **Storage Location** | Storage Location where the Dimension will be created |
+| **Storage Location** | Storage Location where the persistent stage will be created |
 | **Node Type** | Name of template used to create node objects |
 | **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
 
@@ -256,7 +248,7 @@ The Dimension node type has four configuration groups:
 
 You can create the node as:
 
-* [Table](#dimension-advanced-deploy-create-as-table)
+* [Table](#persistent-advanced-deploy-create-as-table)
 
 #### Persistent Stage Advanced Deploy Create as Table
 
@@ -301,7 +293,7 @@ You can create the node as:
 | **Setting** | **Description** |
 |---------|-------------|
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
-| **Pre-SQL / Post-SQL**| SQL to execute before or after the dimension load operation. |
+| **Pre-SQL / Post-SQL**| SQL to execute before or after the persistent stage load operation. |
 
 <img width="585" height="550" alt="image" src="https://github.com/user-attachments/assets/35f3290e-52f1-4669-b758-778a1bb65dfe" />
 
@@ -342,7 +334,7 @@ Join conditions and other clauses can be specified in the join space next to map
 
 ### Persistent Stage Advanced Deploy Deployment
 
-When deployed for the first time into an environment the Dimension node of materialization type table or view will execute the following stage:
+When deployed for the first time into an environment the persistent stage node of materialization type table or view will execute the following stage:
 
 | **Stage** | **Description** |
 |-----------|----------------|
@@ -374,13 +366,11 @@ The following stages are executed:
 |-----------|----------------|
 | **ALTER TABLE** | Alter table statement is executed to perform the alter operation |
 
-
 #### Drop and Recreate Persistent Stage Table
 
 | **Change** | **Stages Executed** |
 |------------|-------------------|
 | **Any materialization to Table** |  1. Drop `materialization`<br/>2. Create Persistent table |
-
 
 ### Persistent Stage Advanced Deploy Undeployment
 
@@ -393,7 +383,6 @@ The stage executed:
 | **Drop table** | Removes the table from the environment |
 
 -----
-
 
 ## Dimension Advanced Deploy
 
@@ -428,9 +417,11 @@ You can create the node as:
 * [Table](#dimension-advanced-deploy-create-as-table)
 * [View](#dimension-advanced-deploy-create-as-view)
 
-##### Dimension Advanced Deploy Create as Table
+#### Dimension Advanced Deploy Create as Table
 
 <img width="683" height="518" alt="image" src="https://github.com/user-attachments/assets/1dff2e17-31dd-4023-97f0-9e9047aeb0a3" />
+
+#### Dimension Advanced Deploy Create Options
 
 | **Setting** | **Description** |
 |---------|-------------|
@@ -448,6 +439,11 @@ You can create the node as:
 | **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
 | **Expiration Value** | **Text Box**: Enter the value based on the selected Expiration Type. <br/>- For **EXACT DATE/DATETIME**, use format: `YYYY-MM-DD` or `YYYY-MM-DD HH:MM:SS` (e.g., `2024-12-31`). <br/>- For **DAYS FROM NOW**, enter an integer (e.g., `30`). |
 | **Default Rounding Mode** | **Dropdown**: (Optional) Specify the rounding behavior for numeric calculations. <br/>- `ROUND_HALF_AWAY_FROM_ZERO` <br/>- `ROUND_HALF_EVEN` |
+
+#### Dimension Advanced Deploy Load Options
+
+| **Setting** | **Description** |
+|---------|-------------|
 | **Multi Source** | Toggle: True/False<br/>Implementation of SQL UNIONs<br/>**True**: Combine multiple sources using `UNION ALL` or `UNION DISTINCT`. |
 | **Update Strategy** | Choose the SQL pattern for loading data: <br/>- **MERGE**: Utilizes a single **`MERGE INTO`** statement to synchronize the source and target. <br/>- **INSERT/UPDATE**: Utilizes a multi-step transactional approach (e.g., **`BEGIN TRANSACTION`**...**`COMMIT`**) to execute separate update and insert operations. |
 | **Unmatched Record Strategy** | Options for `NO DELETE`, `SOFT DELETE` (Flagging), or `HARD DELETE` (Physical removal) for records no longer in source. |
@@ -469,6 +465,11 @@ You can create the node as:
 | **Truncate Before** | Toggle: True/False<br/>**True**: Table is truncated before every load.<br/>**False**: Incremental load based on update strategy. |
 | **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
 | **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
+
+#### Dimension Advanced Deploy Other Options
+
+| **Setting** | **Description** |
+|---------|-------------|
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
 | **Pre-SQL / Post-SQL**| SQL to execute before or after the dimension load operation. |
 
@@ -590,7 +591,6 @@ The Fact node type has four configuration groups:
 * Node Properties
 * Create Options
 * Load Fact Options
-* Zero Key Record Options
 * Other Options
 
   <img width="706" height="274" alt="image" src="https://github.com/user-attachments/assets/bedc2d2c-5193-47b2-a99b-76f0ae308cac" />
@@ -610,9 +610,11 @@ You can create the node as:
 * [Table](#fact-advanced-deploy-create-as-table)
 * [View](#fact-advanced-deploy-create-as-view)
 
-##### Fact Advanced Deploy Create as Table
+#### Fact Advanced Deploy Create as Table
 
 <img width="689" height="637" alt="image" src="https://github.com/user-attachments/assets/4aac2a97-ef31-48b7-8480-5cd41ba7d33c" />
+
+#### Fact Advanced Deploy Create Options
 
 | **Setting** | **Description** |
 |---------|-------------|
@@ -630,6 +632,11 @@ You can create the node as:
 | **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
 | **Expiration Value** | **Text Box**: Enter the value based on the selected Expiration Type. <br/>- For **EXACT DATE/DATETIME**, use format: `YYYY-MM-DD` or `YYYY-MM-DD HH:MM:SS` (e.g., `2024-12-31`). <br/>- For **DAYS FROM NOW**, enter an integer (e.g., `30`). |
 | **Default Rounding Mode** | **Dropdown**: (Optional) Specify the rounding behavior for numeric calculations. <br/>- `ROUND_HALF_AWAY_FROM_ZERO` <br/>- `ROUND_HALF_EVEN` |
+
+#### Fact Advanced Deploy Load Options
+
+| **Setting** | **Description** |
+|---------|-------------|
 | **Multi Source** | Toggle: True/False<br/>Implementation of SQL UNIONs<br/>**True**: Combine multiple sources using `UNION ALL` or `UNION DISTINCT`. |
 | **Unmatched Record Strategy** | Options for `NO DELETE` or `HARD DELETE` (Physical removal) for records no longer in source. <br/>*Available only when atleast one Business Key is chosen*|
 | **Business key** | Required column for SCD Fact.<br/>**Note:** Geometry and Geography data type columns are not supported as business key columns. |
@@ -641,6 +648,11 @@ You can create the node as:
 | **Truncate Before** | Toggle: True/False<br/>**True**: Table is truncated before every load.<br/>**False**: Incremental load based on update strategy. |
 | **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
 | **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
+
+#### Fact Advanced Deploy Other Options
+
+| **Setting** | **Description** |
+|---------|-------------|
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
 | **Pre-SQL / Post-SQL**| SQL to execute before or after the Fact load operation. |
 
@@ -740,14 +752,13 @@ The stage executed:
 |-----------|----------------|
 | **Drop table/view** | Removes the table or view from the environment |
 
-
 -----
 
 ## Factless Fact Advance Deploy
 
 The Coalesce Fact UDN is a versatile node that allows you to develop and deploy a Fact table in Google BigQuery.
 
-A factless fact table is used to record events or situations that have no measures, and it has the same level of detail as the dimensions.
+A factless fact table is used to record events or situations that have no measures.
 
 ### Factless Fact Advanced Deploy Node Configuration
 
@@ -755,7 +766,7 @@ The Factless Fact node type has four configuration groups:
 
 * Node Properties
 * Create Options
-* Load Options
+* Load Fact Options
 * Other Options
 
 <img width="393" height="286" alt="image" src="https://github.com/user-attachments/assets/9eb7142c-b49c-4563-8103-920b6b83e318" />
@@ -800,7 +811,6 @@ You can create the node as:
 ##### Factless Fact Advanced Deploy Load Options
 
 <img width="379" height="329" alt="image" src="https://github.com/user-attachments/assets/8d962b14-4d8a-4dc3-ada7-e5b79e453cbf" />
-
 
 | **Setting** | **Description** |
 |---------|-------------|
