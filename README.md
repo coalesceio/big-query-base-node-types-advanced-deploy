@@ -97,15 +97,15 @@ You can create the node as:
 
 | **Setting** | **Description** |
 |---------|-------------|
-| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**. <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
 | **Integer Range Expression** | **Text Box**: Provide a SQL expression for integer range partitioning. <br/>*Example*: `RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))` |
 | **Ingestion-time Expression** | **Text Box**: (Optional) Provide a custom expression for ingestion-time partitioning. <br/>*Example*: `DATE_TRUNC(_PARTITIONTIME, MONTH)` |
 | **Partition Expiration Days** | **Text Box**: (Optional) Specify the number of days after which a partition should expire and be deleted. <br/>*Example*: `30` |
-| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table. |
+| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/clustered-tables#limitations) |
 | **Cluster By** | **Tabular Input**: Select up to **4 columns** to cluster the table data. The order of columns determines the sort hierarchy. |
 | **Table Expiration** | **Toggle**: True/False <br/> Enables or disables the automatic expiration of the table. |
 | **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
@@ -257,15 +257,15 @@ You can create the node as:
 
 | **Setting** | **Description** |
 |---------|-------------|
-| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**. <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
 | **Integer Range Expression** | **Text Box**: Provide a SQL expression for integer range partitioning. <br/>*Example*: `RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))` |
 | **Ingestion-time Expression** | **Text Box**: (Optional) Provide a custom expression for ingestion-time partitioning. <br/>*Example*: `DATE_TRUNC(_PARTITIONTIME, MONTH)` |
 | **Partition Expiration Days** | **Text Box**: (Optional) Specify the number of days after which a partition should expire and be deleted. <br/>*Example*: `30` |
-| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table. |
+| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/clustered-tables#limitations) |
 | **Cluster By** | **Tabular Input**: Select up to **4 columns** to cluster the table data. The order of columns determines the sort hierarchy. |
 | **Table Expiration** | **Toggle**: True/False <br/> Enables or disables the automatic expiration of the table. |
 | **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
@@ -425,15 +425,15 @@ You can create the node as:
 
 | **Setting** | **Description** |
 |---------|-------------|
-| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**. <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
 | **Integer Range Expression** | **Text Box**: Provide a SQL expression for integer range partitioning. <br/>*Example*: `RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))` |
 | **Ingestion-time Expression** | **Text Box**: (Optional) Provide a custom expression for ingestion-time partitioning. <br/>*Example*: `DATE_TRUNC(_PARTITIONTIME, MONTH)` |
 | **Partition Expiration Days** | **Text Box**: (Optional) Specify the number of days after which a partition should expire and be deleted. <br/>*Example*: `30` |
-| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table. |
+| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/clustered-tables#limitations) |
 | **Cluster By** | **Tabular Input**: Select up to **4 columns** to cluster the table data. The order of columns determines the sort hierarchy. |
 | **Table Expiration** | **Toggle**: True/False <br/> Enables or disables the automatic expiration of the table. |
 | **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
@@ -618,15 +618,15 @@ You can create the node as:
 
 | **Setting** | **Description** |
 |---------|-------------|
-| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**. <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
 | **Integer Range Expression** | **Text Box**: Provide a SQL expression for integer range partitioning. <br/>*Example*: `RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))` |
 | **Ingestion-time Expression** | **Text Box**: (Optional) Provide a custom expression for ingestion-time partitioning. <br/>*Example*: `DATE_TRUNC(_PARTITIONTIME, MONTH)` |
 | **Partition Expiration Days** | **Text Box**: (Optional) Specify the number of days after which a partition should expire and be deleted. <br/>*Example*: `30` |
-| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table. |
+| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/clustered-tables#limitations) |
 | **Cluster By** | **Tabular Input**: Select up to **4 columns** to cluster the table data. The order of columns determines the sort hierarchy. |
 | **Table Expiration** | **Toggle**: True/False <br/> Enables or disables the automatic expiration of the table. |
 | **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
@@ -793,15 +793,15 @@ You can create the node as:
 
 | **Setting** | **Description** |
 |---------|-------------|
-| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). |
-| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**. <br/> *Note: Changing partitions drops and recreates the table.* |
+| **Primary Key** | Toggle: True/False <br/> Define primary key columns for documentation/metadata (Not enforced). <br/>For more info please refrer [documentation](https://docs.cloud.google.com/bigquery/docs/primary-foreign-keys#limitations) |
+| **Enable Partitioning** | Toggle: True/False <br/> **True**: Enables partitioning based on **Ingestion Time**, **Time-Unit Column**, or **Integer Range**.<br/>For more info please refer [documnetation](https://docs.cloud.google.com/bigquery/docs/partitioned-tables#limitations). <br/> *Note: Changing partitions drops and recreates the table.* |
 | **Partition By** | **Dropdown**: Select the partitioning strategy. <br/>- **Ingestion Time**: Partitioning based on when data is loaded. <br/>- **Time-Unit Column**: Partitioning based on a specific DATE/TIMESTAMP column or expression. <br/>- **Integer Range**: Partitioning based on numeric ranges. |
 | **Partition By Column** | **Column Selector**: Choose a specific column (DataType: DATE) to use for partitioning. <br/>*Used with "Time-Unit Column" strategy.* |
 | **Time-Unit Expression** | **Text Box**: Provide a SQL expression for time partitioning. <br/>*Example*: `DATE_TRUNC(columnName, MONTH)` |
 | **Integer Range Expression** | **Text Box**: Provide a SQL expression for integer range partitioning. <br/>*Example*: `RANGE_BUCKET(columnName, GENERATE_ARRAY(1, 100, 200))` |
 | **Ingestion-time Expression** | **Text Box**: (Optional) Provide a custom expression for ingestion-time partitioning. <br/>*Example*: `DATE_TRUNC(_PARTITIONTIME, MONTH)` |
 | **Partition Expiration Days** | **Text Box**: (Optional) Specify the number of days after which a partition should expire and be deleted. <br/>*Example*: `30` |
-| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table. |
+| **Enable Clustering** | **Toggle**: True/False <br/> Enables or disables clustering for the table.<br/>For more info please refer [documentation](https://docs.cloud.google.com/bigquery/docs/clustered-tables#limitations) |
 | **Cluster By** | **Tabular Input**: Select up to **4 columns** to cluster the table data. The order of columns determines the sort hierarchy. |
 | **Table Expiration** | **Toggle**: True/False <br/> Enables or disables the automatic expiration of the table. |
 | **Expiration Type** | **Dropdown**: Select how the expiration is calculated. <br/>- **EXACT DATE/DATETIME**: The table will expire at a specific point in time. <br/>- **DAYS FROM NOW**: The table will expire after a set number of days from the deployment date. |
