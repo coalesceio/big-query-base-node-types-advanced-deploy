@@ -274,6 +274,9 @@ You can create the node as:
 
 ##### Persistent Stage Advance Deploy Load Options
 
+<img width="507" height="762" alt="image" src="https://github.com/user-attachments/assets/cd5fbedf-5186-446c-8b81-79f6a851a565" />
+
+
 | **Setting** | **Description** |
 |---------|-------------|
 | **Multi Source** | Toggle: True/False<br/>Implementation of SQL UNIONs<br/>**True**: Combine multiple sources using `UNION ALL` or `UNION DISTINCT`. |
@@ -289,6 +292,9 @@ You can create the node as:
 | **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
 
 ##### Persistent Stage Advance Deploy Other Options
+
+<img width="468" height="402" alt="image" src="https://github.com/user-attachments/assets/b1abdda7-6c2f-423c-a12a-ff57ec2d6e2d" />
+
 
 | **Setting** | **Description** |
 |---------|-------------|
