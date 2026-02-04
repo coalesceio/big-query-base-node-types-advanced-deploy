@@ -18,6 +18,32 @@
 **Summary:**  
 Together, these node types ensure data is accurate, reusable, scalable, and aligned with business reporting and decision-making needs.
 
+----
+
+## Prerequisites Checklist
+
+Before the application can connect, ensure the following are in place:
+
+- **API Enabled**
+  - The BigQuery API is enabled in the Google Cloud Console.
+
+- **Service Account Key**
+  - A `.json` key file has been generated for the Service Account.
+  - The key file path is correctly provided to the application.
+
+- **IAM Permissions**
+
+  - **roles/bigquery.jobUser** (Project level)
+    - Allows the service account to run query jobs and pay for compute resources within the project.
+
+  - **roles/bigquery.dataEditor** (Dataset level)
+    - Granted only on the required dataset to limit access.
+    - Provides permissions to read, create, and alter data within that dataset.
+  
+-----
+
+## Nodetypes Config Matrix
+
 | Category | Feature                         | Dim | Fact | Factless | Work | PStage |
 |----------|----------------------------------|-----|------|----------|------|--------|
 | Create   | Create As Table                  | ✅  | ✅   | ✅       | ✅   | ✅     |
