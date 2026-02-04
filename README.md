@@ -939,3 +939,40 @@ The stage executed:
 | **Stage** | **Description** |
 |-----------|----------------|
 | **Drop table** | Removes the table from the environment |
+
+---
+
+## Code
+
+### Work Advance Deploy Code
+
+* [Node definition](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/WorkAdvanceDeploy-170/definition.yml)
+* [Create Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/WorkAdvanceDeploy-170/create.sql.j2)
+* [Run Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/WorkAdvanceDeploy-170/run.sql.j2)
+
+### Persistent Stage Advance Deploy Code
+
+* [Node definition](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/PersistentStageAdvancedDeploy-171/definition.yml)
+* [Create Template](https://github.com/coalesceio/big-query-base-node-types/blob/main/nodeTypes/PersistentStage-160/create.sql.j2)
+* [Run Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/PersistentStageAdvancedDeploy-171/run.sql.j2)
+
+### Dimension Advance Deploy Code
+
+* [Node definition](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/DimensionAdvancedDeploy-388/definition.yml)
+* [Create Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/DimensionAdvancedDeploy-388/create.sql.j2)
+* [Run Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/DimensionAdvancedDeploy-388/run.sql.j2)
+
+### Fact Advance Deploy Code
+
+* [Node definition](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/FactAdvancedDeploy-389/definition.yml)
+* [Create Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/FactAdvancedDeploy-389/create.sql.j2)
+* [Run Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/FactAdvancedDeploy-389/run.sql.j2)
+
+
+### Factless Fact Advance Deploy Code
+
+* [Node definition](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/FactlessFactAdvancedDeploy-177/definition.yml)
+* [Create Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/FactlessFactAdvancedDeploy-177/create.sql.j2)
+* [Run Template](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/nodeTypes/FactlessFactAdvancedDeploy-177/run.sql.j2)
+
+[Macros](https://github.com/coalesceio/big-query-base-node-types-advanced-deploy/blob/main/macros/macro-1.yml)
