@@ -199,6 +199,11 @@ metadata:
         isRequired: false
         enableIf: "{% if node.isMultisource %} true {% else %} false {% endif %}"
 
+      - type: label
+        displayName: ℹ️ Business Key → MERGE, No Business Key → INSERT
+        attributeName: labelBK
+        enableIf: "true"
+
       - type: businessKeyColumns
         isRequired: false
 
@@ -206,6 +211,14 @@ metadata:
         attributeName: lastModifiedCompToggle
         displayName: Last Modified Comparison
         default: false
+        enableIf: "{% if columns 
+                            | selectattr('isBusinessKey')
+                            | list
+                            | length > 0
+                    and columns
+                        | selectattr('isChangeTracking')
+                        | list
+                        | length == 0 %} true {% else %} false {% endif %}"
         
       - type: columnDropdownSelector
         attributeName: lastModifiedColumn
@@ -213,9 +226,13 @@ metadata:
         default: ''
         enableIf: "{% if config.lastModifiedCompToggle 
                     and columns 
-                            | selectattr('isBusinessKey')
-                            | list
-                            | length > 0 %} true {% else %} false {% endif %}"
+                        | selectattr('isBusinessKey')
+                        | list
+                        | length > 0
+                    and columns
+                        | selectattr('isChangeTracking')
+                        | list
+                        | length == 0 %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: treatNullAsCurrentTimestamp
@@ -226,7 +243,11 @@ metadata:
                     and columns 
                             | selectattr('isBusinessKey')
                             | list
-                            | length > 0 %} true {% else %} false {% endif %}"
+                            | length > 0
+                    and columns
+                        | selectattr('isChangeTracking')
+                        | list
+                        | length == 0 %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: type2Dimension
@@ -236,7 +257,11 @@ metadata:
                         and columns 
                             | selectattr('isBusinessKey')
                             | list
-                            | length > 0 %} true {% else %} false {% endif %}"
+                            | length > 0
+                    and columns
+                        | selectattr('isChangeTracking')
+                        | list
+                        | length == 0 %} true {% else %} false {% endif %}"
 
       - type: changeTrackingColumns
         isRequired: false

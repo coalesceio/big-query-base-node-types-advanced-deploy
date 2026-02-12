@@ -183,7 +183,7 @@ metadata:
         - "ROUND_HALF_EVEN"
         isRequired: false
 
-    - groupName: Load Options
+    - groupName: Load Fact Options
       items:
 
       - type: multisourceToggle

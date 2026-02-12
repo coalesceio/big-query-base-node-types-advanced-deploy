@@ -1,6 +1,6 @@
 fileVersion: 1
-id: 3bdd5561-d0f6-4f0a-82b4-7b5b4ed125ef
-name: fct_nation_withIngestionTime
+id: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
+name: wrk_nation
 operation:
   config:
     clusterKeyConfig:
@@ -8,23 +8,16 @@ operation:
         - {}
     clusterKeyToggle: false
     defRndMode: ""
-    deleteStrategy: NO DELETE
-    excludeMergeConfig:
-      items:
-        - {}
-    excludeMergeToggle: false
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    lastModifiedColumn: ""
-    lastModifiedCompToggle: false
     partByColumn: ""
     partByIngnTimeExpression: ""
     partByIntSqlExpression: ""
     partByTimeSqlExpression: ""
     partExpireDays: ""
     partitionBy: Ingestion Time
-    partitionByToggle: true
+    partitionByToggle: false
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""
@@ -36,7 +29,6 @@ operation:
     tabExpirationToggle: false
     tabExprnExpression: ""
     testsEnabled: false
-    treatNullAsCurrentTimestamp: false
     truncateBefore: false
   database: ""
   deployEnabled: true
@@ -49,8 +41,8 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 6b46901a-c1c6-4df0-a081-27345172512a
-          stepCounter: 3bdd5561-d0f6-4f0a-82b4-7b5b4ed125ef
+          columnCounter: a2635b7f-faf6-4532-a7c5-fc5de0758d45
+          stepCounter: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
         config: {}
         dataType: INT64
         description: ""
@@ -63,8 +55,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 7d83f61d-21c9-4035-9c53-3d22bc1b71ff
-          stepCounter: 3bdd5561-d0f6-4f0a-82b4-7b5b4ed125ef
+          columnCounter: ba22aa37-508d-40a3-9fad-ac1952e7729c
+          stepCounter: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
         config: {}
         dataType: STRING
         description: ""
@@ -77,8 +69,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: ca116265-dc53-4631-aca5-f6c9021525b3
-          stepCounter: 3bdd5561-d0f6-4f0a-82b4-7b5b4ed125ef
+          columnCounter: d0ae0b3d-851b-4a5d-b24b-272ac4c915a4
+          stepCounter: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
         config: {}
         dataType: INT64
         description: ""
@@ -91,8 +83,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: f7cda0ce-0a1f-4034-b377-786a294c560f
-          stepCounter: 3bdd5561-d0f6-4f0a-82b4-7b5b4ed125ef
+          columnCounter: b69c5be1-dabf-4607-a7f9-e1398573419d
+          stepCounter: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
         config: {}
         dataType: STRING
         description: ""
@@ -103,40 +95,6 @@ operation:
               - columnCounter: 0a2c752c-cd1d-4bd5-b9cb-82b6887d50f7
                 stepCounter: efd785c7-064a-4b57-ad3a-9e21e8e680af
             transform: ""
-      - acceptedValues:
-          strictMatch: true
-          values: []
-        appliedColumnTests: {}
-        columnReference:
-          columnCounter: d141e8cd-cd74-4d3e-8a86-092724a71ec0
-          stepCounter: 3bdd5561-d0f6-4f0a-82b4-7b5b4ed125ef
-        config: {}
-        dataType: TIMESTAMP
-        defaultValue: ""
-        description: ""
-        isSystemCreateDate: true
-        name: system_create_date
-        nullable: true
-        sourceColumnReferences:
-          - columnReferences: []
-            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
-      - acceptedValues:
-          strictMatch: true
-          values: []
-        appliedColumnTests: {}
-        columnReference:
-          columnCounter: fc756f7c-0bab-4e9f-afb5-dc2cb6c09674
-          stepCounter: 3bdd5561-d0f6-4f0a-82b4-7b5b4ed125ef
-        config: {}
-        dataType: TIMESTAMP
-        defaultValue: ""
-        description: ""
-        isSystemUpdateDate: true
-        name: system_update_date
-        nullable: true
-        sourceColumnReferences:
-          - columnReferences: []
-            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
     cteString: ""
     enabledColumnTestIDs: []
     sourceMapping:
@@ -149,12 +107,12 @@ operation:
             nodeName: nation
         join:
           joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
-        name: fct_nation_withIngestionTime
+        name: wrk_nation
         noLinkRefs: []
-  name: fct_nation_withIngestionTime
+  name: wrk_nation
   overrideSQL: false
   schema: ""
-  sqlType: "389"
+  sqlType: "170"
   type: sql
   version: 1
 type: Node

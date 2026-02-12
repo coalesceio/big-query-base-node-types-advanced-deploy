@@ -28,7 +28,7 @@ does not permit copying or modification for any other purpose.
             DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
         {%- endif %}
             
-        {%- if desiredState.node.override.create.enabled and desiredState.node.override.create.script | trim != "" %}
+        {%- if desiredState.node.override.create.enabled %}
 
             {# Run the overriding script #}
             {{ desiredState.node.override.create.script }}

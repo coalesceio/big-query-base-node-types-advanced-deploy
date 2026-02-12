@@ -192,7 +192,7 @@ metadata:
         isRequired: false
         enableIf: "{% if node.materializationType != 'view' %} true {% else %} flase {% endif %}"
         
-    - groupName: Load Options
+    - groupName: Load Work Options
 
       items:
 

@@ -1,6 +1,6 @@
 fileVersion: 1
-id: 1e788960-49e9-47f6-a17f-34d7f7983a55
-name: fct_nation_withColPartition
+id: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
+name: fct_nation1
 operation:
   config:
     clusterKeyConfig:
@@ -8,23 +8,16 @@ operation:
         - {}
     clusterKeyToggle: false
     defRndMode: ""
-    deleteStrategy: NO DELETE
-    excludeMergeConfig:
-      items:
-        - {}
-    excludeMergeToggle: false
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    lastModifiedColumn: ""
-    lastModifiedCompToggle: false
     partByColumn: ""
     partByIngnTimeExpression: ""
-    partByIntSqlExpression: RANGE_BUCKET(n_nationkey, GENERATE_ARRAY(1, 100, 200))
+    partByIntSqlExpression: ""
     partByTimeSqlExpression: ""
     partExpireDays: ""
-    partitionBy: Integer Range
-    partitionByToggle: true
+    partitionBy: Ingestion Time
+    partitionByToggle: false
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""
@@ -36,7 +29,6 @@ operation:
     tabExpirationToggle: false
     tabExprnExpression: ""
     testsEnabled: false
-    treatNullAsCurrentTimestamp: false
     truncateBefore: false
   database: ""
   deployEnabled: true
@@ -49,8 +41,8 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 6d4cd02d-f081-4355-a565-ef8e7210de77
-          stepCounter: 1e788960-49e9-47f6-a17f-34d7f7983a55
+          columnCounter: d49a9711-326a-4fa4-81dd-9b8dbee7b25b
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: INT64
         description: ""
@@ -63,8 +55,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 0ee71a21-a5c6-4546-b492-ac16ca6e4dfa
-          stepCounter: 1e788960-49e9-47f6-a17f-34d7f7983a55
+          columnCounter: 794b9aef-ef69-4e85-95f5-2c4d8d69546f
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: STRING
         description: ""
@@ -77,8 +69,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 0ff4cb0b-7b6b-4a37-9b19-51252b559899
-          stepCounter: 1e788960-49e9-47f6-a17f-34d7f7983a55
+          columnCounter: 8460297e-7002-4478-a514-5af48cd04b7b
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: INT64
         description: ""
@@ -91,8 +83,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: f3dbdbdb-3424-4328-9c18-77564e2f474b
-          stepCounter: 1e788960-49e9-47f6-a17f-34d7f7983a55
+          columnCounter: 8f969c6f-758a-482c-963b-2a40a9b38d33
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: STRING
         description: ""
@@ -108,8 +100,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: 544f09c9-6441-4a6a-8eb4-36df5eca851c
-          stepCounter: 1e788960-49e9-47f6-a17f-34d7f7983a55
+          columnCounter: 574b3487-5919-49b3-a7b0-64434ecc9e0a
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -125,8 +117,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: dbb8f7a9-cbbf-45b3-88f3-0910861a15cf
-          stepCounter: 1e788960-49e9-47f6-a17f-34d7f7983a55
+          columnCounter: e01acaaa-2856-4020-a6e0-d424d0a3269c
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -149,12 +141,12 @@ operation:
             nodeName: nation
         join:
           joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
-        name: fct_nation_withColPartition
+        name: fct_nation1
         noLinkRefs: []
-  name: fct_nation_withColPartition
+  name: fct_nation1
   overrideSQL: false
   schema: ""
-  sqlType: "389"
+  sqlType: "177"
   type: sql
   version: 1
 type: Node
