@@ -354,12 +354,14 @@ metadata:
         attributeName: preSQL
         type: textBox
         syntax: sql
+        default: ""
         isRequired: false
 
       - displayName: Post-SQL
         attributeName: postSQL
         type: textBox
         syntax: sql
+        default: ""
         isRequired: false
 
       isRequired: false
