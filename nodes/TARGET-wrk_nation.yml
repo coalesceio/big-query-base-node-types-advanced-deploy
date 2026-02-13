@@ -1,6 +1,6 @@
 fileVersion: 1
-id: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
-name: fct_nation
+id: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
+name: wrk_nation
 operation:
   config:
     clusterKeyConfig:
@@ -8,16 +8,9 @@ operation:
         - {}
     clusterKeyToggle: false
     defRndMode: ""
-    deleteStrategy: NO DELETE
-    excludeMergeConfig:
-      items:
-        - {}
-    excludeMergeToggle: false
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    lastModifiedColumn: ""
-    lastModifiedCompToggle: false
     partByColumn: ""
     partByIngnTimeExpression: ""
     partByIntSqlExpression: ""
@@ -32,16 +25,15 @@ operation:
       items:
         - {}
     primaryToggle: false
-    selectDistinct: true
+    selectDistinct: false
     tabExpirationToggle: false
     tabExprnExpression: ""
     testsEnabled: false
-    treatNullAsCurrentTimestamp: false
     truncateBefore: false
   database: ""
   deployEnabled: true
   description: ""
-  isMultisource: true
+  isMultisource: false
   locationName: TARGET
   materializationType: table
   metadata:
@@ -49,8 +41,8 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 65620bfc-4650-498b-a607-59a5e9299475
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: a2635b7f-faf6-4532-a7c5-fc5de0758d45
+          stepCounter: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
         config: {}
         dataType: INT64
         description: ""
@@ -63,8 +55,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: bbe02358-0df6-430f-b726-0bdc8f17415e
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: ba22aa37-508d-40a3-9fad-ac1952e7729c
+          stepCounter: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
         config: {}
         dataType: STRING
         description: ""
@@ -77,8 +69,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 3a6a78ee-a2c3-4eeb-b199-53d5cee17df7
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: d0ae0b3d-851b-4a5d-b24b-272ac4c915a4
+          stepCounter: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
         config: {}
         dataType: INT64
         description: ""
@@ -91,8 +83,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: c46cf078-a9e3-4350-ae17-07062bf998d1
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: b69c5be1-dabf-4607-a7f9-e1398573419d
+          stepCounter: 2951a9f5-1d8b-420f-ae4b-0e9fc7bfba9e
         config: {}
         dataType: STRING
         description: ""
@@ -103,67 +95,24 @@ operation:
               - columnCounter: 0a2c752c-cd1d-4bd5-b9cb-82b6887d50f7
                 stepCounter: efd785c7-064a-4b57-ad3a-9e21e8e680af
             transform: ""
-      - acceptedValues:
-          strictMatch: true
-          values: []
-        appliedColumnTests: {}
-        columnReference:
-          columnCounter: b6240219-a4dd-40d5-a914-c7d25885ec3f
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
-        config: {}
-        dataType: TIMESTAMP
-        defaultValue: ""
-        description: ""
-        isSystemCreateDate: true
-        name: system_create_date
-        nullable: true
-        sourceColumnReferences:
-          - columnReferences: []
-            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
-      - acceptedValues:
-          strictMatch: true
-          values: []
-        appliedColumnTests: {}
-        columnReference:
-          columnCounter: e4ee6dbd-94e3-47fb-ae94-0bb57699f46c
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
-        config: {}
-        dataType: TIMESTAMP
-        defaultValue: ""
-        description: ""
-        isSystemUpdateDate: true
-        name: system_update_date
-        nullable: true
-        sourceColumnReferences:
-          - columnReferences: []
-            transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
     cteString: ""
     enabledColumnTestIDs: []
     sourceMapping:
       - aliases:
           nation: efd785c7-064a-4b57-ad3a-9e21e8e680af
         customSQL:
-          customSQL: |-
-            {{ stage('Override Create SQL') }}
-            	CREATE OR REPLACE VIEW {{ ref('TARGET', 'fct_nation')}} AS (
-            		SELECT 
-             `N_NATIONKEY` AS `N_NATIONKEY`,
-             `N_NAME` AS `N_NAME`,
-             `N_REGIONKEY` AS `N_REGIONKEY`,
-             `N_COMMENT` AS `N_COMMENT`
-             FROM {{ ref('SRC', 'nation') }}
-            	)
+          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation
         join:
           joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
-        name: fct_nation
+        name: wrk_nation
         noLinkRefs: []
-  name: fct_nation
+  name: wrk_nation
   overrideSQL: false
   schema: ""
-  sqlType: "389"
+  sqlType: "170"
   type: sql
   version: 1
 type: Node

@@ -1,6 +1,6 @@
 fileVersion: 1
-id: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
-name: fct_nation
+id: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
+name: fct_nation1
 operation:
   config:
     clusterKeyConfig:
@@ -8,16 +8,9 @@ operation:
         - {}
     clusterKeyToggle: false
     defRndMode: ""
-    deleteStrategy: NO DELETE
-    excludeMergeConfig:
-      items:
-        - {}
-    excludeMergeToggle: false
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    lastModifiedColumn: ""
-    lastModifiedCompToggle: false
     partByColumn: ""
     partByIngnTimeExpression: ""
     partByIntSqlExpression: ""
@@ -32,16 +25,15 @@ operation:
       items:
         - {}
     primaryToggle: false
-    selectDistinct: true
+    selectDistinct: false
     tabExpirationToggle: false
     tabExprnExpression: ""
     testsEnabled: false
-    treatNullAsCurrentTimestamp: false
     truncateBefore: false
   database: ""
   deployEnabled: true
   description: ""
-  isMultisource: true
+  isMultisource: false
   locationName: TARGET
   materializationType: table
   metadata:
@@ -49,8 +41,8 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 65620bfc-4650-498b-a607-59a5e9299475
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: d49a9711-326a-4fa4-81dd-9b8dbee7b25b
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: INT64
         description: ""
@@ -63,8 +55,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: bbe02358-0df6-430f-b726-0bdc8f17415e
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: 794b9aef-ef69-4e85-95f5-2c4d8d69546f
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: STRING
         description: ""
@@ -77,8 +69,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 3a6a78ee-a2c3-4eeb-b199-53d5cee17df7
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: 8460297e-7002-4478-a514-5af48cd04b7b
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: INT64
         description: ""
@@ -91,8 +83,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: c46cf078-a9e3-4350-ae17-07062bf998d1
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: 8f969c6f-758a-482c-963b-2a40a9b38d33
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: STRING
         description: ""
@@ -108,8 +100,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: b6240219-a4dd-40d5-a914-c7d25885ec3f
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: 574b3487-5919-49b3-a7b0-64434ecc9e0a
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -125,8 +117,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: e4ee6dbd-94e3-47fb-ae94-0bb57699f46c
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: e01acaaa-2856-4020-a6e0-d424d0a3269c
+          stepCounter: 45c267ac-5f54-42f0-a46f-bbbc66b05bd2
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -143,27 +135,18 @@ operation:
       - aliases:
           nation: efd785c7-064a-4b57-ad3a-9e21e8e680af
         customSQL:
-          customSQL: |-
-            {{ stage('Override Create SQL') }}
-            	CREATE OR REPLACE VIEW {{ ref('TARGET', 'fct_nation')}} AS (
-            		SELECT 
-             `N_NATIONKEY` AS `N_NATIONKEY`,
-             `N_NAME` AS `N_NAME`,
-             `N_REGIONKEY` AS `N_REGIONKEY`,
-             `N_COMMENT` AS `N_COMMENT`
-             FROM {{ ref('SRC', 'nation') }}
-            	)
+          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation
         join:
           joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
-        name: fct_nation
+        name: fct_nation1
         noLinkRefs: []
-  name: fct_nation
+  name: fct_nation1
   overrideSQL: false
   schema: ""
-  sqlType: "389"
+  sqlType: "177"
   type: sql
   version: 1
 type: Node

@@ -383,7 +383,7 @@ does not permit copying or modification for any other purpose.
 
 {%- elif currentState != undefined and desiredState == undefined %}
 
-    {# Drop the table/view in undeployment #}
+    {# Drop the table in undeployment #}
     {{ stage('Drop Current ' + currentState.node.materializationType ) }}
     DROP {{ dropMaterialization(currentState.node.materializationType) }} {{ nsNodeVariables.curObjectNameFullPath }}
 

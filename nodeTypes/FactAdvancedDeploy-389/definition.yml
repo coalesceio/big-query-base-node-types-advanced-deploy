@@ -226,6 +226,7 @@ metadata:
 
       - type: businessKeyColumns
         isRequired: false
+        enableIf: "{% if node.materializationType != 'view' %} true {% else %} false {% endif %}"
 
       - type: toggleButton
         attributeName: lastModifiedCompToggle
