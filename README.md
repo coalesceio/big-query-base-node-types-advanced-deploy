@@ -85,7 +85,7 @@ The Coalesce Base Node Types Package includes:
 
 ---
 
-## Work Advance Deploy
+## Work Advanced Deploy
 The Coalesce Work Node is a versatile node that allows you to develop and deploy a Work table/view in Google BigQuery.
 
 A Work node serves as an intermediary object and is commonly employed to store raw data before undergoing the crucial phases of transformation and loading into the main tables of the data warehouse.
@@ -243,7 +243,7 @@ The stage executed:
 
 -----
 
-## Persistent Stage Advance Deploy
+## Persistent Stage Advanced Deploy
 
 The Coalesce Persistent Stage Nodes element, serving as an intermediary object, is frequently utilized to maintain data persistence across multiple execution cycles.
 
@@ -786,7 +786,7 @@ The stage executed:
 
 -----
 
-## Factless Fact Advance Deploy
+## Factless Fact Advanced Deploy
 
 The Coalesce Fact UDN is a versatile node that allows you to develop and deploy a Fact table in Google BigQuery.
 
