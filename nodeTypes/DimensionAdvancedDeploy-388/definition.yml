@@ -267,7 +267,7 @@ metadata:
       - type: label
         displayName: ℹ️ Note - SCD Type2 if selected, Else SCD Type1
         attributeName: labelCT
-        enableIf: "{% if node.materializationType != 'view' and config.lastModifiedCompToggle == false %} true {% else %} false {% endif %}"
+        enableIf: "{% if node.materializationType != 'view' and (config.updateStrategy != 'MERGE' or (config.updateStrategy == 'MERGE' and config.lastModifiedCompToggle == false)) %} true {% else %} false {% endif %}"
 
       - displayName: Exclude Columns from Merge (ℹ️ For SCD Type1)
         attributeName: excludeMergeToggle

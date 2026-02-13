@@ -32,7 +32,7 @@ operation:
       items:
         - {}
     primaryToggle: false
-    selectDistinct: false
+    selectDistinct: true
     tabExpirationToggle: false
     tabExprnExpression: ""
     testsEnabled: false
@@ -54,7 +54,6 @@ operation:
         config: {}
         dataType: INT64
         description: ""
-        isBusinessKey: true
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
@@ -144,7 +143,16 @@ operation:
       - aliases:
           nation: efd785c7-064a-4b57-ad3a-9e21e8e680af
         customSQL:
-          customSQL: ""
+          customSQL: |-
+            {{ stage('Override Create SQL') }}
+            	CREATE OR REPLACE VIEW {{ ref('TARGET', 'fct_nation')}} AS (
+            		SELECT 
+             `N_NATIONKEY` AS `N_NATIONKEY`,
+             `N_NAME` AS `N_NAME`,
+             `N_REGIONKEY` AS `N_REGIONKEY`,
+             `N_COMMENT` AS `N_COMMENT`
+             FROM {{ ref('SRC', 'nation') }}
+            	)
         dependencies:
           - locationName: SRC
             nodeName: nation

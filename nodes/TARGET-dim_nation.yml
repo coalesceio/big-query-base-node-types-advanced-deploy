@@ -5,13 +5,18 @@ operation:
   config:
     clusterKeyConfig:
       items:
-        - {}
-    clusterKeyToggle: false
+        - clustColumn:
+            columnCounter: 984801b4-454d-494a-b7ba-8d02125d302c
+            stepCounter: b5edd59c-c8c4-41c0-84a6-01e74f95ba1a
+        - clustColumn:
+            columnCounter: 2e8d6827-3265-49b5-acbd-5d4c4145c7c6
+            stepCounter: b5edd59c-c8c4-41c0-84a6-01e74f95ba1a
+    clusterKeyToggle: true
     customZeroKeyValuesConfig:
       items:
         - {}
-    defRndMode: ""
-    deleteStrategy: NO DELETE
+    defRndMode: ROUND_HALF_AWAY_FROM_ZERO
+    deleteStrategy: SOFT DELETE
     excludeMergeConfig:
       items:
         - {}
@@ -26,30 +31,38 @@ operation:
     insertZeroKeySurrogateKey: "0"
     insertZeroKeyTimestamp: "1900-01-01 00:00:00"
     insertZeroKeyToggle: false
-    lastModifiedColumn: ""
-    lastModifiedCompToggle: false
+    lastModifiedColumn:
+      columnCounter: 84567693-77aa-4b8c-b774-86148b7916b1
+      stepCounter: b5edd59c-c8c4-41c0-84a6-01e74f95ba1a
+    lastModifiedCompToggle: true
     partByColumn: ""
     partByIngnTimeExpression: ""
-    partByIntSqlExpression: ""
+    partByIntSqlExpression: RANGE_BUCKET(N_NATIONKEY, GENERATE_ARRAY(1, 100, 200))
     partByTimeSqlExpression: ""
-    partExpireDays: ""
-    partitionBy: Ingestion Time
-    partitionByToggle: false
+    partExpireDays: "70"
+    partitionBy: Integer Range
+    partitionByToggle: true
     partitionFilterToggle: false
-    postSQL: ""
-    preSQL: ""
+    postSQL: |-
+      SELECT value
+      FROM UNNEST(['A', 'B', 'C']) AS value;
+    preSQL: |-
+      SELECT value
+      FROM UNNEST(['A', 'B', 'C']) AS value;
     primaryKeyConfig:
       items:
-        - {}
-    primaryToggle: false
+        - primaryKeyColumn:
+            columnCounter: 984801b4-454d-494a-b7ba-8d02125d302c
+            stepCounter: b5edd59c-c8c4-41c0-84a6-01e74f95ba1a
+    primaryToggle: true
     selectDistinct: false
-    tabExpirationToggle: false
-    tabExprnExpression: ""
+    tabExpirationToggle: true
+    tabExprnExpression: "80"
     testsEnabled: false
-    treatNullAsCurrentTimestamp: false
-    truncateBefore: false
-    type2Dimension: false
-    updateStrategy: MERGE
+    treatNullAsCurrentTimestamp: true
+    truncateBefore: true
+    type2Dimension: true
+    updateStrategy: INSERT/UPDATE
   database: ""
   deployEnabled: true
   description: ""
@@ -83,6 +96,7 @@ operation:
         config: {}
         dataType: INT64
         description: ""
+        isBusinessKey: true
         name: N_NATIONKEY
         nullable: true
         sourceColumnReferences:
