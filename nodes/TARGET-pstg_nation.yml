@@ -230,14 +230,16 @@ operation:
     enabledColumnTestIDs: []
     sourceMapping:
       - aliases:
-          nation: efd785c7-064a-4b57-ad3a-9e21e8e680af
+          nation: 41ba6f71-cf99-4820-82e9-ecc2368c29f9
         customSQL:
           customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation
         join:
-          joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
+          joinCondition: |-
+            FROM {{ ref('SRC', 'nation') }} `nation`
+            where `nation`.`N_NATIONKEY` = 1
         name: pstg_nation
         noLinkRefs: []
   name: pstg_nation
