@@ -342,7 +342,7 @@ These columns are automatically added to manage dimension logic:
 
 | **Column** | **Description** |
 |----------|-------------|
-| **`{{NODE_NAME}}`_key** | The generated Surrogate Key for the dimension record. |
+| **`{{NODE_NAME}}_key`** | The generated Surrogate Key for the dimension record. |
 | **system_version** | Incremental version number for SCD Type 2 tracking. |
 | **system_current_flag** | Indicates the active record ('Y'/'N'). |
 | **system_start_date** | The timestamp when the record version became active. |
@@ -529,7 +529,7 @@ These columns are automatically added to manage dimension logic:
 
 | **Column** | **Description** |
 |----------|-------------|
-| **`{{NODE_NAME}}`_key** | The generated Surrogate Key for the dimension record. |
+| **`{{NODE_NAME}}_key`** | The generated Surrogate Key for the dimension record. |
 | **system_version** | Incremental version number for SCD Type 2 tracking. |
 | **system_current_flag** | Indicates the active record ('Y'/'N'). |
 | **system_start_date** | The timestamp when the record version became active. |
