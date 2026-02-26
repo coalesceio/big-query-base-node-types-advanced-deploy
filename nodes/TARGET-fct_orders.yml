@@ -7,7 +7,7 @@ operation:
       items:
         - {}
     clusterKeyToggle: false
-    defRndMode: ""
+    defRndMode: ROUND_HALF_AWAY_FROM_ZERO
     deleteStrategy: NO DELETE
     excludeMergeConfig:
       items:
@@ -54,6 +54,7 @@ operation:
         config: {}
         dataType: INT64
         description: ""
+        isBusinessKey: true
         name: O_ORDERKEY
         nullable: true
         sourceColumnReferences:
