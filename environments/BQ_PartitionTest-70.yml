@@ -1,5 +1,5 @@
 fileVersion: 1
-id: "686"
+id: "70"
 mappingDefinitions:
   SRC:
     database: cls-qa
@@ -7,5 +7,5 @@ mappingDefinitions:
   TARGET:
     database: cls-dev-bigquery
     schema: DE_QA
-name: GBQ_Test_Advanced_1
+name: BQ_PartitionTest
 type: Environment
