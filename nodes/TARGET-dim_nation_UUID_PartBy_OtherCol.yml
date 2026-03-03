@@ -1,6 +1,6 @@
 fileVersion: 1
 id: 51b88438-cbb1-440c-9f1f-569b01d4d56b
-name: dim_nation_UUID_PartBy
+name: dim_nation_UUID_PartBy_OtherCol
 operation:
   config:
     clusterKeyConfig:
@@ -247,9 +247,9 @@ operation:
             nodeName: nation
         join:
           joinCondition: FROM {{ ref('SRC', 'nation') }} `nation`
-        name: dim_nation_UUID_PartBy
+        name: dim_nation_UUID_PartBy_OtherCol
         noLinkRefs: []
-  name: dim_nation_UUID_PartBy
+  name: dim_nation_UUID_PartBy_OtherCol
   overrideSQL: false
   schema: ""
   sqlType: "388"
