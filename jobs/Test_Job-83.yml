@@ -1,0 +1,6 @@
+excludeSelector: ""
+fileVersion: 1
+id: "83"
+includeSelector: "{ location: TARGET name: dim_nation_UUID_ClusterBy } OR { location: TARGET name: dim_nation_UUID_HardDelete_SCD1 } OR { location: TARGET name: dim_nation_UUID_HardDelete_SCD2 } OR { location: TARGET name: dim_nation_UUID_IU_PartBy_ClusterBy_SCD1 } OR { location: TARGET name: dim_nation_UUID_IU_PartBy_ClusterBy_SCD2 } OR { location: TARGET name: dim_nation_UUID_LM_HardDelete_SCD1 } OR { location: TARGET name: dim_nation_UUID_LM_HardDelete_SCD2 } OR { location: TARGET name: dim_nation_UUID_LM_NoDelete_SCD1 } OR { location: TARGET name: dim_nation_UUID_LM_NoDelete_SCD2 } OR { location: TARGET name: dim_nation_UUID_LM_SoftDelete_SCD1 } OR { location: TARGET name: dim_nation_UUID_LM_SoftDelete_SCD2 } OR { location: TARGET name: dim_nation_UUID_NODelete_SCD1 } OR { location: TARGET name: dim_nation_UUID_NODelete_SCD2 } OR { location: TARGET name: dim_nation_UUID_PartBy } OR { location: TARGET name: dim_nation_UUID_PartBy_ClusterBy } OR { location: TARGET name: dim_nation_UUID_SoftDelete_SCD1 } OR { location: TARGET name: dim_nation_UUID_SoftDelete_SCD2 } OR { location: SRC name: nation }"
+name: Test_Job
+type: Job
