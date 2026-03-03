@@ -1,11 +1,11 @@
 fileVersion: 1
-id: "70"
+id: "730"
 mappingDefinitions:
   SRC:
     database: cls-qa
     schema: tpch_sf001
   TARGET:
     database: cls-dev-bigquery
-    schema: DE_QA
-name: BQ_PartitionTest
+    schema: DE_QA_ADV
+name: GBQ_Test_UUID
 type: Environment
