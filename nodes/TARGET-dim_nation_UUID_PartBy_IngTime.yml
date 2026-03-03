@@ -7,11 +7,7 @@ operation:
       items:
         - {}
     clusterKeyToggle: false
-    customZeroKeyValuesConfig:
-      items:
-        - {}
     defRndMode: ""
-    deleteStrategy: NO DELETE
     excludeMergeConfig:
       items:
         - {}
@@ -19,13 +15,6 @@ operation:
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    insertZeroKeyAdvancedToggle: false
-    insertZeroKeyBool: "TRUE"
-    insertZeroKeyDate: 01-01-1900
-    insertZeroKeyStr: UNKNOWN
-    insertZeroKeySurrogateKey: "0"
-    insertZeroKeyTimestamp: "1900-01-01 00:00:00"
-    insertZeroKeyToggle: true
     lastModifiedColumn: ""
     lastModifiedCompToggle: false
     partByColumn: ""
@@ -49,7 +38,6 @@ operation:
     treatNullAsCurrentTimestamp: false
     truncateBefore: false
     type2Dimension: false
-    updateStrategy: MERGE
   database: ""
   deployEnabled: true
   description: ""
@@ -250,7 +238,7 @@ operation:
   name: dim_nation_UUID_PartBy_IngTime
   overrideSQL: false
   schema: ""
-  sqlType: "388"
+  sqlType: "171"
   type: sql
   version: 1
 type: Node

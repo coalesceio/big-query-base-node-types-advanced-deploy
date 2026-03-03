@@ -7,11 +7,7 @@ operation:
       items:
         - {}
     clusterKeyToggle: false
-    customZeroKeyValuesConfig:
-      items:
-        - {}
     defRndMode: ""
-    deleteStrategy: SOFT DELETE
     excludeMergeConfig:
       items:
         - {}
@@ -19,16 +15,7 @@ operation:
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    insertZeroKeyAdvancedToggle: false
-    insertZeroKeyBool: "TRUE"
-    insertZeroKeyDate: 01-01-1900
-    insertZeroKeyStr: UNKNOWN
-    insertZeroKeySurrogateKey: "0"
-    insertZeroKeyTimestamp: "1900-01-01 00:00:00"
-    insertZeroKeyToggle: true
-    lastModifiedColumn:
-      columnCounter: 10021871-3b5e-4e68-9316-e388c33c1c76
-      stepCounter: 7b35bd34-a1f3-4f9d-8f02-543e5968893e
+    lastModifiedColumn: ""
     lastModifiedCompToggle: true
     partByColumn: ""
     partByIngnTimeExpression: ""
@@ -51,7 +38,6 @@ operation:
     treatNullAsCurrentTimestamp: false
     truncateBefore: false
     type2Dimension: true
-    updateStrategy: MERGE
   database: ""
   deployEnabled: true
   description: ""
@@ -242,8 +228,6 @@ operation:
     sourceMapping:
       - aliases:
           nation: efd785c7-064a-4b57-ad3a-9e21e8e680af
-        customSQL:
-          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation
@@ -254,7 +238,7 @@ operation:
   name: dim_nation_UUID_LM_SoftDelete_SCD2
   overrideSQL: false
   schema: ""
-  sqlType: "388"
+  sqlType: "171"
   type: sql
   version: 1
 type: Node

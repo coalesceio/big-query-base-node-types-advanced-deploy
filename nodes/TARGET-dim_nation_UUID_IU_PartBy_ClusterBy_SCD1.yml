@@ -9,11 +9,7 @@ operation:
             columnCounter: 9d35156c-2411-4835-8809-f9fa5ace7e0a
             stepCounter: 52735fba-ea7d-40ab-a071-c8fa01693be1
     clusterKeyToggle: true
-    customZeroKeyValuesConfig:
-      items:
-        - {}
     defRndMode: ""
-    deleteStrategy: NO DELETE
     excludeMergeConfig:
       items:
         - {}
@@ -21,13 +17,6 @@ operation:
     exprnType: DAYS FROM NOW
     groupByAll: false
     insertStrategy: UNION ALL
-    insertZeroKeyAdvancedToggle: false
-    insertZeroKeyBool: "TRUE"
-    insertZeroKeyDate: 01-01-1900
-    insertZeroKeyStr: UNKNOWN
-    insertZeroKeySurrogateKey: "0"
-    insertZeroKeyTimestamp: "1900-01-01 00:00:00"
-    insertZeroKeyToggle: true
     lastModifiedColumn: ""
     lastModifiedCompToggle: false
     partByColumn: ""
@@ -51,7 +40,6 @@ operation:
     treatNullAsCurrentTimestamp: false
     truncateBefore: false
     type2Dimension: false
-    updateStrategy: INSERT/UPDATE
   database: ""
   deployEnabled: true
   description: ""
@@ -242,8 +230,6 @@ operation:
     sourceMapping:
       - aliases:
           nation: efd785c7-064a-4b57-ad3a-9e21e8e680af
-        customSQL:
-          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation
@@ -254,7 +240,7 @@ operation:
   name: dim_nation_UUID_IU_PartBy_ClusterBy_SCD1
   overrideSQL: false
   schema: ""
-  sqlType: "388"
+  sqlType: "171"
   type: sql
   version: 1
 type: Node
