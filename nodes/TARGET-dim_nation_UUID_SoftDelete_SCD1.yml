@@ -10,7 +10,7 @@ operation:
     customZeroKeyValuesConfig:
       items:
         - {}
-    defRndMode: ""
+    defRndMode: ROUND_HALF_AWAY_FROM_ZERO
     deleteStrategy: SOFT DELETE
     excludeMergeConfig:
       items:
@@ -240,8 +240,6 @@ operation:
     sourceMapping:
       - aliases:
           nation: efd785c7-064a-4b57-ad3a-9e21e8e680af
-        customSQL:
-          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation

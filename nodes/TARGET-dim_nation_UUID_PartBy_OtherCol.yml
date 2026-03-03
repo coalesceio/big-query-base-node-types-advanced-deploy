@@ -30,7 +30,7 @@ operation:
     lastModifiedCompToggle: false
     partByColumn: ""
     partByIngnTimeExpression: ""
-    partByIntSqlExpression: RANGE_BUCKET(N_NATIONKEY, GENERATE_ARRAY(1, 100, 200))
+    partByIntSqlExpression: RANGE_BUCKET(N_NATIONKEY, GENERATE_ARRAY(1, 150, 200))
     partByTimeSqlExpression: ""
     partExpireDays: ""
     partitionBy: Integer Range
