@@ -1,0 +1,6 @@
+excludeSelector: ""
+fileVersion: 1
+id: "87"
+includeSelector: "{ location: \"TARGET\" name: \"dim_UUID_TEST\" } OR { location: \"SRC\" name: \"nation\" }"
+name: Test_Job1
+type: Job
