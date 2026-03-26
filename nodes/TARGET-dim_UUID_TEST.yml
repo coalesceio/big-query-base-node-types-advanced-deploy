@@ -8,9 +8,6 @@ operation:
         - clustColumn:
             columnCounter: 23b6727e-8707-415f-8194-e8e89e6b3fd2
             stepCounter: d44bf639-a739-440a-8671-7d8d79720ca1
-        - clustColumn:
-            columnCounter: 29f30132-a3cc-4a89-b52e-d57d7a1128b3
-            stepCounter: d44bf639-a739-440a-8671-7d8d79720ca1
     clusterKeyToggle: true
     customZeroKeyValuesConfig:
       items:
