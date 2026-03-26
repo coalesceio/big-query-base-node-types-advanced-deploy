@@ -3,7 +3,7 @@ id: "730"
 mappingDefinitions:
   SRC:
     database: cls-qa
-    schema: data_entrega
+    schema: tpch_sf001
   TARGET:
     database: cls-dev-bigquery
     schema: DE_TGT
