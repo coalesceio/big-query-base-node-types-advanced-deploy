@@ -80,7 +80,7 @@ operation:
         description: ""
         isSurrogateKey: true
         name: dim_nation_key
-        nullable: false
+        nullable: true
         sourceColumnReferences:
           - columnReferences: []
             transform: ""
