@@ -102,7 +102,7 @@ operation:
           stepCounter: d44bf639-a739-440a-8671-7d8d79720ca1
         config: {}
         dataType: STRING
-        description: Name
+        description: Name changed
         isChangeTracking: true
         name: N_NAME
         nullable: true
