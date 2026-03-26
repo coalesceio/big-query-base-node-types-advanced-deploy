@@ -34,11 +34,11 @@ does not permit copying or modification for any other purpose.
                 or desiredState.config.partitionByToggle != currentState.config.partitionByToggle
                 or desiredState.config.partitionBy != currentState.config.partitionBy
                 or desiredState.config.partByIngnTimeExpression | trim != currentState.config.partByIngnTimeExpression | trim
-                or desiredState.config.partByColumn.name != currentState.config.partByColumn.name
+                or desiredState.config.partByColumn.id != currentState.config.partByColumn.id
                 or desiredState.config.partByTimeSqlExpression | trim != currentState.config.partByTimeSqlExpression | trim
                 or desiredState.config.partByIntSqlExpression | trim != currentState.config.partByIntSqlExpression | trim
                 or desiredState.config.clusterKeyToggle != currentState.config.clusterKeyToggle
-                or desiredState.config.get('clusterKeyConfig', []) != currentState.config.get('clusterKeyConfig', [])) %}
+                or (desiredState.config.clusterKeyConfig.get('items', [])) | map(attribute='clustColumn.id') | list | sort  != (currentState.config.clusterKeyConfig.get('items', [])) | map(attribute='clustColumn.id') | list | sort ) %}
             {%- set nsConfigVariables.createTable = true %}
             {%- set nsNodeVariables.metadataChanges = true %}
         {%- endif %}
