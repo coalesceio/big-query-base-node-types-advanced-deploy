@@ -210,7 +210,7 @@ does not permit copying or modification for any other purpose.
     {# == Execute if business key is not specified  == #}        
     {%- else %}
 
-        {{ stage('Load Dimension Table Using Insert') }}
+        {{ stage('Load Fact Table Using Insert') }}
         INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
         (
             {%- for col in columns %}

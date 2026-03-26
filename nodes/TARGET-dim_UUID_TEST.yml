@@ -77,7 +77,7 @@ operation:
         config: {}
         dataType: STRING
         defaultValue: GENERATE_UUID()
-        description: ""
+        description: Surrogate key
         isSurrogateKey: true
         name: dim_nation_key
         nullable: false
