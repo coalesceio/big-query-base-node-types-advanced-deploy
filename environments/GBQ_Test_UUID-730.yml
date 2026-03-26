@@ -2,8 +2,8 @@ fileVersion: 1
 id: "730"
 mappingDefinitions:
   SRC:
-    database: cls-qa
-    schema: tpch_sf001
+    database: cls-dev-bigquery
+    schema: DE_SRC
   TARGET:
     database: cls-dev-bigquery
     schema: DE_TGT
