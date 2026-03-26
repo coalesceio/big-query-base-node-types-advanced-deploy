@@ -5,7 +5,9 @@ operation:
   config:
     clusterKeyConfig:
       items:
-        - {}
+        - clustColumn:
+            columnCounter: 29f30132-a3cc-4a89-b52e-d57d7a1128b3
+            stepCounter: d44bf639-a739-440a-8671-7d8d79720ca1
     clusterKeyToggle: true
     customZeroKeyValuesConfig:
       items:
@@ -40,11 +42,13 @@ operation:
     preSQL: ""
     primaryKeyConfig:
       items:
-        - {}
+        - primaryKeyColumn:
+            columnCounter: 29f30132-a3cc-4a89-b52e-d57d7a1128b3
+            stepCounter: d44bf639-a739-440a-8671-7d8d79720ca1
     primaryToggle: true
     selectDistinct: true
     tabExpirationToggle: true
-    tabExprnExpression: ""
+    tabExprnExpression: "70"
     testsEnabled: false
     treatNullAsCurrentTimestamp: false
     truncateBefore: false
