@@ -1,5 +1,11 @@
 fileVersion: 1
 id: "730"
-mappingDefinitions: {}
+mappingDefinitions:
+  SRC:
+    database: cls-qa
+    schema: data_entrega
+  TARGET:
+    database: cls-dev-bigquery
+    schema: DE_TGT
 name: GBQ_Test_UUID
 type: Environment
