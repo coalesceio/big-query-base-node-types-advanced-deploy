@@ -78,6 +78,7 @@ Before the application can connect, ensure the following are in place:
 * Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
 * Columns that are part of clustering or partitioning cannot be **renamed** directly. If such changes are included, the ALTER statement will fail during deployment.
 * Changes involving the drop and re-creation of table may not reflect accurately when executed in the **coalesce browser**.
+* **NOT NULL** constraints cannot always be applied using ALTER TABLE
 
 ## Base Node Types Advanced Deploy
 
