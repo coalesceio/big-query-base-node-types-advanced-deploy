@@ -76,6 +76,23 @@ operation:
           - columnReferences: []
             transform: ""
         transform: ""
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 232a6b90-90c7-4a10-940f-e92902e55015
+          stepCounter: efd785c7-064a-4b57-ad3a-9e21e8e680af
+        config: {}
+        dataType: TIMESTAMP
+        defaultValue: ""
+        description: ""
+        name: last_modified
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
   name: nation
   schema: ""
   sqlType: Source
