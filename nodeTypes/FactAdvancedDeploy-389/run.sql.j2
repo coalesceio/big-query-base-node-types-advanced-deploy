@@ -5,7 +5,7 @@ Unauthorized reproduction, distribution, or disclosure of this material is stric
 Coalesce permits you to copy and modify this script for the purposes of using with Coalesce but
 does not permit copying or modification for any other purpose.  
 #}
-{# == Node Type Name           : Fact Advance Deploy == #}
+{# == Node Type Name           : Fact Advanced Deploy == #}
 {# == Node Type Description    : This node loads data into fact table using config options distinct, groupby all, order by, multi-source  == #}
 
 {# == List of all business Key value columns Length == #}
@@ -75,7 +75,7 @@ does not permit copying or modification for any other purpose.
                     {{ get_clause(joinclause, 'from') }}
                     {%- if config.lastModifiedCompToggle %}	        
                         LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                        {%- for col in source.columns | selectattr('isBusinessKey') | list -%}
+                        {%- for col in source.columns | selectattr('isBusinessKey') | list %}
                             {%- if not loop.first %}
                                 AND
                             {%- endif %}
@@ -110,11 +110,11 @@ does not permit copying or modification for any other purpose.
                             {%- endif %}
                             AS `{{ col.name }}`
                             {%- if not loop.last %}, {%- endif %}
-                        {%- endfor -%}
+                        {%- endfor %}
                         {{ get_clause(joinclause, 'from') }}
 
                         RIGHT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                        {%- for col in businessColList -%}
+                        {%- for col in businessColList %}
                             {%- if not loop.first %}
                                 AND
                             {%- endif %}
@@ -122,7 +122,7 @@ does not permit copying or modification for any other purpose.
                         {%- endfor %}
 
                         WHERE
-                        {%- for col in businessColList -%}
+                        {%- for col in businessColList %}
                             {%- if not loop.first %}
                                 AND
                             {%- endif %}
@@ -140,7 +140,7 @@ does not permit copying or modification for any other purpose.
             {%- endfor %}  
         ) AS `SRC`
         ON
-        {%- for col in businessColList -%}
+        {%- for col in businessColList %}
             {%- if not loop.first %}
                 AND
             {%- endif %}
@@ -197,25 +197,25 @@ does not permit copying or modification for any other purpose.
             {%- for col in columns if not col.isSurrogateKey %}
                 `{{ col.name }}`
                 {%- if not loop.last %}, {%- endif %}
-            {%- endfor -%}
+            {%- endfor %}
         )
         VALUES
         (
             {%- for col in columns if not col.isSurrogateKey %}
                 `SRC`.`{{ col.name }}`
                 {%- if not loop.last %}, {%- endif %}
-            {%- endfor -%}
+            {%- endfor %}
         )
 
     {# == Execute if business key is not specified  == #}        
     {%- else %}
 
-        {{ stage('Load Dimension Table Using Insert') }}
+        {{ stage('Load Fact Table Using Insert') }}
         INSERT INTO {{ ref_no_link(node.location.name, node.name) }}
         (
             {%- for col in columns %}
                 `{{ col.name }}`
-                {%- if not loop.last -%},{%- endif %}
+                {%- if not loop.last %},{%- endif %}
             {%- endfor %}
         )
         {%- for source in sources %}
@@ -224,7 +224,7 @@ does not permit copying or modification for any other purpose.
                 {%- if config.selectDistinct %} DISTINCT {%- endif %}
                 {%- for col in source.columns %}
                     {{ get_source_transform(col) }} AS `{{ col.name }}`
-                    {%- if not loop.last -%}, {%- endif %}
+                    {%- if not loop.last %}, {%- endif %}
                 {%- endfor %}
                 {{ source.join }}
                 {%- if config.groupByAll %} GROUP BY ALL {%- endif %}

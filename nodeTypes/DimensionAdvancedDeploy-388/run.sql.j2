@@ -8,11 +8,11 @@ does not permit copying or modification for any other purpose.
 {# == Node Type Name           : Dimension Advanced Deploy == #}
 {# == Node Type Description    : This node creates dimension table, view and also override create sql for view with advanced deployment strategy == #}
 
-{%- if config.updateStrategy == 'INSERT/UPDATE' -%}
-    {%- set updateStrategy = 'INSERT/UPDATE' -%}
-{%- else -%}
-    {%- set updateStrategy = 'MERGE' -%}
-{%- endif -%}
+{%- if config.updateStrategy == 'INSERT/UPDATE' %}
+    {%- set updateStrategy = 'INSERT/UPDATE' %}
+{%- else %}
+    {%- set updateStrategy = 'MERGE' %}
+{%- endif %}
 
 {# == Variable check to identify type of dimension == #}
 {%- if config.lastModifiedCompToggle and updateStrategy == 'MERGE' %}
@@ -58,7 +58,7 @@ does not permit copying or modification for any other purpose.
 
         {%- endif %}
 
-        {%- if updateStrategy == 'MERGE' -%}
+        {%- if updateStrategy == 'MERGE' %}
             {{ stage('Insert/Update Zero Record') }}
             MERGE INTO {{ ref_no_link(node.location.name, node.name) }} USING
             (
@@ -69,7 +69,7 @@ does not permit copying or modification for any other purpose.
                     {%- if col.isSurrogateKey %}
                         '{{config.insertZeroKeySurrogateKey}}'
                     {%- elif config.insertZeroKeyAdvancedToggle and col.name in nsZKAdv.columnNameDefault %}
-                        {%- for loopColumn in nsZKAdv.columnNameDefault -%}
+                        {%- for loopColumn in nsZKAdv.columnNameDefault %}
                             {%- if col.name == loopColumn %}
                                 {%- if col.dataType | upper == 'STRING' %}
                                     '{{ nsZKAdv.columnValueDefault[loop.index0] }}'
@@ -81,7 +81,7 @@ does not permit copying or modification for any other purpose.
                                     {{ nsZKAdv.columnValueDefault[loop.index0] }}
                                 {%- endif %}
                             {%- endif %}					
-                        {%- endfor -%}
+                        {%- endfor %}
                     {%- elif col.isSystemCurrentFlag %}
                         'Y'
                     {%- elif col.isSystemStartDate or col.isSystemEndDate or col.isSystemUpdateDate or col.isSystemCreateDate %}
@@ -110,35 +110,35 @@ does not permit copying or modification for any other purpose.
 
                     AS `{{ col.name }}`
 
-                    {%- if not loop.last %}, {%- endif %}
+                    {%- if not loop.last %}, {% endif %}
                 {%- endfor %}
                 FROM UNNEST([1])
             ) AS SOURCE_ZERO
             ON
             {%- for col in columns if col.isSurrogateKey %}
                 {{ node.name }}.{{ col.name }} = {%- if col.dataType | upper in ['BYTES', 'STRING', 'DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] %}'{%- endif %}{{ config.insertZeroKeySurrogateKey }}{%- if col.dataType | upper in ['BYTES', 'STRING', 'DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] %}'{%- endif %}
-            {%- endfor -%}
+            {%- endfor %}
                 
             WHEN MATCHED THEN UPDATE
             SET
                 {%- for col in columns if (not col.isSurrogateKey and not col.isBusinessKey) %}
                     {{ node.name }}.{{ col.name }} = SOURCE_ZERO.{{ col.name }}
-                    {%- if not loop.last %}, {%- endif %}		
-                {%- endfor -%}
+                    {%- if not loop.last %}, {% endif %}		
+                {%- endfor %}
 
             WHEN NOT MATCHED THEN INSERT
             (
                 {%- for col in columns %}
                     {{ col.name}}
                     {%- if not loop.last %}, {%- endif %}		
-                {%- endfor -%}
+                {%- endfor %}
             )
             VALUES
             (
                 {%- for col in columns %}
                     SOURCE_ZERO.{{ col.name}}			
                     {%- if not loop.last %}, {%- endif %}		
-                {%- endfor -%}
+                {%- endfor %}
             )
 
         {%- else %}
@@ -160,7 +160,7 @@ does not permit copying or modification for any other purpose.
                             {%- if col.isSurrogateKey %}
                                 '{{config.insertZeroKeySurrogateKey}}'
                             {%- elif config.insertZeroKeyAdvancedToggle and col.name in nsZKAdv.columnNameDefault %}
-                                {%- for loopColumn in nsZKAdv.columnNameDefault -%}
+                                {%- for loopColumn in nsZKAdv.columnNameDefault %}
                                     {%- if col.name == loopColumn %}
                                         {%- if col.dataType | upper == 'STRING' %}
                                             '{{ nsZKAdv.columnValueDefault[loop.index0] }}'
@@ -172,7 +172,7 @@ does not permit copying or modification for any other purpose.
                                             {{ nsZKAdv.columnValueDefault[loop.index0] }}
                                         {%- endif %}
                                     {%- endif %}					
-                                {%- endfor -%}
+                                {%- endfor %}
                             {%- elif col.isSystemCurrentFlag %}
                                 'Y'
                             {%- elif col.isSystemStartDate or col.isSystemEndDate or col.isSystemUpdateDate or col.isSystemCreateDate %}
@@ -226,7 +226,7 @@ does not permit copying or modification for any other purpose.
                         {%- if col.isSurrogateKey %}
                             '{{config.insertZeroKeySurrogateKey}}'
                         {%- elif config.insertZeroKeyAdvanced == true and col.name in ns.varColumnNameDefault %}
-                            {%- for loopColumn in ns.varColumnNameDefault  -%}
+                            {%- for loopColumn in ns.varColumnNameDefault %}
                                 {%- if col.name == loopColumn %}
                                     {%- if col.dataType | upper == 'STRING' %}
                                         '{{ nsZKAdv.columnValueDefault[loop.index0] }}'
@@ -238,7 +238,7 @@ does not permit copying or modification for any other purpose.
                                         {{ nsZKAdv.columnValueDefault[loop.index0] }}
                                     {%- endif %}                              
                                 {%- endif %}						
-                            {%- endfor -%}
+                            {%- endfor %}
                         {%- elif col.isSystemCurrentFlag %}
                             'Y'
                         {%- elif col.isSystemStartDate or col.isSystemEndDate or col.isSystemUpdateDate or col.isSystemCreateDate %}
@@ -284,7 +284,7 @@ does not permit copying or modification for any other purpose.
         {%- endif %}
     {%- endif %}
 
-    {%- if updateStrategy == 'MERGE' -%}
+    {%- if updateStrategy == 'MERGE' %}
         {%- if isSCDType2 %}
             {# SCD-Type2 Dimension == #}
             {{ stage('Load Dimension Table Using Merge(SCD Type2)') }}
@@ -319,14 +319,14 @@ does not permit copying or modification for any other purpose.
                             LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM`
                             ON
 
-                            {%- for col in source.columns if col.isBusinessKey -%}
+                            {%- for col in source.columns if col.isBusinessKey %}
                                 {%- if not loop.first %}
                                     AND
                                 {%- endif %}
                                 {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                             {%- endfor %}
                             WHERE
-                            {%- for col in source.columns if col.isBusinessKey -%}
+                            {%- for col in source.columns if col.isBusinessKey %}
                                 {%- if not loop.first %}
                                     AND
                                 {%- endif %}
@@ -368,14 +368,14 @@ does not permit copying or modification for any other purpose.
                             INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM`
                             ON
 
-                            {%- for col in source.columns if col.isBusinessKey -%}
+                            {%- for col in source.columns if col.isBusinessKey %}
                                 {%- if not loop.first %} AND {%- endif %}
                                 {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                             {%- endfor %}
                             WHERE `DIM`.`{{ get_value_by_column_attribute("isSystemCurrentFlag") }}` = 'Y'
 
                             {%- if config.lastModifiedCompToggle %} 
-                                {%- for col in source.columns if col.name == lastModifiedColumn -%}
+                                {%- for col in source.columns if col.name == lastModifiedColumn %}
                                     AND
                                     {%- if useCurrentTimeStamp %}
                                         COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) > `DIM`.`{{ lastModifiedColumn }}`
@@ -436,14 +436,14 @@ does not permit copying or modification for any other purpose.
                                     `DIM`.`{{ col.name }}`
                                 {%- endif %}
                                 AS `{{ col.name }}`,
-                            {%- endfor -%}
+                            {%- endfor %}
                             'UPDATE_EXPIRED_VERSION_ROWS' AS `DML_OPERATION`
                             {{  get_clause(joinclause,'from')  }}
 
                             INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM`
                             ON
 
-                            {%- for col in source.columns if col.isBusinessKey -%}
+                            {%- for col in source.columns if col.isBusinessKey %}
                                 {%- if not loop.first %}
                                     AND
                                 {%- endif %}
@@ -453,7 +453,7 @@ does not permit copying or modification for any other purpose.
                             WHERE `DIM`.`{{ get_value_by_column_attribute("isSystemCurrentFlag") }}` = 'Y'
 
                             {%- if config.lastModifiedCompToggle %} 
-                                {%- for col in source.columns if col.name == lastModifiedColumn -%}
+                                {%- for col in source.columns if col.name == lastModifiedColumn %}
                                     AND
                                     {%- if useCurrentTimeStamp %}
                                         COALESCE({{ get_source_transform(col) }}, CURRENT_TIMESTAMP()) > `DIM`.`{{ lastModifiedColumn }}`
@@ -513,7 +513,7 @@ does not permit copying or modification for any other purpose.
                                         `DIM`.`{{ col.name }}`
                                     {%- endif %}
                                     AS `{{ col.name }}`,
-                                {%- endfor -%}
+                                {%- endfor %}
 
                                 {%- if config.deleteStrategy == "HARD DELETE" %}
                                     /* Hard delete rows */
@@ -526,7 +526,7 @@ does not permit copying or modification for any other purpose.
                                 {{  get_clause(joinclause,'from')  }}
 
                                 RIGHT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                                {%- for col in source.columns if col.isBusinessKey -%}
+                                {%- for col in source.columns if col.isBusinessKey %}
                                     {%- if not loop.first %}
                                         AND
                                     {%- endif %}
@@ -534,7 +534,7 @@ does not permit copying or modification for any other purpose.
                                 {%- endfor %}
 
                                 WHERE
-                                {%- for col in source.columns if col.isBusinessKey -%}
+                                {%- for col in source.columns if col.isBusinessKey %}
                                     {%- if not loop.first %}
                                         AND
                                     {%- endif %}
@@ -587,11 +587,11 @@ does not permit copying or modification for any other purpose.
                                             {{ get_source_transform(col) }}
                                         {%- endif %}
                                         AS `{{ col.name }}`,
-                                    {%- endfor -%}
+                                    {%- endfor %}
                                         'UPDATE_NON_TYPE2_ROWS' AS `DML_OPERATION`
                                     {{  get_clause(joinclause, 'from')  }}
                                     INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                                    {%- for col in source.columns if col.isBusinessKey -%}
+                                    {%- for col in source.columns if col.isBusinessKey %}
                                         {%- if not loop.first %}
                                             AND
                                         {%- endif %}
@@ -600,7 +600,7 @@ does not permit copying or modification for any other purpose.
                                     WHERE `DIM`.`{{ get_value_by_column_attribute("isSystemCurrentFlag") }}` = 'Y'
                                 AND
                                 (
-                                    {%- for col in source.columns if (col.isChangeTracking) -%}
+                                    {%- for col in source.columns if (col.isChangeTracking) %}
                                         {%- if not loop.first %}
                                             AND
                                         {%- endif %}
@@ -616,7 +616,7 @@ does not permit copying or modification for any other purpose.
                                                                             col.isSystemStartDate or
                                                                             col.isSystemEndDate or
                                                                             col.isSystemUpdateDate or
-                                                                            col.isSystemCreateDate) -%}
+                                                                            col.isSystemCreateDate) %}
                                         {%- if loop.first %}
                                             AND (
                                         {%- endif %}
@@ -654,7 +654,7 @@ does not permit copying or modification for any other purpose.
                 {%- endfor %}
             ) AS `SRC`
             ON
-            {%- for col in columns if col.isBusinessKey -%}
+            {%- for col in columns if col.isBusinessKey %}
                 {%- if not loop.first %}
                     AND
                 {%- endif %}
@@ -687,21 +687,21 @@ does not permit copying or modification for any other purpose.
             {%- for col in columns if not (col.isBusinessKey or col.isSurrogateKey or col.isSystemCreateDate) %}
                 `TGT`.`{{ col.name }}` = `SRC`.`{{ col.name }}`
                 {%- if not loop.last %}, {%- endif %}
-            {%- endfor -%}
+            {%- endfor %}
 
             WHEN NOT MATCHED THEN INSERT
             (
                 {%- for col in columns if not col.isSurrogateKey %}
                     `{{ col.name }}`
                     {%- if not loop.last %}, {%- endif %}
-                {%- endfor -%}
+                {%- endfor %}
             )
             VALUES
             (
                 {%- for col in columns if not col.isSurrogateKey %}
                     `SRC`.`{{ col.name }}`
                     {%- if not loop.last %}, {%- endif %}
-                {%- endfor -%}
+                {%- endfor %}
             )
 
         {# == Merge Load for SCD Type1 == #}
@@ -749,7 +749,7 @@ does not permit copying or modification for any other purpose.
                         {%- if config.lastModifiedCompToggle %}
                             {{  get_clause(source.join, 'from')  }}
                             LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                            {%- for col in source.columns if col.isBusinessKey -%}
+                            {%- for col in source.columns if col.isBusinessKey %}
                                 {%- if not loop.first %}
                                     AND
                                 {%- endif %} {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
@@ -790,19 +790,19 @@ does not permit copying or modification for any other purpose.
                                     `DIM`.`{{ col.name }}`
                                 {%- endif %} AS `{{ col.name }}`
                                 {%- if not loop.last %}, {%- endif %}
-                            {%- endfor -%}
+                            {%- endfor %}
 
                             {{ get_clause(source.join, 'from') }}
 
                             RIGHT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                            {%- for col in source.columns if col.isBusinessKey -%}
+                            {%- for col in source.columns if col.isBusinessKey %}
                                 {%- if not loop.first %}
                                     AND
                                 {%- endif %} {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                             {%- endfor %}
 
                             WHERE
-                            {%- for col in source.columns if col.isBusinessKey -%}
+                            {%- for col in source.columns if col.isBusinessKey %}
                                 {%- if not loop.first %}
                                     AND
                                 {%- endif %} {{ get_source_transform(col) }} IS NULL
@@ -822,7 +822,7 @@ does not permit copying or modification for any other purpose.
                 {%- endfor %}
             ) AS `SRC`
             ON
-            {%- for col in columns if col.isBusinessKey -%}
+            {%- for col in columns if col.isBusinessKey %}
                 {%- if not loop.first %}
                     AND
                 {%- endif %} `SRC`.`{{ col.name }}` = `TGT`.`{{ col.name }}`
@@ -904,14 +904,14 @@ does not permit copying or modification for any other purpose.
                 {%- for col in columns if not col.isSurrogateKey %}
                     `{{ col.name }}`
                     {%- if not loop.last %}, {%- endif %}
-                {%- endfor -%}
+                {%- endfor %}
             )
             VALUES
             (
                 {%- for col in columns if not col.isSurrogateKey %}
                     `SRC`.`{{ col.name }}`
                     {%- if not loop.last %}, {%- endif %}
-                {%- endfor -%}
+                {%- endfor %}
             )
         {%- endif %}
 
@@ -945,14 +945,14 @@ does not permit copying or modification for any other purpose.
                         'INSERT_INITAL_VERSION_ROWS' AS `DML_OPERATION`
                         {{  get_clause(joinclause, 'from')  }}
                         LEFT JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                        {%- for col in source.columns if col.isBusinessKey -%}
+                        {%- for col in source.columns if col.isBusinessKey %}
                             {%- if not loop.first %}
                                 AND
                             {%- endif %} {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                         {%- endfor %}
 
                         WHERE
-                        {%- for col in source.columns if col.isBusinessKey -%}
+                        {%- for col in source.columns if col.isBusinessKey %}
                             {%- if not loop.first %}
                                 AND
                             {%- endif %} `DIM`.`{{ col.name }}` IS NULL
@@ -982,7 +982,7 @@ does not permit copying or modification for any other purpose.
                         {{ get_clause(joinclause, 'from') }}
 
                         INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                        {%- for col in source.columns if col.isBusinessKey -%}
+                        {%- for col in source.columns if col.isBusinessKey %}
                             {%- if not loop.first %}
                                 AND
                             {%- endif %} {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
@@ -1036,13 +1036,13 @@ does not permit copying or modification for any other purpose.
                             {%- else %}
                                 `DIM`.`{{ col.name }}`
                             {%- endif %} AS `{{ col.name }}`,
-                        {%- endfor -%}
+                        {%- endfor %}
 
                         'UPDATE_EXPIRED_VERSION_ROWS' AS `DML_OPERATION`
                         {{ get_clause(joinclause, 'from') }}
 
                         INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                        {%- for col in source.columns if col.isBusinessKey -%}
+                        {%- for col in source.columns if col.isBusinessKey %}
                             {%- if not loop.first %}
                                 AND
                             {%- endif %} {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
@@ -1106,20 +1106,20 @@ does not permit copying or modification for any other purpose.
                                 {%- else %}
                                     {{ get_source_transform(col) }}
                                 {%- endif %} AS `{{ col.name }}`,
-                            {%- endfor -%}
+                            {%- endfor %}
 
                             'UPDATE_NON_TYPE2_ROWS' AS `DML_OPERATION`
                             {{ get_clause(joinclause, 'from') }}
 
                             INNER JOIN {{ ref_no_link(node.location.name, node.name) }} `DIM` ON
-                            {%- for col in source.columns if col.isBusinessKey -%}
+                            {%- for col in source.columns if col.isBusinessKey %}
                                 {%- if not loop.first %}
                                     AND
                                 {%- endif %} {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                             {%- endfor %}
 
                             WHERE `DIM`.`{{ get_value_by_column_attribute("isSystemCurrentFlag") }}` = 'Y'
-                            {%- for col in source.columns if (col.isChangeTracking) -%}
+                            {%- for col in source.columns if (col.isChangeTracking) %}
                                 AND {{ get_source_transform(col) }} = `DIM`.`{{ col.name }}`
                             {%- endfor %}
                             
@@ -1131,7 +1131,7 @@ does not permit copying or modification for any other purpose.
                                                                     col.isSystemStartDate or
                                                                     col.isSystemEndDate or
                                                                     col.isSystemUpdateDate or
-                                                                    col.isSystemCreateDate) -%}
+                                                                    col.isSystemCreateDate) %}
                                 {%- if loop.first %}
                                     AND (
                                 {%- endif %}

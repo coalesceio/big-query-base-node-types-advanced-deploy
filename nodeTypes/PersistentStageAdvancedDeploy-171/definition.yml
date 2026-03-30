@@ -372,6 +372,7 @@ metadata:
       dataType: STRING
       placement: beginning
       attributeName: isSurrogateKey
+      defaultValue: GENERATE_UUID()
 
     - displayName: system_version
       transform: ''
