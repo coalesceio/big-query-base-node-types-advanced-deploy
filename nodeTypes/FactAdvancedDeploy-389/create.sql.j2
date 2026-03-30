@@ -245,6 +245,14 @@ does not permit copying or modification for any other purpose.
                     {%- set defaultValueTest = curCol.defaultValue == desiredDefaultValue %}
                     {%- set descriptionTest = curCol.description == desiredDescription %}
 
+                    {%- if nullableTest == false and curCol.nullable %}
+                        {{ stage('Metadata Updates - Nullable') }}
+                        /* "desiredState"  : {{ desiredNullable }},
+                        "currentState"  : {{ curCol.nullable }} */
+                        -- NOT NULL cannot be applied using ALTER COLUMN; It must be defined at table creation or enforced by recreating the table.
+                        select 1=0
+                    {%- endif %}
+
                     {%- if datatypeTest == false 
                         or (nullableTest == false and desiredNullable)
                         or defaultValueTest == false
