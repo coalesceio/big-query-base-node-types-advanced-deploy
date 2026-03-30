@@ -72,6 +72,13 @@ Before the application can connect, ensure the following are in place:
 
 ---
 
+## General Guidelines
+
+* Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
+* Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
+* Columns that are part of clustering or partitioning cannot be **renamed** directly. If such changes are included, the ALTER statement will fail during deployment.
+* Changes involving the drop and re-creation of table may not reflect accurately when executed in the **coalesce browser**.
+
 ## Base Node Types Advanced Deploy
 
 The Coalesce Base Node Types Package includes:
@@ -157,14 +164,6 @@ You can create the node as:
 |---------|-------------|
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
 | **Pre-SQL / Post-SQL**| SQL to execute before or after the work load operation. |
-
-<img width="585" height="550" alt="image" src="https://github.com/user-attachments/assets/35f3290e-52f1-4669-b758-778a1bb65dfe" />
-
-> [!WARNING]
-> **Destructive Change:** Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
-
-> [!WARNING]
-> **Destructive Change:** Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
 
 ##### Work Advanced Deploy Create as View
 
@@ -326,15 +325,6 @@ You can create the node as:
 |---------|-------------|
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
 | **Pre-SQL / Post-SQL**| SQL to execute before or after the persistent stage load operation. |
-
-<img width="585" height="550" alt="image" src="https://github.com/user-attachments/assets/35f3290e-52f1-4669-b758-778a1bb65dfe" />
-
-> [!WARNING]
-> **Destructive Change:** Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
-
-> [!WARNING]
-> **Destructive Change:** Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
-
 
 #### Persistent Stage Advanced Deploy System Columns
 
@@ -504,14 +494,6 @@ You can create the node as:
 |---------|-------------|
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
 | **Pre-SQL / Post-SQL**| SQL to execute before or after the dimension load operation. |
-
-<img width="688" height="595" alt="image" src="https://github.com/user-attachments/assets/bc2c8a47-6ea9-4fcc-bf74-c7118f0cc24b" />
-
-> [!WARNING]
-> **Destructive Change:** Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
-
-> [!WARNING]
-> **Destructive Change:** Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
 
 ##### Dimension Advanced Deploy Create as View
 
@@ -688,14 +670,6 @@ You can create the node as:
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
 | **Pre-SQL / Post-SQL**| SQL to execute before or after the Fact load operation. |
 
-<img width="688" height="595" alt="image" src="https://github.com/user-attachments/assets/b179b4cf-e2bb-41cf-9875-0fbd297444ca" />
-
-> [!WARNING]
-> **Destructive Change:** Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
-
-> [!WARNING]
-> **Destructive Change:** Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
-
 ##### Fact Advanced Deploy Create as View
 
 | **Setting** | **Description** |
@@ -858,14 +832,6 @@ You can create the node as:
 |---------|-------------|
 | **Enable tests** | Toggle: True/False<br/>Determines if tests are enabled |
 | **Pre-SQL / Post-SQL**| SQL to execute before or after the Fact load operation. |
-
-<img width="585" height="550" alt="image" src="https://github.com/user-attachments/assets/35f3290e-52f1-4669-b758-778a1bb65dfe" />
-
-> [!WARNING]
-> **Destructive Change:** Modifying partitioning settings on a deployed table will cause the table to be **dropped and recreated** during the next deployment.<br/>
-
-> [!WARNING]
-> **Destructive Change:** Similar to partitioning, modifying clustering columns on an existing table will cause the table to be **dropped and recreated**.
 
 #### Factless Fact Advanced Deploy System Columns
 
