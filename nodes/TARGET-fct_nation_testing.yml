@@ -40,7 +40,7 @@ operation:
     truncateBefore: false
   database: ""
   deployEnabled: true
-  description: ""
+  description: table description
   isMultisource: false
   locationName: TARGET
   materializationType: table
@@ -53,7 +53,7 @@ operation:
           stepCounter: 9582b7ba-1988-4154-a2fe-8a7400b8de71
         config: {}
         dataType: INT64
-        description: ""
+        description: column description
         isBusinessKey: true
         name: N_NATIONKEY
         nullable: false
