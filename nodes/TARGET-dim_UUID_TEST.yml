@@ -36,7 +36,7 @@ operation:
       RANGE_BUCKET(N_NATIONKEY, GENERATE_ARRAY(1, 100, 200))
     partByTimeSqlExpression: ""
     partExpireDays: "90"
-    partitionBy: Time-Unit Column
+    partitionBy: Ingestion Time
     partitionByToggle: true
     partitionFilterToggle: false
     postSQL: ""

@@ -21,7 +21,7 @@ operation:
       stepCounter: f6f50bac-1f92-40d0-8820-9db046715df3
     partByIngnTimeExpression: ""
     partByIntSqlExpression: ""
-    partByTimeSqlExpression: ""
+    partByTimeSqlExpression: DATE_TRUNC(last_modified_1, MONTH)
     partExpireDays: ""
     partitionBy: Time-Unit Column
     partitionByToggle: true

@@ -56,7 +56,7 @@ operation:
         description: ""
         isBusinessKey: true
         name: N_NATIONKEY
-        nullable: true
+        nullable: false
         sourceColumnReferences:
           - columnReferences:
               - columnCounter: c576c021-1863-43bb-96f2-a2b494515d09
