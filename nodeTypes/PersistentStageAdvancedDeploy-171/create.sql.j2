@@ -212,7 +212,7 @@ does not permit copying or modification for any other purpose.
                             {%- set ns.attributeColCount = ns.attributeColCount + 1 %}
                         {%- endif %}
 
-                        {%- if nullableTest == false %}
+                        {%- if nullableTest == false and desiredNullable %}
                             {%- if ns.attributeColCount > 1 %} , {%- endif %}
                             ALTER COLUMN `{{ desiredColumnName }}`
                             DROP NOT NULL
