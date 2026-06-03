@@ -114,7 +114,7 @@ This pivotal step ensures that the raw data is processed and structured effectiv
 |----------|-------------|
 | **Storage Location** | Storage Location where the work will be created |
 | **Node Type** | Name of template used to create node objects |
-| **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
+| **Deploy Enabled** | If TRUE the node will be deployed or redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
 
 #### Work Advanced Deploy Options
 
@@ -268,7 +268,7 @@ The Persistent Stage node type has four configuration groups:
 |----------|-------------|
 | **Storage Location** | Storage Location where the persistent stage will be created |
 | **Node Type** | Name of template used to create node objects |
-| **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
+| **Deploy Enabled** | If TRUE the node will be deployed or redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
 
 #### Persistent Stage Advanced Deploy Options
 
@@ -312,7 +312,7 @@ You can create the node as:
 | **Enable SCD Type 2** | Toggle: True/False <br/> **True**: Maintains historical versions of records using system start/end dates and version flags. |
 | **Change Tracking Columns**<br/>(Visible when Last Modified Comparison is OFF) | **Checkbox List**: Provides a list of available target columns to define historical tracking behavior. <br/>- **SCD Type 2 (History):** Any column selected in this list will trigger the creation of a new record version when a change is detected. <br/>- **SCD Type 1 (Overwrite):** Columns that are **not** selected will follow SCD Type 1 logic, meaning changes to these columns will overwrite the existing current record without creating a new version. <br/>- **Default Logic:** If **no columns** are selected, the entire table is treated as **SCD Type 1**. |
 | **Exclude Columns from Merge** | **Toggle**: True/False <br/> Enables the ability to exclude specific columns from the `UPDATE` clause of the **`MERGE INTO`** statement. This is primarily used in **SCD Type 1** scenarios to ensure that certain columns remain unchanged after the initial record creation. <br/> *Note: This option is only available when no Change Tracking columns are selected and Last Modified Comparison is disabled.* |
-| **Exclude Merge List** | **Tabular Input**: A list of columns to be omitted from the update logic. <br/>- **Exclude Column Name**: Select the specific column(s) that should be ignored during the update phase of the merge. These columns will be populated during the initial **INSERT** but never modified during a **MERGE UPDATE**. |
+| **Exclude Merge List** | **Tabular Input**: A list of columns to be omitted from the update logic. <br/>- **Exclude Column Name**: Select the specific columns that should be ignored during the update phase of the merge. These columns will be populated during the initial **INSERT** but never modified during a **MERGE UPDATE**. |
 | **Truncate Before** | Toggle: True/False<br/>**True**: Table is truncated before every load.<br/>**False**: Incremental load based on update strategy. |
 | **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
 | **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
@@ -431,7 +431,7 @@ The Dimension node type has four configuration groups:
 |----------|-------------|
 | **Storage Location** | Storage Location where the Dimension will be created |
 | **Node Type** | Name of template used to create node objects |
-| **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
+| **Deploy Enabled** | If TRUE the node will be deployed or redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
 
 #### Dimension Advanced Deploy Options
 
@@ -476,7 +476,7 @@ You can create the node as:
 | **Enable SCD Type 2** | Toggle: True/False <br/> **True**: Maintains historical versions of records using system start/end dates and version flags. |
 | **Change Tracking Columns**<br/>(Visible when Last Modified Comparison is OFF) | **Checkbox List**: Provides a list of available target columns to define historical tracking behavior. <br/>- **SCD Type 2 (History):** Any column selected in this list will trigger the creation of a new record version when a change is detected. <br/>- **SCD Type 1 (Overwrite):** Columns that are **not** selected will follow SCD Type 1 logic, meaning changes to these columns will overwrite the existing current record without creating a new version. <br/>- **Default Logic:** If **no columns** are selected, the entire table is treated as **SCD Type 1**. |
 | **Exclude Columns from Merge** | **Toggle**: True/False <br/> Enables the ability to exclude specific columns from the `UPDATE` clause of the **`MERGE INTO`** statement. This is primarily used in **SCD Type 1** scenarios to ensure that certain columns remain unchanged after the initial record creation. <br/> *Note: This option is only available when no Change Tracking columns are selected and Last Modified Comparison is disabled.* |
-| **Exclude Merge List** | **Tabular Input**: A list of columns to be omitted from the update logic. <br/>- **Exclude Column Name**: Select the specific column(s) that should be ignored during the update phase of the merge. These columns will be populated during the initial **INSERT** but never modified during a **MERGE UPDATE**. |
+| **Exclude Merge List** | **Tabular Input**: A list of columns to be omitted from the update logic. <br/>- **Exclude Column Name**: Select the specific columns that should be ignored during the update phase of the merge. These columns will be populated during the initial **INSERT** but never modified during a **MERGE UPDATE**. |
 | **Insert Zero Key** | Toggle: True/False <br/> Automatically inserts a placeholder record (e.g., ID 0, "UNKNOWN") to handle null foreign keys in fact tables. |
 | **Default Surrogate Key Value** | The numeric or string value to be assigned to the Surrogate Key column for the zero key record. <br/>**Default**: `0` |
 | **Default String Value** | The default value used for all string/text columns in the zero key record. <br/>**Default**: `UNKNOWN` |
@@ -616,7 +616,7 @@ The Fact node type has four configuration groups:
 |----------|-------------|
 | **Storage Location** | Storage Location where the Fact will be created |
 | **Node Type** | Name of template used to create node objects |
-| **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
+| **Deploy Enabled** | If TRUE the node will be deployed or redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
 
 #### Fact Advanced Deploy Options
 
@@ -659,7 +659,7 @@ You can create the node as:
 | **Treat NULL as Current Timestamp**(For TIMESTAMP Columns) | **Toggle**: True/False <br/>- **True**: Source records with a `NULL` value in the comparison column are assigned the current system timestamp. This ensures that records with missing modification metadata are treated as "new" and are updated in the target table. <br/>- **False**: `NULL` values are handled per standard SQL comparison rules, which may result in these records being ignored during incremental loads. *Available only when atleast one Business Key is chosen*|
 | **Enable SCD Type 2** | Toggle: True/False <br/> **True**: Maintains historical versions of records using system start/end dates and version flags. <br/>*Available only when atleast one Business Key is chosen*|
 | **Exclude Columns from Merge** | **Toggle**: True/False <br/> Enables the ability to exclude specific columns from the `UPDATE` clause of the **`MERGE INTO`** statement. This is primarily used in **SCD Type 1** scenarios to ensure that certain columns remain unchanged after the initial record creation. <br/>*Available only when atleast one Business Key is chosen*|
-| **Exclude Merge List** | **Tabular Input**: A list of columns to be omitted from the update logic. <br/>- **Exclude Column Name**: Select the specific column(s) that should be ignored during the update phase of the merge. These columns will be populated during the initial **INSERT** but never modified during a **MERGE UPDATE**. <br/>*Available only when atleast one Business Key is chosen* |
+| **Exclude Merge List** | **Tabular Input**: A list of columns to be omitted from the update logic. <br/>- **Exclude Column Name**: Select the specific columns that should be ignored during the update phase of the merge. These columns will be populated during the initial **INSERT** but never modified during a **MERGE UPDATE**. <br/>*Available only when atleast one Business Key is chosen* |
 | **Truncate Before** | Toggle: True/False<br/>**True**: Table is truncated before every load.<br/>**False**: Incremental load based on update strategy. |
 | **Distinct** | Toggle: True/False<br/>**True**: Applies a DISTINCT clause to the data. |
 | **Group By All** | Toggle: True/False<br/>**True**: Applies a GROUP BY ALL clause on columns. |
@@ -784,7 +784,7 @@ The Factless Fact node type has four configuration groups:
 |----------|-------------|
 | **Storage Location** | Storage Location where the Fact will be created |
 | **Node Type** | Name of template used to create node objects |
-| **Deploy Enabled** | If TRUE the node will be deployed / redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
+| **Deploy Enabled** | If TRUE the node will be deployed or redeployed when changes are detected<br/> If FALSE the node will not be deployed or will be dropped during redeployment |
 
 #### Factless Fact Advanced Deploy Options
 
