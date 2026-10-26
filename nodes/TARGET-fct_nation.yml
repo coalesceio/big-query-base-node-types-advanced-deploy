@@ -1,5 +1,5 @@
 fileVersion: 1
-id: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+id: 81959c35-e3e3-44e4-9668-695b07185dbb
 name: fct_nation
 operation:
   config:
@@ -32,16 +32,16 @@ operation:
       items:
         - {}
     primaryToggle: false
-    selectDistinct: true
-    tabExpirationToggle: true
-    tabExprnExpression: "80"
+    selectDistinct: false
+    tabExpirationToggle: false
+    tabExprnExpression: ""
     testsEnabled: false
     treatNullAsCurrentTimestamp: false
     truncateBefore: false
   database: ""
   deployEnabled: true
   description: ""
-  isMultisource: true
+  isMultisource: false
   locationName: TARGET
   materializationType: table
   metadata:
@@ -49,8 +49,8 @@ operation:
     columns:
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 65620bfc-4650-498b-a607-59a5e9299475
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: c828ae0f-cfa2-47b7-8897-35e5cb5608af
+          stepCounter: 81959c35-e3e3-44e4-9668-695b07185dbb
         config: {}
         dataType: INT64
         description: ""
@@ -63,8 +63,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: bbe02358-0df6-430f-b726-0bdc8f17415e
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: 2dee0ba3-500d-4aed-bc43-62c9cacbc8f8
+          stepCounter: 81959c35-e3e3-44e4-9668-695b07185dbb
         config: {}
         dataType: STRING
         description: ""
@@ -77,8 +77,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: 3a6a78ee-a2c3-4eeb-b199-53d5cee17df7
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: 8c53bb2c-bcf7-45b3-80a6-09351540d276
+          stepCounter: 81959c35-e3e3-44e4-9668-695b07185dbb
         config: {}
         dataType: INT64
         description: ""
@@ -91,8 +91,8 @@ operation:
             transform: ""
       - appliedColumnTests: {}
         columnReference:
-          columnCounter: c46cf078-a9e3-4350-ae17-07062bf998d1
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: ad88efd8-5ca2-484c-bb38-eb1db5c30f3c
+          stepCounter: 81959c35-e3e3-44e4-9668-695b07185dbb
         config: {}
         dataType: STRING
         description: ""
@@ -108,8 +108,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: b6240219-a4dd-40d5-a914-c7d25885ec3f
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: dbf570fd-acee-40e5-8bca-933b1e07d981
+          stepCounter: 81959c35-e3e3-44e4-9668-695b07185dbb
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -125,8 +125,8 @@ operation:
           values: []
         appliedColumnTests: {}
         columnReference:
-          columnCounter: e4ee6dbd-94e3-47fb-ae94-0bb57699f46c
-          stepCounter: b9ad32b1-6e88-4e4f-80a1-3c6276b71a4e
+          columnCounter: dce060d5-b0e0-4498-ba97-e56aca5de9fe
+          stepCounter: 81959c35-e3e3-44e4-9668-695b07185dbb
         config: {}
         dataType: TIMESTAMP
         defaultValue: ""
@@ -143,16 +143,7 @@ operation:
       - aliases:
           nation: efd785c7-064a-4b57-ad3a-9e21e8e680af
         customSQL:
-          customSQL: |-
-            {{ stage('Override Create SQL') }}
-            	CREATE OR REPLACE VIEW {{ ref('TARGET', 'fct_nation')}} AS (
-            		SELECT 
-             `N_NATIONKEY` AS `N_NATIONKEY`,
-             `N_NAME` AS `N_NAME`,
-             `N_REGIONKEY` AS `N_REGIONKEY`,
-             `N_COMMENT` AS `N_COMMENT`
-             FROM {{ ref('SRC', 'nation') }}
-            	)
+          customSQL: ""
         dependencies:
           - locationName: SRC
             nodeName: nation
