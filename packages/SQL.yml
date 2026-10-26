@@ -1,0 +1,19 @@
+config:
+  entities:
+    nodeTypes:
+      SQLDimension:
+        defaultStorageLocation: null
+        isDisabled: false
+      SQLFact:
+        defaultStorageLocation: null
+        isDisabled: false
+      SQLWork:
+        defaultStorageLocation: null
+        isDisabled: false
+  packageVariables: ""
+fileVersion: 1
+id: "@coalesce/bigquery/bigquery-base-node-types-sql"
+name: SQL
+packageID: "@coalesce/bigquery/bigquery-base-node-types-sql"
+releaseID: 911ddce0-e4d7-433e-9a7e-a7488473139b
+type: Package
