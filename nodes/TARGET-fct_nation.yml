@@ -28,10 +28,6 @@ operation:
     partitionFilterToggle: false
     postSQL: ""
     preSQL: ""
-    primaryKeyConfig:
-      items:
-        - {}
-    primaryToggle: false
     selectDistinct: false
     tabExpirationToggle: false
     tabExprnExpression: ""
